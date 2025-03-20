@@ -1,0 +1,40 @@
+"print new line 
+"
+"string with 2 slashes and double quote\""
+Not recognised expression: "
+Found ID string
+Found ID with
+Found ID ASCII
+Found ID enter
+Not recognised expression: "
+Not recognised expression: "
+Found ID Illegal
+Found ID escape
+Found ID char
+Found PUNCTUATION (
+Not recognised expression: \
+Not recognised expression: \
+Found ID m
+Found PUNCTUATION )
+Not recognised expression: \
+Found ID m
+Not recognised expression: "
+Not recognised expression: "
+Found ID Illegal
+Found ID string
+Found PUNCTUATION (
+Found ID without
+Found ID final
+Found ID double
+Found ID quote
+Found PUNCTUATION )
+Found ID with
+Found INTCONST 2
+Found ID slashes
+Found KEYWORD and
+Found ID double
+Found ID quota
+Not recognised expression: \
+Not recognised expression: \
+Not recognised expression: \
+Not recognised expression: "
