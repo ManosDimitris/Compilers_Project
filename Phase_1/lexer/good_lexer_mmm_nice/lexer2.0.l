@@ -93,7 +93,7 @@ INVALID_STRING  \"([^\"\\\n]|\\.)*
                         }
                         if(nested != 0){
                             if(c == '/'){
-                                if(c = cin.get() == '*'){
+                                if((c = cin.get()) == '*'){
                                     nested++;
                                     temp_node = new CommentNode;
                                     temp_node->comment_content += "/*";
@@ -102,7 +102,7 @@ INVALID_STRING  \"([^\"\\\n]|\\.)*
                                 else cin.putback(c);
                             }
                             else if(c == '*'){
-                                if(c = cin.get() == '/'){
+                                if((c = cin.get()) == '/'){
                                     nested--;
                                     curr_Node->comment_content += "/";
                                 }

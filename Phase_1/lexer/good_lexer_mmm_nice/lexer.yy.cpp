@@ -798,7 +798,7 @@ YY_RULE_SETUP
                         }
                         if(nested != 0){
                             if(c == '/'){
-                                if(c = cin.get() == '*'){
+                                if((c = cin.get()) == '*'){
                                     nested++;
                                     temp_node = new CommentNode;
                                     temp_node->comment_content += "/*";
@@ -807,7 +807,7 @@ YY_RULE_SETUP
                                 else cin.putback(c);
                             }
                             else if(c == '*'){
-                                if(c = cin.get() == '/'){
+                                if((c = cin.get()) == '/'){
                                     nested--;
                                     curr_Node->comment_content += "/";
                                 }
