@@ -1,6 +1,6 @@
-#line 2 "lexer.yy.cpp"
+#line 1 "lexer.yy.cpp"
 
-#line 4 "lexer.yy.cpp"
+#line 3 "lexer.yy.cpp"
 
 #define  YY_INT_ALIGNED short int
 
@@ -486,14 +486,22 @@ static const flex_int32_t yy_rule_can_match_eol[14] =
 #line 2 "lexer2.0.l"
     #include<iostream>
     #include<string>
-    #include<list>
+    #include<vector>
     #include <unordered_map>
     using namespace std;
 
     string string_buff;
 
-#line 496 "lexer.yy.cpp"
-#line 497 "lexer.yy.cpp"
+    struct CommentNode{
+        string comment_content = "";
+        vector<CommentNode *> children;  
+    };
+
+    CommentNode *rootNode;
+
+    void printTree(CommentNode *Node, int depth);
+#line 503 "lexer.yy.cpp"
+#line 504 "lexer.yy.cpp"
 
 #define INITIAL 0
 
@@ -625,10 +633,10 @@ YY_DECL
 		}
 
 	{
-#line 31 "lexer2.0.l"
+#line 39 "lexer2.0.l"
 
 
-#line 632 "lexer.yy.cpp"
+#line 639 "lexer.yy.cpp"
 
 	while ( /*CONSTCOND*/1 )		/* loops until end-of-file is reached */
 		{
@@ -697,33 +705,33 @@ do_action:	/* This label is used only to access EOF actions. */
 
 case 1:
 YY_RULE_SETUP
-#line 33 "lexer2.0.l"
+#line 41 "lexer2.0.l"
 {cout << "Found KEYWORD: " << yytext << endl;}
 	YY_BREAK
 case 2:
 YY_RULE_SETUP
-#line 34 "lexer2.0.l"
+#line 42 "lexer2.0.l"
 {cout << "Found OPERATOR: " << yytext << endl;}
 	YY_BREAK
 case 3:
 YY_RULE_SETUP
-#line 35 "lexer2.0.l"
+#line 43 "lexer2.0.l"
 {cout << "Found INTCONST: " << yytext << endl;}
 	YY_BREAK
 case 4:
 YY_RULE_SETUP
-#line 36 "lexer2.0.l"
+#line 44 "lexer2.0.l"
 {cout << "Found REAL: " << yytext << endl;}
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
-#line 37 "lexer2.0.l"
+#line 45 "lexer2.0.l"
 {cout << "Invalid STRING: " << yytext << endl;}
 	YY_BREAK
 case 6:
 /* rule 6 can match eol */
 YY_RULE_SETUP
-#line 38 "lexer2.0.l"
+#line 46 "lexer2.0.l"
 {string_buff = yytext;
               unordered_map<char, string> escape_map = {
                 {'n', "\n"},
@@ -758,41 +766,81 @@ YY_RULE_SETUP
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
-#line 69 "lexer2.0.l"
+#line 77 "lexer2.0.l"
 {cout << "Found PUNCTUATION: " << yytext << endl;}
 	YY_BREAK
 case 8:
 YY_RULE_SETUP
-#line 70 "lexer2.0.l"
+#line 78 "lexer2.0.l"
 {cout << "Found ID: " << yytext << endl;}
 	YY_BREAK
 case 9:
 YY_RULE_SETUP
-#line 71 "lexer2.0.l"
-{cout << "Found COMMENT1: " << yytext << endl;}
+#line 79 "lexer2.0.l"
+{cout << "Found LINE_COMMENT: " << yytext << endl;}
 	YY_BREAK
 case 10:
 YY_RULE_SETUP
-#line 72 "lexer2.0.l"
-{cout << "Found COMMENT2: " << yytext << endl;}
+#line 80 "lexer2.0.l"
+{
+                    int c;
+                    int nested = 1;
+                    CommentNode *curr_Node, *temp_node, *root = new CommentNode;
+
+                    curr_Node = root;
+                    curr_Node->comment_content += "/*";
+
+                    while((c = cin.get()) != EOF){
+                        curr_Node = root;
+                        for(int i = 0; i < nested; i++){
+                            curr_Node->comment_content += (char)c;
+                            if(i < nested -1 && curr_Node->children.size() > 0) curr_Node = curr_Node->children.back();
+                        }
+                        if(nested != 0){
+                            if(c == '/'){
+                                if(c = cin.get() == '*'){
+                                    nested++;
+                                    temp_node = new CommentNode;
+                                    temp_node->comment_content += "/*";
+                                    curr_Node->children.push_back(temp_node);
+                                }
+                                else cin.putback(c);
+                            }
+                            else if(c == '*'){
+                                if(c = cin.get() == '/'){
+                                    nested--;
+                                    curr_Node->comment_content += "/";
+                                }
+                                else cin.putback(c);
+                            }
+                        }
+                        else break;
+                    }
+                    if(c == EOF) cout << "Comment not terminated before end of file" << endl;
+                    else{
+                        rootNode = root;
+                        cout << "New comment found " << endl;
+                        printTree(rootNode, 0);
+                    }
+            }
 	YY_BREAK
 case 11:
 /* rule 11 can match eol */
 YY_RULE_SETUP
-#line 73 "lexer2.0.l"
+#line 122 "lexer2.0.l"
 {}
 	YY_BREAK
 case 12:
 YY_RULE_SETUP
-#line 76 "lexer2.0.l"
+#line 125 "lexer2.0.l"
 { cout << "Not recognised expression: " << yytext << endl; }
 	YY_BREAK
 case 13:
 YY_RULE_SETUP
-#line 78 "lexer2.0.l"
+#line 127 "lexer2.0.l"
 ECHO;
 	YY_BREAK
-#line 796 "lexer.yy.cpp"
+#line 843 "lexer.yy.cpp"
 case YY_STATE_EOF(INITIAL):
 	yyterminate();
 
@@ -1764,7 +1812,7 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 78 "lexer2.0.l"
+#line 127 "lexer2.0.l"
 
 
 int main(){
@@ -1772,4 +1820,13 @@ int main(){
     while (lexer.yylex() != 0);
     return 0;
 }
+
+ void printTree(CommentNode *Node, int depth){
+    cout << "Level " << depth << ": " << Node->comment_content << endl;
+    //cout << "level " << depth << " has " << Node->children.size() << " nodes" << endl;
+    for(CommentNode *child : Node->children){
+        printTree(child, depth + 1);
+    }
+
+ }
 
