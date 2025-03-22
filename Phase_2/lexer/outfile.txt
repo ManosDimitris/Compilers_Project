@@ -1,0 +1,166 @@
+New comment found 
+Level 0: /* /nested comments1 * */
+Level 1: /*nested comments1 */
+New comment found 
+Level 0: /* /nested comments2 * */
+Level 1: /*nested comments2 */
+New comment found 
+Level 0: /* /nested /some more nested comments* comments /nested comments3 * * /nested comments3 * */
+Level 1: /*nested /some more nested comments* comments /nested comments3 * */
+Level 2: /*some more nested comments*/
+Level 2: /*nested comments3 */
+Level 1: /*nested comments3 */
+Found ID: string
+Found OPERATOR: =
+Found STRING: "tralala
+	"
+Found PUNCTUATION: ;
+Found ID: quoteInString
+Found OPERATOR: =
+Found STRING: ""foo"-"bar""
+Found ID: commentsInString
+Found OPERATOR: =
+Found STRING: "/*(**)/**/lala/ / ///****"
+Found PUNCTUATION: ;
+Found ID: function
+New comment found 
+Level 0: /*some comment*/
+Found ID: foo
+Found PUNCTUATION: (
+Found PUNCTUATION: )
+Found PUNCTUATION: {
+Not recognised expression: 	
+Found ID: print
+Found PUNCTUATION: (
+Found PUNCTUATION: ::
+Found ID: string
+Found PUNCTUATION: )
+Found PUNCTUATION: ;
+Not recognised expression: 	
+Found ID: print
+Found PUNCTUATION: (
+Found INTCONST: 1
+Found OPERATOR: +
+Found INTCONST: 2
+Found OPERATOR: *
+Found INTCONST: 3
+Found OPERATOR: /
+Found INTCONST: 4
+Found OPERATOR: %
+Found INTCONST: 5
+Found PUNCTUATION: )
+Found PUNCTUATION: ;
+Not recognised expression: 	
+Found KEYWORD: local
+Found ID: y
+Found OPERATOR: =
+Found REAL: 123.456
+Found PUNCTUATION: ;
+Not recognised expression: 	
+Found KEYWORD: for
+Found PUNCTUATION: (
+Found KEYWORD: local
+New comment found 
+Level 0: /*another comment here*/
+Found ID: i
+Found OPERATOR: =
+Found INTCONST: 0
+Found PUNCTUATION: ;
+Found ID: i
+Found OPERATOR: <
+Found INTCONST: 10
+Found PUNCTUATION: ;
+Found OPERATOR: ++
+Found ID: i
+Found PUNCTUATION: )
+Found PUNCTUATION: {
+Not recognised expression: 	
+Not recognised expression: 	
+Found KEYWORD: if
+Found PUNCTUATION: (
+Found PUNCTUATION: ::
+Found ID: string
+Found OPERATOR: ==
+Found ID: quoteInString
+Found PUNCTUATION: )
+Not recognised expression: 	
+Not recognised expression: 	
+Not recognised expression: 	
+Found ID: y
+Found OPERATOR: +
+Found OPERATOR: =
+Found REAL: 5.4
+Found PUNCTUATION: ;
+Not recognised expression: 	
+Not recognised expression: 	
+Found KEYWORD: else
+Found KEYWORD: if
+Found PUNCTUATION: (
+Found ID: y
+Found OPERATOR: >
+Found INTCONST: 1000
+Found PUNCTUATION: )
+Not recognised expression: 	
+Not recognised expression: 	
+Not recognised expression: 	
+Found KEYWORD: break
+Found PUNCTUATION: ;
+Not recognised expression: 	
+Not recognised expression: 	
+Found KEYWORD: local
+Found ID: t_a_b_l_e
+Found OPERATOR: =
+Found PUNCTUATION: [
+Found INTCONST: 1
+Found PUNCTUATION: ,
+Found INTCONST: 2
+Found PUNCTUATION: ,
+Found INTCONST: 3
+Found PUNCTUATION: ]
+Found PUNCTUATION: ;
+Not recognised expression: 	
+Not recognised expression: 	
+Found KEYWORD: if
+Found PUNCTUATION: (
+Found ID: t_a_b_l_e
+Found PUNCTUATION: )
+Not recognised expression: 	
+Not recognised expression: 	
+Not recognised expression: 	
+Found KEYWORD: continue
+Found PUNCTUATION: ;
+Not recognised expression: 	
+Not recognised expression: 	
+Found KEYWORD: else
+Not recognised expression: 	
+Not recognised expression: 	
+Not recognised expression: 	
+Found KEYWORD: return
+Found ID: t_a_b_l_e
+Found PUNCTUATION: ..
+Found ID: f
+Found PUNCTUATION: (
+Found INTCONST: 5
+Found PUNCTUATION: )
+Found PUNCTUATION: ;
+Found LINE_COMMENT: // line comment1
+Found LINE_COMMENT: // line comment2
+Not recognised expression: 	
+Found PUNCTUATION: }
+Found PUNCTUATION: }
+Found LINE_COMMENT: //This is a valid line comment /* /* 
+New comment found 
+Level 0: /* This is a valid comment
+	/
+// and this is not a line comment
+// so the following closes the previous opening comment
+// *  and the same for this
+	/
+	*
+*/
+Level 1: /*
+// and this is not a line comment
+// so the following closes the previous opening comment
+// */
+Level 1: /*
+	*/
