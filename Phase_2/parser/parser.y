@@ -8,7 +8,8 @@
 
 
 
-%left ADD, SUB /* + - */
+%left ADD /* + */
 %left MUL,DIV /* * / */ 
 %right /* ++ */ 
 %right /* -- */
+%nonassoc EQ,DIF /* == != */
