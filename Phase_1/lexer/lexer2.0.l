@@ -7,13 +7,14 @@
 
     string string_buff;
 
-    struct BlockCommentContent{
-        string comment_content;
-        bool isNested;
+    struct CommentNode{
+        string comment_content = "";
+        vector<CommentNode *> children;  
     };
 
-    vector<BlockCommentContent *> comment_buffers;
+    CommentNode *rootNode;
 
+    void printTree(CommentNode *Node, int depth);
 %}
 
 %option noyywrap
@@ -31,7 +32,7 @@ ID             [a-zA-Z][a-zA-Z_0-9]*
 LINE_COMMENT       "//".*
 BLOCK_COMMENT       "/*"
 WHITESPACE     (" "|"\n")
-INVALID_STRING  \"([^\"\\\n]|\\.)* 
+INVALID_STRING  \"([^\"\\\n]|\\.)*
 
 
 
@@ -77,8 +78,46 @@ INVALID_STRING  \"([^\"\\\n]|\\.)*
 {ID}   {cout << "Found ID: " << yytext << endl;}
 {LINE_COMMENT}   {cout << "Found LINE_COMMENT: " << yytext << endl;}
 {BLOCK_COMMENT}   {
-                    
-                 }
+                    int c;
+                    int nested = 1;
+                    CommentNode *curr_Node, *temp_node, *root = new CommentNode;
+
+                    curr_Node = root;
+                    curr_Node->comment_content += "/*";
+
+                    while((c = cin.get()) != EOF){
+                        curr_Node = root;
+                        for(int i = 0; i < nested; i++){
+                            curr_Node->comment_content += (char)c;
+                            if(i < nested -1 && curr_Node->children.size() > 0) curr_Node = curr_Node->children.back();
+                        }
+                        if(nested != 0){
+                            if(c == '/'){
+                                if((c = cin.get()) == '*'){
+                                    nested++;
+                                    temp_node = new CommentNode;
+                                    temp_node->comment_content += "/*";
+                                    curr_Node->children.push_back(temp_node);
+                                }
+                                else cin.putback(c);
+                            }
+                            else if(c == '*'){
+                                if((c = cin.get()) == '/'){
+                                    nested--;
+                                    curr_Node->comment_content += "/";
+                                }
+                                else cin.putback(c);
+                            }
+                        }
+                        else break;
+                    }
+                    if(c == EOF) cout << "Comment not terminated before end of file" << endl;
+                    else{
+                        rootNode = root;
+                        cout << "New comment found " << endl;
+                        printTree(rootNode, 0);
+                    }
+            }
 
 {WHITESPACE}   {}
 
@@ -93,4 +132,11 @@ int main(){
     return 0;
 }
 
+ void printTree(CommentNode *Node, int depth){
+    cout << "Level " << depth << ": " << Node->comment_content << endl;
+    //cout << "level " << depth << " has " << Node->children.size() << " nodes" << endl;
+    for(CommentNode *child : Node->children){
+        printTree(child, depth + 1);
+    }
 
+ }
