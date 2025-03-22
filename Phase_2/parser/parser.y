@@ -1,5 +1,15 @@
 %{
     #include <stdio.h>
 
-    int yyerror(char *)
+    void yyerror(char *errormeseage){
+        cerr << "Error: " << errormeseage << endl;
+    }
 %}
+
+
+
+%left '+'
+%left '*' 
+%left '/'
+%right "++" 
+%right "--"
