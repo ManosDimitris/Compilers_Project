@@ -8,8 +8,7 @@
 
 
 
-%left '+'
-%left '*' 
-%left '/'
-%right "++" 
-%right "--"
+%left ADD, SUB /* + - */
+%left MUL,DIV /* * / */ 
+%right /* ++ */ 
+%right /* -- */
