@@ -6,10 +6,12 @@
     }
 %}
 
+%token KEYWORD
+%token OPERATOR
+%token REAL
+%token STRING
+%token PUNCTUATION
+%token ID
 
+%%
 
-%left ADD /* + */
-%left MUL,DIV /* * / */ 
-%right /* ++ */ 
-%right /* -- */
-%nonassoc EQ,DIF /* == != */

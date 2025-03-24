@@ -7,20 +7,6 @@
     
     using namespace std;
 
-    enum Expression{
-        KEYWORD,
-        OPERATOR,
-        INTCONST, 
-        REAL, 
-        STRING,
-        INVALID_STRING, 
-        PUNCTUATION, 
-        ID, 
-        LINE_COMMENT, 
-        BLOCK_COMMENT,
-        BAD_BLOCK_COMMENT
-    };
-
     string string_buff;
 
     struct CommentNode{
@@ -74,7 +60,8 @@ INVALID_STRING  \"([^\"\\\n]|\\.)*
             };
 
             if (string_buff.find("\n") != string::npos) {
-                return INVALID_STRING;
+                cout << "Error at line " << yylineno << ": string cannot contain an enter character" << endl;
+                exit(1);
             }else{   
                 int index = 0;
                 while((index = string_buff.find("\\", index)) != string::npos){
@@ -83,7 +70,8 @@ INVALID_STRING  \"([^\"\\\n]|\\.)*
                     {
                         string_buff.replace(index,2,escape_map[next_index]);
                     }else{
-                        return INVALID_STRING;
+                        cout << "Error at line " << yylineno << ": unterminated string" << endl;
+                        exit(1);
                     }
                     index += escape_map[next_index].length();
                 }
@@ -92,7 +80,7 @@ INVALID_STRING  \"([^\"\\\n]|\\.)*
         }
 {PUNCTUATION}   { return PUNCTUATION; }
 {ID}   { return ID; }
-{LINE_COMMENT}   { return LINE_COMMENT; }
+{LINE_COMMENT}   { /* Not returning anything since parser only eats up comments */ }
 {BLOCK_COMMENT}   {
                     int c;
                     int nested = 1;
@@ -124,13 +112,16 @@ INVALID_STRING  \"([^\"\\\n]|\\.)*
                                 }
                                 else cin.putback(c);
                             }
+                            else if(c == '\n') ++yylineno;
                         }
                         else break;
                     }
-                    if(c == EOF) return BAD_BLOCK_COMMENT;
+                    if(c == EOF){
+                        cout << "Error at line " << yylineno << ": Unterminated comment" << endl;
+                        exit(1);
+                    }
                     else{
                         rootNode = root;
-                        return BLOCK_COMMENT;
                     }
             }
 
