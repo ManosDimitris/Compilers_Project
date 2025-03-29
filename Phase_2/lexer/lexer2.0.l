@@ -3,7 +3,7 @@
     #include<string>
     #include<vector>
     #include <unordered_map>
-    #include "parser.h"
+    #include "parser.hpp"
     
     using namespace std;
 
@@ -40,11 +40,11 @@ INVALID_STRING  \"([^\"\\\n]|\\.)*
 
 %%
 
-{KEYWORD}   { return KEYWORD; }
-{OPERATOR}   { return OPERATOR; }
-{INTCONST}   { return INTCONST; }
-{REAL}   { return REAL; }
-{INVALID_STRING} { return INVALID_STRING; }
+{KEYWORD}   { yyval.as<string *> = new string(yytext); return KEYWORD; }
+{OPERATOR}   { yyval.as<string *> = new string(yytext); return OPERATOR; }
+{INTCONST}   { yyval.as<int> = stoi(yytext); return INTCONST; }
+{REAL}   { yyval.as<double> = stod(yytext); return REAL; }
+{INVALID_STRING} { cout << "Invalid String" << endl; exit(1); }
 {STRING}   {string_buff = yytext;
               unordered_map<char, string> escape_map = {
                 {'n', "\n"},
@@ -75,11 +75,12 @@ INVALID_STRING  \"([^\"\\\n]|\\.)*
                     }
                     index += escape_map[next_index].length();
                 }
+                yyval.as<string *> = new string(yytext);
                 return STRING;
             }
         }
-{PUNCTUATION}   { return PUNCTUATION; }
-{ID}   { return ID; }
+{PUNCTUATION}   { yyval.as<string *> = new string(yytext); return PUNCTUATION; }
+{ID}   { yyval.as<string *> = new string(yytext); return ID; }
 {LINE_COMMENT}   { /* Not returning anything since parser only eats up comments */ }
 {BLOCK_COMMENT}   {
                     int c;
