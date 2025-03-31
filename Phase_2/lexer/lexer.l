@@ -7,8 +7,10 @@
     
     using namespace std;
 
-    string string_buff;
+    int yylineno = 0;
 
+    string string_buff;
+    
     struct CommentNode{
         string comment_content = "";
         vector<CommentNode *> children;  
@@ -24,7 +26,7 @@
 %option c++
 
 
-KEYWORD        (if|else|while|for|return|break|continue|and|not|or|local|true|false|nil)
+KEYWORD        (if|else|while|for|return|break|continue|and|not|or|local|true|false|nil|function)
 OPERATOR       (=|\+|\-|\*|\/|%|==|!=|\+\+|\-\-|>|<|>=|<=)
 INTCONST        (0[xX][0-9A-Fa-f]+)|([0-9]+)
 REAL           [0-9]*\.[0-9]*
@@ -38,8 +40,9 @@ INVALID_STRING  \"([^\"\\\n]|\\.)*
 
 
 
-%%
 
+%%
+\n        {yylineno++;}
 {KEYWORD}   { yyval.as<string *> = new string(yytext); return KEYWORD; }
 {OPERATOR}   { yyval.as<string *> = new string(yytext); return OPERATOR; }
 {INTCONST}   { yyval.as<int> = stoi(yytext); return INTCONST; }
