@@ -43,10 +43,10 @@ INVALID_STRING  \"([^\"\\\n]|\\.)*
 
 %%
 \n        {yylineno++;}
-{KEYWORD}   { yyval.as<string *> = new string(yytext); return KEYWORD; }
-{OPERATOR}   { yyval.as<string *> = new string(yytext); return OPERATOR; }
-{INTCONST}   { yyval.as<int> = stoi(yytext); return INTCONST; }
-{REAL}   { yyval.as<double> = stod(yytext); return REAL; }
+{KEYWORD}   { yylval.as<string *> = new string(yytext); return KEYWORD; }
+{OPERATOR}   { yylval.as<string *> = new string(yytext); return OPERATOR; }
+{INTCONST}   { yylval.as<int> = stoi(yytext); return INTCONST; }
+{REAL}   { yylval.as<double> = stod(yytext); return REAL; }
 {INVALID_STRING} { cout << "Invalid String" << endl; exit(1); }
 {STRING}   {string_buff = yytext;
               unordered_map<char, string> escape_map = {
@@ -78,12 +78,12 @@ INVALID_STRING  \"([^\"\\\n]|\\.)*
                     }
                     index += escape_map[next_index].length();
                 }
-                yyval.as<string *> = new string(yytext);
+                yylval.as<string *> = new string(yytext);
                 return STRING;
             }
         }
-{PUNCTUATION}   { yyval.as<string *> = new string(yytext); return PUNCTUATION; }
-{ID}   { yyval.as<string *> = new string(yytext); return ID; }
+{PUNCTUATION}   { yylval.as<string *> = new string(yytext); return PUNCTUATION; }
+{ID}   { yylval.as<string *> = new string(yytext); return ID; }
 {LINE_COMMENT}   { /* Not returning anything since parser only eats up comments */ }
 {BLOCK_COMMENT}   {
                     int c;

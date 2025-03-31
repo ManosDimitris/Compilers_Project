@@ -1,9 +1,13 @@
+%language "c++"
 %define api.value.type variant
 %{
     #include <iostream>
     #include <string>
     #include <cstring>
     #include<vector>
+
+    #include "parser.hpp"
+
     using namespace std;
 
     int yyerror(char *yaccProvidedMessage);
@@ -15,13 +19,21 @@
 
 %}
 
-%token <string *> KEYWORD
-%token <string *> OPERATOR
-%token <int> INTCONST
-%token <double> REAL
-%token <string *> STRING
-%token <string *> PUNCTUATION
-%token <string *> ID
+%token KEYWORD
+%token OPERATOR
+%token INTCONST
+%token REAL
+%token STRING
+%token PUNCTUATION
+%token ID
+
+%type <string *> KEYWORD
+%type <string *> OPERATOR
+%type <int> INTCONST
+%type <double> REAL
+%type <string *> STRING
+%type <string *> PUNCTUATION
+%type <string *> ID
 
 %start program
 
@@ -239,7 +251,7 @@ whilestmt: KEYWORD PUNCTUATION expr PUNCTUATION stmt {
     }
 ;
 
-forstmt: KEYWORD PUNCTUATION elist PUNCTUATION expr PUNCTUATION elist PUNCTUATION stmt{]
+forstmt: KEYWORD PUNCTUATION elist PUNCTUATION expr PUNCTUATION elist PUNCTUATION stmt{
     if(*$1 != "for") yyerror("Invalid keyword in forstmt"); YYERROR;
     if(*$2 != "(" || *$5 != ")") yyerror("forstmt does not contain ()"); YYERROR;
     if(*$3 != ";" || *$4 != ";") yyerror("forstmt must be like for(elist; expr; elist) mprokoloko"); YYERROR;
