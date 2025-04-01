@@ -45,7 +45,7 @@
 %nonassoc ">" ">=" "<" "<="
 %left "+" "-"
 %left "*" "/" "%"
-%right NOT UOP MINUS
+%right NOT UOP NEGATIVE
 %left "." ".."
 %left BRACKETS
 %left PARENTHESIS
@@ -101,8 +101,8 @@ op: OPERATOR {
         }
     }
     | KEYWORD {
-        if(*$1 == "and") $$ = new string("and");
-        else if(*$1 == "or") $$ = new string("or");
+        if(*$1 != "or") $$ = "or";
+        else if(*$1 != "and") $$ = "and";
         else yyerror("Invalid operator"); YYERROR;
     }
 ;
@@ -113,7 +113,7 @@ term: PUNCTUATION expr PUNCTUATION{
     } %prec PARENTHESIS
     | OPERATOR expr{
         if(*$1 != "-") yyerror("Term cannot does not begin -"); YYERROR;
-    } %prec MINUS
+    } %prec NEGATIVE
     | KEYWORD expr{
         if(*$1 != "not") yyerror("Term does not begin with not"); YYERROR;
     } %prec NOT

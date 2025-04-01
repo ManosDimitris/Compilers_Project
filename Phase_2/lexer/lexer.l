@@ -1,13 +1,11 @@
 %{
-    #include<iostream>
-    #include<string>
-    #include<vector>
+    #include <iostream>
+    #include <string>
+    #include <vector>
     #include <unordered_map>
-    #include "parser.hpp"
-    
-    using namespace std;
+    #include "../parser/parser.hpp"
 
-    int yylineno = 0;
+    using namespace std;
 
     string string_buff;
     
@@ -23,7 +21,6 @@
 
 %option noyywrap
 %option yylineno
-%option c++
 
 
 KEYWORD        (if|else|while|for|return|break|continue|and|not|or|local|true|false|nil|function)
@@ -43,10 +40,10 @@ INVALID_STRING  \"([^\"\\\n]|\\.)*
 
 %%
 \n        {yylineno++;}
-{KEYWORD}   { yylval.as<string *> = new string(yytext); return KEYWORD; }
-{OPERATOR}   { yylval.as<string *> = new string(yytext); return OPERATOR; }
-{INTCONST}   { yylval.as<int> = stoi(yytext); return INTCONST; }
-{REAL}   { yylval.as<double> = stod(yytext); return REAL; }
+{KEYWORD}   { yylval.strVal = new string(yytext); return KEYWORD; }
+{OPERATOR}   { yylval.strVal = new string(yytext); return OPERATOR; }
+{INTCONST}   { yylval.intVal = stoi(yytext); return INTCONST; }
+{REAL}   { yylval.realVal = stod(yytext); return REAL; }
 {INVALID_STRING} { cout << "Invalid String" << endl; exit(1); }
 {STRING}   {string_buff = yytext;
               unordered_map<char, string> escape_map = {
@@ -78,12 +75,12 @@ INVALID_STRING  \"([^\"\\\n]|\\.)*
                     }
                     index += escape_map[next_index].length();
                 }
-                yylval.as<string *> = new string(yytext);
+                yylval.strVal = new string(yytext);
                 return STRING;
             }
         }
-{PUNCTUATION}   { yylval.as<string *> = new string(yytext); return PUNCTUATION; }
-{ID}   { yylval.as<string *> = new string(yytext); return ID; }
+{PUNCTUATION}   { yylval.strVal = new string(yytext); return PUNCTUATION; }
+{ID}   { yylval.strVal = new string(yytext); return ID; }
 {LINE_COMMENT}   { /* Not returning anything since parser only eats up comments */ }
 {BLOCK_COMMENT}   {
                     int c;
