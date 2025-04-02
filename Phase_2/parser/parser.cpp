@@ -67,13 +67,13 @@
 
 
 /* First part of user prologue.  */
-#line 1 "parser.y"
+#line 1 "parser/parser.y"
 
     #include <iostream>
     #include <string>
     #include <cstring>
     #include<vector>
-
+    #include"SymTable.hpp"
     using namespace std;
 
     int yyerror(string yaccProvidedMessage);
@@ -83,8 +83,10 @@
     extern char *yytext;
     extern FILE *yyin;
 
+    SymbolTable symTable;
+    int scope = 0;
 
-#line 88 "parser.cpp"
+#line 90 "parser/parser.cpp"
 
 # ifndef YY_CAST
 #  ifdef __cplusplus
@@ -578,15 +580,15 @@ static const yytype_int8 yytranslate[] =
 /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_uint8 yyrline[] =
 {
-       0,    51,    51,    54,    55,    58,    59,    60,    61,    62,
-      63,    64,    65,    66,    67,    70,    71,    72,    73,    74,
-      75,    76,    77,    78,    79,    80,    81,    82,    83,    84,
-      87,    88,    89,    90,    91,    92,    93,    94,    97,   100,
-     101,   102,   103,   104,   107,   108,   109,   110,   113,   114,
-     115,   116,   119,   120,   121,   124,   125,   128,   131,   134,
-     135,   136,   139,   140,   143,   146,   147,   150,   153,   156,
-     157,   160,   161,   162,   163,   164,   165,   168,   169,   170,
-     173,   174,   177,   180,   183,   184
+       0,    53,    53,    56,    57,    60,    61,    62,    63,    64,
+      65,    66,    67,    68,    69,    72,    73,    74,    75,    76,
+      77,    78,    79,    80,    81,    82,    83,    84,    85,    86,
+      89,    90,    91,    92,    93,    94,    95,    96,    99,   102,
+     103,   104,   105,   106,   109,   110,   111,   112,   115,   116,
+     117,   118,   121,   122,   123,   126,   127,   130,   133,   136,
+     137,   138,   141,   142,   145,   148,   149,   152,   155,   158,
+     159,   162,   163,   164,   165,   166,   167,   170,   171,   172,
+     175,   176,   179,   182,   185,   186
 };
 #endif
 
@@ -1348,8 +1350,14 @@ yyreduce:
   YY_REDUCE_PRINT (yyn);
   switch (yyn)
     {
+  case 44: /* lvalue: ID  */
+#line 109 "parser/parser.y"
+           { symTable.insert(*(yyvsp[0].strVal), scope, yylineno);}
+#line 1357 "parser/parser.cpp"
+    break;
 
-#line 1353 "parser.cpp"
+
+#line 1361 "parser/parser.cpp"
 
       default: break;
     }
@@ -1542,7 +1550,7 @@ yyreturnlab:
   return yyresult;
 }
 
-#line 187 "parser.y"
+#line 189 "parser/parser.y"
 
 
 int yyerror(string yaccProvidedMessage){
@@ -1550,8 +1558,19 @@ int yyerror(string yaccProvidedMessage){
     return 1;
 }
 
-int main(){
+int main(int argc, char* argv[]){
+     if (argc > 1) {
+        
+        yyin = fopen(argv[1], "r");
+        if (!yyin) {
+            cerr << "Error opening file: " << argv[1] << endl;
+            return 1;
+        }
+    } else {
+        yyin = stdin;
+    }
     yyparse();
+    symTable.display();
     return 0;
 }
 

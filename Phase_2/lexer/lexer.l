@@ -81,60 +81,60 @@ INVALID_STRING  \"([^\"\\\n]|\\.)*
 
 
 %%
-{IF}		{return IF; }
-{ELSE}		{return ELSE;}
-{WHILE}		{return WHILE;}
-{FOR}		{return FOR;}
-{FUNCTION}	{return FUNCTION;}
-{RETURN}		{return RETURN;}
-{BREAK}		{return BREAK;}
-{CONTINUE}		{return CONTINUE;}
-{AND}		{return AND;}
-{NOT}		{return NOT;}
-{OR}		{return OR;}
-{LOCAL}		{return LOCAL;}
-{TRUE}		{return TRUE;}
-{FALSE}		{return FALSE;}
-{NIL}		{return NIL;}
+{IF}		{yylval.strVal = new string(yytext); return IF; }
+{ELSE}		{yylval.strVal = new string(yytext); return ELSE;}
+{WHILE}		{yylval.strVal = new string(yytext); return WHILE;}
+{FOR}		{yylval.strVal = new string(yytext); return FOR;}
+{FUNCTION}	{yylval.strVal = new string(yytext); return FUNCTION;}
+{RETURN}		{yylval.strVal = new string(yytext); return RETURN;}
+{BREAK}		{yylval.strVal = new string(yytext); return BREAK;}
+{CONTINUE}		{yylval.strVal = new string(yytext); return CONTINUE;}
+{AND}		{yylval.strVal = new string(yytext); return AND;}
+{NOT}		{yylval.strVal = new string(yytext); return NOT;}
+{OR}		{yylval.strVal = new string(yytext); return OR;}
+{LOCAL}		{yylval.strVal = new string(yytext); return LOCAL;}
+{TRUE}		{yylval.strVal = new string(yytext); return TRUE;}
+{FALSE}		{yylval.strVal = new string(yytext); return FALSE;}
+{NIL}		{yylval.strVal = new string(yytext); return NIL;}
 
-{EQUAL}		{return EQUAL;}
-{ASSIGN}		{return ASSIGN;}
-{UPLUS}		{return UPLUS;}
-{PLUS}		{return PLUS;}
-{UMINUS}		{return UMINUS;}
-{MINUS}		{return MINUS;}
-{MULTI}		{return MULTI;}
-{DIV}		{return DIV;}
-{MOD}		{return MOD;}
-{NEQUAL}		{return NEQUAL;}
-
-
-{GREATER_EQUAL}		{return GREATER_EQUAL;}
-{LESS_EQUAL}		{return LESS_EQUAL;}
-{GREATER}		{return GREATER;}
-{LESS}		{return LESS;}
+{EQUAL}		{yylval.strVal = new string(yytext); return EQUAL;}
+{ASSIGN}		{yylval.strVal = new string(yytext); return ASSIGN;}
+{UPLUS}		{yylval.strVal = new string(yytext); return UPLUS;}
+{PLUS}		{yylval.strVal = new string(yytext); return PLUS;}
+{UMINUS}		{yylval.strVal = new string(yytext); return UMINUS;}
+{MINUS}		{yylval.strVal = new string(yytext); return MINUS;}
+{MULTI}		{yylval.strVal = new string(yytext); return MULTI;}
+{DIV}		{yylval.strVal = new string(yytext); return DIV;}
+{MOD}		{yylval.strVal = new string(yytext); return MOD;}
+{NEQUAL}		{yylval.strVal = new string(yytext); return NEQUAL;}
 
 
-{LEFT_CBRACKET}	{return LEFT_CBRACKET;}
-{RIGHT_CBRACKET}	{return RIGHT_CBRACKET;}
-{LEFT_BRACKET}	{return LEFT_BRACKET;}
-{RIGHT_BRACKET}	{return RIGHT_BRACKET;}
-{LEFT_PARENTHES}	{return LEFT_PARENTHES;}
-{RIGHT_PARENTHES}	{return RIGHT_PARENTHES;}
-{SEMICOLON}  {return SEMICOLON;}
-{COMMA}		{return COMMA;}
-{DCOLON}		{return DCOLON;}
-{COLON}		{return COLON;}
-{DOTS}		{return DOTS;}
-{DOT}		{return DOT;}
+{GREATER_EQUAL}		{yylval.strVal = new string(yytext); return GREATER_EQUAL;}
+{LESS_EQUAL}		{yylval.strVal = new string(yytext); return LESS_EQUAL;}
+{GREATER}		{yylval.strVal = new string(yytext); return GREATER;}
+{LESS}		{yylval.strVal = new string(yytext); return LESS;}
+
+
+{LEFT_CBRACKET}	{yylval.strVal = new string(yytext); return LEFT_CBRACKET;}
+{RIGHT_CBRACKET}	{yylval.strVal = new string(yytext); return RIGHT_CBRACKET;}
+{LEFT_BRACKET}	{yylval.strVal = new string(yytext); return LEFT_BRACKET;}
+{RIGHT_BRACKET}	{yylval.strVal = new string(yytext); return RIGHT_BRACKET;}
+{LEFT_PARENTHES}	{yylval.strVal = new string(yytext); return LEFT_PARENTHES;}
+{RIGHT_PARENTHES}	{yylval.strVal = new string(yytext); return RIGHT_PARENTHES;}
+{SEMICOLON}  {yylval.strVal = new string(yytext); return SEMICOLON;}
+{COMMA}		{yylval.strVal = new string(yytext); return COMMA;}
+{DCOLON}		{yylval.strVal = new string(yytext); return DCOLON;}
+{COLON}		{yylval.strVal = new string(yytext); return COLON;}
+{DOTS}		{yylval.strVal = new string(yytext); return DOTS;}
+{DOT}		{yylval.strVal = new string(yytext); return DOT;}
 
 
 
 
 
 \n        {yylineno++;}
-{INTCONST}   { return INTCONST;}
-{REAL}   { return REAL;}
+{INTCONST}   {yylval.intVal = stoi(yytext); return INTCONST;}
+{REAL}   {yylval.realVal = stod(yytext); return REAL;}
 {INVALID_STRING} { cout << "Invalid String" << endl; exit(1); }
 {STRING}   {string_buff = yytext;
               unordered_map<char, string> escape_map = {
@@ -166,11 +166,12 @@ INVALID_STRING  \"([^\"\\\n]|\\.)*
                     }
                     index += escape_map[next_index].length();
                 }
+                yylval.strVal = new string(yytext); 
                 return STRING;
             }
         }
 
-{ID}   {return ID; }
+{ID}   {yylval.strVal = new string(yytext); return ID; }
 {LINE_COMMENT}   { /* Not returning anything since parser only eats up comments */ }
 {BLOCK_COMMENT}   {
                     int c;

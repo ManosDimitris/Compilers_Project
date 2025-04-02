@@ -35,8 +35,8 @@
    especially those whose name start with YY_ or yy_.  They are
    private implementation details that can be changed or removed.  */
 
-#ifndef YY_YY_PARSER_HPP_INCLUDED
-# define YY_YY_PARSER_HPP_INCLUDED
+#ifndef YY_YY_PARSER_PARSER_HPP_INCLUDED
+# define YY_YY_PARSER_PARSER_HPP_INCLUDED
 /* Debug traces.  */
 #ifndef YYDEBUG
 # define YYDEBUG 0
@@ -103,18 +103,69 @@ extern int yydebug;
   };
   typedef enum yytokentype yytoken_kind_t;
 #endif
+/* Token kinds.  */
+#define YYEMPTY -2
+#define YYEOF 0
+#define YYerror 256
+#define YYUNDEF 257
+#define IF 258
+#define ELSE 259
+#define WHILE 260
+#define FOR 261
+#define FUNCTION 262
+#define RETURN 263
+#define BREAK 264
+#define CONTINUE 265
+#define AND 266
+#define OR 267
+#define LOCAL 268
+#define TRUE 269
+#define FALSE 270
+#define NIL 271
+#define EQUAL 272
+#define ASSIGN 273
+#define UPLUS 274
+#define PLUS 275
+#define UMINUS 276
+#define MINUS 277
+#define MULTI 278
+#define DIV 279
+#define MOD 280
+#define NEQUAL 281
+#define INTCONST 282
+#define REAL 283
+#define STRING 284
+#define GREATER_EQUAL 285
+#define LESS_EQUAL 286
+#define GREATER 287
+#define LESS 288
+#define LEFT_CBRACKET 289
+#define RIGHT_CBRACKET 290
+#define LEFT_BRACKET 291
+#define RIGHT_BRACKET 292
+#define LEFT_PARENTHES 293
+#define RIGHT_PARENTHES 294
+#define SEMICOLON 295
+#define COMMA 296
+#define DCOLON 297
+#define COLON 298
+#define DOTS 299
+#define DOT 300
+#define ID 301
+#define NOT 302
+#define THEN 303
 
 /* Value type.  */
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 union YYSTYPE
 {
-#line 18 "parser.y"
+#line 20 "parser/parser.y"
 
     std::string *strVal;
     int intVal;
     double realVal;
 
-#line 118 "parser.hpp"
+#line 169 "parser/parser.hpp"
 
 };
 typedef union YYSTYPE YYSTYPE;
@@ -129,4 +180,4 @@ extern YYSTYPE yylval;
 int yyparse (void);
 
 
-#endif /* !YY_YY_PARSER_HPP_INCLUDED  */
+#endif /* !YY_YY_PARSER_PARSER_HPP_INCLUDED  */

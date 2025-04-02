@@ -3,7 +3,7 @@
     #include <string>
     #include <cstring>
     #include<vector>
-
+    #include"SymTable.hpp"
     using namespace std;
 
     int yyerror(string yaccProvidedMessage);
@@ -13,6 +13,8 @@
     extern char *yytext;
     extern FILE *yyin;
 
+    SymbolTable symTable;
+    int scope = 0;
 %}
 
 %union{
@@ -104,7 +106,7 @@ primary: lvalue
     | const
 ;
 
-lvalue: ID
+lvalue: ID { symTable.insert(*$1, scope, yylineno);}
     | LOCAL ID
     | DCOLON ID
     | member
@@ -166,7 +168,7 @@ const: INTCONST
 ;
 
 idlist:
-    | ID
+    | ID 
     | idlist COMMA ID
 ;
 
@@ -191,8 +193,19 @@ int yyerror(string yaccProvidedMessage){
     return 1;
 }
 
-int main(){
+int main(int argc, char* argv[]){
+     if (argc > 1) {
+        
+        yyin = fopen(argv[1], "r");
+        if (!yyin) {
+            cerr << "Error opening file: " << argv[1] << endl;
+            return 1;
+        }
+    } else {
+        yyin = stdin;
+    }
     yyparse();
+    symTable.display();
     return 0;
 }
 
