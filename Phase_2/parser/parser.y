@@ -6,7 +6,7 @@
 
     using namespace std;
 
-    int yyerror(char *yaccProvidedMessage);
+    int yyerror(string yaccProvidedMessage);
     int yylex(void);
 
     extern int yylineno;
@@ -41,6 +41,9 @@
 %left LEFT_BRACKET RIGHT_BRACKET
 %left LEFT_PARENTHES RIGHT_PARENTHES
 
+%nonassoc THEN
+%nonassoc ELSE
+
 %start program
 
 %%
@@ -48,8 +51,7 @@
 program: stmntlist
 ;
 
-stmntlist: 
-    | stmt
+stmntlist:  stmt
     | stmntlist stmt
 ;
 
@@ -66,23 +68,20 @@ stmt: expr SEMICOLON
 ;
 
 expr: assignexpr
-    | expr op expr
+    | expr PLUS expr
+    | expr MINUS expr
+    | expr MULTI expr
+    | expr DIV expr
+    | expr MOD expr
+    | expr GREATER expr
+    | expr GREATER_EQUAL expr
+    | expr LESS expr
+    | expr LESS_EQUAL expr
+    | expr EQUAL expr
+    | expr NEQUAL expr
+    | expr AND expr 
+    | expr OR expr
     | term
-;
-
-op: PLUS
-    | MINUS
-    | MULTI
-    | DIV
-    | MOD
-    | GREATER
-    | GREATER_EQUAL
-    | LESS
-    | LESS_EQUAL
-    | EQUAL
-    | NEQUAL
-    | AND
-    | OR 
 ;
 
 term: LEFT_PARENTHES expr RIGHT_PARENTHES
@@ -137,16 +136,14 @@ elist:
     | elist COMMA expr
 ;
 
-objectdef: LEFT_BRACKET RIGHT_BRACKET
-    | LEFT_BRACKET elist RIGHT_BRACKET
+objectdef: LEFT_BRACKET elist RIGHT_BRACKET
     | LEFT_BRACKET indexed RIGHT_BRACKET
 ;
 
 indexed: indexedelemlist
 ;
 
-indexedelemlist: 
-    | indexedelem
+indexedelemlist: indexedelem
     | indexedelem COMMA indexedelemlist
 ;
 
@@ -173,11 +170,8 @@ idlist:
     | idlist COMMA ID
 ;
 
-ifstmt: IF LEFT_PARENTHES expr RIGHT_PARENTHES stmt
-    | ifstmt elsestmt
-;
-
-elsestmt: ELSE stmt
+ifstmt: IF LEFT_PARENTHES expr RIGHT_PARENTHES stmt %prec THEN
+    | ifstmt ELSE stmt
 ;
 
 whilestmt: WHILE LEFT_PARENTHES expr RIGHT_PARENTHES stmt
@@ -192,8 +186,9 @@ returnstmt: RETURN SEMICOLON
 
 %%
 
-yyerror(char *yaccProvidedMessage){
+int yyerror(string yaccProvidedMessage){
     cout << yaccProvidedMessage << " at line " << yylineno << endl;
+    return 1;
 }
 
 int main(){

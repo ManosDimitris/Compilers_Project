@@ -98,7 +98,8 @@ extern int yydebug;
     DOTS = 299,                    /* DOTS  */
     DOT = 300,                     /* DOT  */
     ID = 301,                      /* ID  */
-    NOT = 302                      /* NOT  */
+    NOT = 302,                     /* NOT  */
+    THEN = 303                     /* THEN  */
   };
   typedef enum yytokentype yytoken_kind_t;
 #endif
@@ -113,7 +114,7 @@ union YYSTYPE
     int intVal;
     double realVal;
 
-#line 117 "parser.hpp"
+#line 118 "parser.hpp"
 
 };
 typedef union YYSTYPE YYSTYPE;
