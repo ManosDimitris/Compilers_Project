@@ -546,8 +546,8 @@ int yy_flex_debug = 0;
 #define YY_MORE_ADJ 0
 #define YY_RESTORE_YY_MORE_OFFSET
 char *yytext;
-#line 1 "lexer_opoio_version_den_kserw.l"
-#line 2 "lexer_opoio_version_den_kserw.l"
+#line 1 "lexer.l"
+#line 2 "lexer.l"
     #include<iostream>
     #include<string>
     #include<vector>
@@ -784,7 +784,7 @@ YY_DECL
 		}
 
 	{
-#line 84 "lexer_opoio_version_den_kserw.l"
+#line 83 "lexer.l"
 
 #line 789 "lexer.yy.cpp"
 
@@ -855,234 +855,234 @@ do_action:	/* This label is used only to access EOF actions. */
 
 case 1:
 YY_RULE_SETUP
-#line 85 "lexer_opoio_version_den_kserw.l"
+#line 84 "lexer.l"
 {return IF; }
 	YY_BREAK
 case 2:
 YY_RULE_SETUP
-#line 86 "lexer_opoio_version_den_kserw.l"
+#line 85 "lexer.l"
 {return ELSE;}
 	YY_BREAK
 case 3:
 YY_RULE_SETUP
-#line 87 "lexer_opoio_version_den_kserw.l"
+#line 86 "lexer.l"
 {return WHILE;}
 	YY_BREAK
 case 4:
 YY_RULE_SETUP
-#line 88 "lexer_opoio_version_den_kserw.l"
+#line 87 "lexer.l"
 {return FOR;}
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
-#line 89 "lexer_opoio_version_den_kserw.l"
+#line 88 "lexer.l"
 {return FUNCTION;}
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
-#line 90 "lexer_opoio_version_den_kserw.l"
+#line 89 "lexer.l"
 {return RETURN;}
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
-#line 91 "lexer_opoio_version_den_kserw.l"
+#line 90 "lexer.l"
 {return BREAK;}
 	YY_BREAK
 case 8:
 YY_RULE_SETUP
-#line 92 "lexer_opoio_version_den_kserw.l"
+#line 91 "lexer.l"
 {return CONTINUE;}
 	YY_BREAK
 case 9:
 YY_RULE_SETUP
-#line 93 "lexer_opoio_version_den_kserw.l"
+#line 92 "lexer.l"
 {return AND;}
 	YY_BREAK
 case 10:
 YY_RULE_SETUP
-#line 94 "lexer_opoio_version_den_kserw.l"
+#line 93 "lexer.l"
 {return NOT;}
 	YY_BREAK
 case 11:
 YY_RULE_SETUP
-#line 95 "lexer_opoio_version_den_kserw.l"
+#line 94 "lexer.l"
 {return OR;}
 	YY_BREAK
 case 12:
 YY_RULE_SETUP
-#line 96 "lexer_opoio_version_den_kserw.l"
+#line 95 "lexer.l"
 {return LOCAL;}
 	YY_BREAK
 case 13:
 YY_RULE_SETUP
-#line 97 "lexer_opoio_version_den_kserw.l"
+#line 96 "lexer.l"
 {return TRUE;}
 	YY_BREAK
 case 14:
 YY_RULE_SETUP
-#line 98 "lexer_opoio_version_den_kserw.l"
+#line 97 "lexer.l"
 {return FALSE;}
 	YY_BREAK
 case 15:
 YY_RULE_SETUP
-#line 99 "lexer_opoio_version_den_kserw.l"
+#line 98 "lexer.l"
 {return NIL;}
 	YY_BREAK
 case 16:
 YY_RULE_SETUP
-#line 101 "lexer_opoio_version_den_kserw.l"
+#line 100 "lexer.l"
 {return EQUAL;}
 	YY_BREAK
 case 17:
 YY_RULE_SETUP
-#line 102 "lexer_opoio_version_den_kserw.l"
+#line 101 "lexer.l"
 {return ASSIGN;}
 	YY_BREAK
 case 18:
 YY_RULE_SETUP
-#line 103 "lexer_opoio_version_den_kserw.l"
-{return PPLUS;}
+#line 102 "lexer.l"
+{return UPLUS;}
 	YY_BREAK
 case 19:
 YY_RULE_SETUP
-#line 104 "lexer_opoio_version_den_kserw.l"
+#line 103 "lexer.l"
 {return PLUS;}
 	YY_BREAK
 case 20:
 YY_RULE_SETUP
-#line 105 "lexer_opoio_version_den_kserw.l"
-{return MMINUS;}
+#line 104 "lexer.l"
+{return UMINUS;}
 	YY_BREAK
 case 21:
 YY_RULE_SETUP
-#line 106 "lexer_opoio_version_den_kserw.l"
+#line 105 "lexer.l"
 {return MINUS;}
 	YY_BREAK
 case 22:
 YY_RULE_SETUP
-#line 107 "lexer_opoio_version_den_kserw.l"
+#line 106 "lexer.l"
 {return MULTI;}
 	YY_BREAK
 case 23:
 YY_RULE_SETUP
-#line 108 "lexer_opoio_version_den_kserw.l"
+#line 107 "lexer.l"
 {return DIV;}
 	YY_BREAK
 case 24:
 YY_RULE_SETUP
-#line 109 "lexer_opoio_version_den_kserw.l"
+#line 108 "lexer.l"
 {return MOD;}
 	YY_BREAK
 case 25:
 YY_RULE_SETUP
-#line 110 "lexer_opoio_version_den_kserw.l"
+#line 109 "lexer.l"
 {return NEQUAL;}
 	YY_BREAK
 case 26:
 YY_RULE_SETUP
-#line 113 "lexer_opoio_version_den_kserw.l"
+#line 112 "lexer.l"
 {return GREATER_EQUAL;}
 	YY_BREAK
 case 27:
 YY_RULE_SETUP
-#line 114 "lexer_opoio_version_den_kserw.l"
+#line 113 "lexer.l"
 {return LESS_EQUAL;}
 	YY_BREAK
 case 28:
 YY_RULE_SETUP
-#line 115 "lexer_opoio_version_den_kserw.l"
+#line 114 "lexer.l"
 {return GREATER;}
 	YY_BREAK
 case 29:
 YY_RULE_SETUP
-#line 116 "lexer_opoio_version_den_kserw.l"
+#line 115 "lexer.l"
 {return LESS;}
 	YY_BREAK
 case 30:
 YY_RULE_SETUP
-#line 119 "lexer_opoio_version_den_kserw.l"
+#line 118 "lexer.l"
 {return LEFT_CBRACKET;}
 	YY_BREAK
 case 31:
 YY_RULE_SETUP
-#line 120 "lexer_opoio_version_den_kserw.l"
+#line 119 "lexer.l"
 {return RIGHT_CBRACKET;}
 	YY_BREAK
 case 32:
 YY_RULE_SETUP
-#line 121 "lexer_opoio_version_den_kserw.l"
+#line 120 "lexer.l"
 {return LEFT_BRACKET;}
 	YY_BREAK
 case 33:
 YY_RULE_SETUP
-#line 122 "lexer_opoio_version_den_kserw.l"
+#line 121 "lexer.l"
 {return RIGHT_BRACKET;}
 	YY_BREAK
 case 34:
 YY_RULE_SETUP
-#line 123 "lexer_opoio_version_den_kserw.l"
+#line 122 "lexer.l"
 {return LEFT_PARENTHES;}
 	YY_BREAK
 case 35:
 YY_RULE_SETUP
-#line 124 "lexer_opoio_version_den_kserw.l"
+#line 123 "lexer.l"
 {return RIGHT_PARENTHES;}
 	YY_BREAK
 case 36:
 YY_RULE_SETUP
-#line 125 "lexer_opoio_version_den_kserw.l"
+#line 124 "lexer.l"
 {return SEMICOLON;}
 	YY_BREAK
 case 37:
 YY_RULE_SETUP
-#line 126 "lexer_opoio_version_den_kserw.l"
+#line 125 "lexer.l"
 {return COMMA;}
 	YY_BREAK
 case 38:
 YY_RULE_SETUP
-#line 127 "lexer_opoio_version_den_kserw.l"
+#line 126 "lexer.l"
 {return DCOLON;}
 	YY_BREAK
 case 39:
 YY_RULE_SETUP
-#line 128 "lexer_opoio_version_den_kserw.l"
+#line 127 "lexer.l"
 {return COLON;}
 	YY_BREAK
 case 40:
 YY_RULE_SETUP
-#line 129 "lexer_opoio_version_den_kserw.l"
+#line 128 "lexer.l"
 {return DOTS;}
 	YY_BREAK
 case 41:
 YY_RULE_SETUP
-#line 130 "lexer_opoio_version_den_kserw.l"
+#line 129 "lexer.l"
 {return DOT;}
 	YY_BREAK
 case 42:
 /* rule 42 can match eol */
 YY_RULE_SETUP
-#line 136 "lexer_opoio_version_den_kserw.l"
+#line 135 "lexer.l"
 {yylineno++;}
 	YY_BREAK
 case 43:
 YY_RULE_SETUP
-#line 137 "lexer_opoio_version_den_kserw.l"
+#line 136 "lexer.l"
 { return INTCONST;}
 	YY_BREAK
 case 44:
 YY_RULE_SETUP
-#line 138 "lexer_opoio_version_den_kserw.l"
+#line 137 "lexer.l"
 { return REAL;}
 	YY_BREAK
 case 45:
 YY_RULE_SETUP
-#line 139 "lexer_opoio_version_den_kserw.l"
+#line 138 "lexer.l"
 { cout << "Invalid String" << endl; exit(1); }
 	YY_BREAK
 case 46:
 /* rule 46 can match eol */
 YY_RULE_SETUP
-#line 140 "lexer_opoio_version_den_kserw.l"
+#line 139 "lexer.l"
 {string_buff = yytext;
               unordered_map<char, string> escape_map = {
                 {'n', "\n"},
@@ -1119,17 +1119,17 @@ YY_RULE_SETUP
 	YY_BREAK
 case 47:
 YY_RULE_SETUP
-#line 174 "lexer_opoio_version_den_kserw.l"
+#line 173 "lexer.l"
 {return ID; }
 	YY_BREAK
 case 48:
 YY_RULE_SETUP
-#line 175 "lexer_opoio_version_den_kserw.l"
+#line 174 "lexer.l"
 { /* Not returning anything since parser only eats up comments */ }
 	YY_BREAK
 case 49:
 YY_RULE_SETUP
-#line 176 "lexer_opoio_version_den_kserw.l"
+#line 175 "lexer.l"
 {
                     int c;
                     int nested = 1;
@@ -1177,17 +1177,17 @@ YY_RULE_SETUP
 case 50:
 /* rule 50 can match eol */
 YY_RULE_SETUP
-#line 220 "lexer_opoio_version_den_kserw.l"
+#line 219 "lexer.l"
 {}
 	YY_BREAK
 case 51:
 YY_RULE_SETUP
-#line 223 "lexer_opoio_version_den_kserw.l"
+#line 222 "lexer.l"
 { cout << "Not recognised expression: " << yytext << endl; }
 	YY_BREAK
 case 52:
 YY_RULE_SETUP
-#line 224 "lexer_opoio_version_den_kserw.l"
+#line 223 "lexer.l"
 ECHO;
 	YY_BREAK
 #line 1193 "lexer.yy.cpp"
@@ -2207,4 +2207,4 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 224 "lexer_opoio_version_den_kserw.l"
+#line 223 "lexer.l"

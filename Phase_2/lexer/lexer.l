@@ -1,14 +1,14 @@
 %{
-    #include <iostream>
-    #include <string>
-    #include <vector>
+    #include<iostream>
+    #include<string>
+    #include<vector>
     #include <unordered_map>
     #include "../parser/parser.hpp"
-
+    
     using namespace std;
 
     string string_buff;
-    
+
     struct CommentNode{
         string comment_content = "";
         vector<CommentNode *> children;  
@@ -22,13 +22,55 @@
 %option noyywrap
 %option yylineno
 
+IF 	    	"if"
+ELSE		"else"
+WHILE 		"while"
+FOR	    	"for"
+FUNCTION	"function"
+RETURN 		"return"
+BREAK	  	"break"
+CONTINUE	"continue"
+AND		    "and"
+NOT	    	"not"
+OR	     	"or"
+LOCAL	  	"local"
+TRUE	   	"true"
+FALSE	  	"false"
+NIL		    "nil"
 
-KEYWORD        (if|else|while|for|return|break|continue|and|not|or|local|true|false|nil|function)
-OPERATOR       (=|\+|\-|\*|\/|%|==|!=|\+\+|\-\-|>|<|>=|<=)
+EQUAL	  	"=="
+ASSIGN		"="
+UPLUS		"++"
+PLUS	   	"+"
+UMINUS		"--"
+MINUS	  	"-"
+MULTI	  	"*"
+DIV		    "/"
+MOD	    	"%"
+NEQUAL		"!="
+
+
+GREATER_EQUAL	">="
+LESS_EQUAL	    "<="
+GREATER		">"
+LESS		"<"
+LEFT_CBRACKET	\{
+RIGHT_CBRACKET	\}
+LEFT_BRACKET	\[
+RIGHT_BRACKET	\]
+LEFT_PARENTHES	\(
+RIGHT_PARENTHES	\)
+SEMICOLON	\;
+COMMA		\,
+DCOLON		\:\:
+COLON		\:
+DOTS		\.\.
+DOT		\.
+
 INTCONST        (0[xX][0-9A-Fa-f]+)|([0-9]+)
 REAL           [0-9]*\.[0-9]*
 STRING          \"(\\.|[^"\\])*\"
-PUNCTUATION    (\{|\}|\[|\]|\(|\)|;|,|:|::|\.|\.\.)
+
 ID             [a-zA-Z][a-zA-Z_0-9]*
 LINE_COMMENT       "//".*
 BLOCK_COMMENT       "/*"
@@ -39,11 +81,60 @@ INVALID_STRING  \"([^\"\\\n]|\\.)*
 
 
 %%
+{IF}		{return IF; }
+{ELSE}		{return ELSE;}
+{WHILE}		{return WHILE;}
+{FOR}		{return FOR;}
+{FUNCTION}	{return FUNCTION;}
+{RETURN}		{return RETURN;}
+{BREAK}		{return BREAK;}
+{CONTINUE}		{return CONTINUE;}
+{AND}		{return AND;}
+{NOT}		{return NOT;}
+{OR}		{return OR;}
+{LOCAL}		{return LOCAL;}
+{TRUE}		{return TRUE;}
+{FALSE}		{return FALSE;}
+{NIL}		{return NIL;}
+
+{EQUAL}		{return EQUAL;}
+{ASSIGN}		{return ASSIGN;}
+{UPLUS}		{return UPLUS;}
+{PLUS}		{return PLUS;}
+{UMINUS}		{return UMINUS;}
+{MINUS}		{return MINUS;}
+{MULTI}		{return MULTI;}
+{DIV}		{return DIV;}
+{MOD}		{return MOD;}
+{NEQUAL}		{return NEQUAL;}
+
+
+{GREATER_EQUAL}		{return GREATER_EQUAL;}
+{LESS_EQUAL}		{return LESS_EQUAL;}
+{GREATER}		{return GREATER;}
+{LESS}		{return LESS;}
+
+
+{LEFT_CBRACKET}	{return LEFT_CBRACKET;}
+{RIGHT_CBRACKET}	{return RIGHT_CBRACKET;}
+{LEFT_BRACKET}	{return LEFT_BRACKET;}
+{RIGHT_BRACKET}	{return RIGHT_BRACKET;}
+{LEFT_PARENTHES}	{return LEFT_PARENTHES;}
+{RIGHT_PARENTHES}	{return RIGHT_PARENTHES;}
+{SEMICOLON}  {return SEMICOLON;}
+{COMMA}		{return COMMA;}
+{DCOLON}		{return DCOLON;}
+{COLON}		{return COLON;}
+{DOTS}		{return DOTS;}
+{DOT}		{return DOT;}
+
+
+
+
+
 \n        {yylineno++;}
-{KEYWORD}   { yylval.strVal = new string(yytext); return KEYWORD; }
-{OPERATOR}   { yylval.strVal = new string(yytext); return OPERATOR; }
-{INTCONST}   { yylval.intVal = stoi(yytext); return INTCONST; }
-{REAL}   { yylval.realVal = stod(yytext); return REAL; }
+{INTCONST}   { return INTCONST;}
+{REAL}   { return REAL;}
 {INVALID_STRING} { cout << "Invalid String" << endl; exit(1); }
 {STRING}   {string_buff = yytext;
               unordered_map<char, string> escape_map = {
@@ -75,12 +166,11 @@ INVALID_STRING  \"([^\"\\\n]|\\.)*
                     }
                     index += escape_map[next_index].length();
                 }
-                yylval.strVal = new string(yytext);
                 return STRING;
             }
         }
-{PUNCTUATION}   { yylval.strVal = new string(yytext); return PUNCTUATION; }
-{ID}   { yylval.strVal = new string(yytext); return ID; }
+
+{ID}   {return ID; }
 {LINE_COMMENT}   { /* Not returning anything since parser only eats up comments */ }
 {BLOCK_COMMENT}   {
                     int c;

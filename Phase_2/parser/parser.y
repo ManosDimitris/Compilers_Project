@@ -4,8 +4,6 @@
     #include <cstring>
     #include<vector>
 
-    #include "parser.hpp"
-
     using namespace std;
 
     int yyerror(char *yaccProvidedMessage);
@@ -17,67 +15,54 @@
 
 %}
 
-%language "c++"
-%define api.value.type variant
+%union{
+    std::string *strVal;
+    int intVal;
+    double realVal;
+}
 
-%token KEYWORD
-%token OPERATOR
-%token INTCONST
-%token REAL
-%token STRING
-%token PUNCTUATION
-%token ID
+%token <strVal> IF ELSE WHILE FOR FUNCTION RETURN BREAK CONTINUE AND OR LOCAL TRUE FALSE NIL
+%token <strVal> EQUAL ASSIGN UPLUS PLUS UMINUS MINUS MULTI DIV MOD NEQUAL
+%token <intVal> INTCONST
+%token <realVal> REAL
+%token <strVal> STRING
+%token <strVal> GREATER_EQUAL LESS_EQUAL GREATER LESS LEFT_CBRACKET RIGHT_CBRACKET LEFT_BRACKET RIGHT_BRACKET LEFT_PARENTHES RIGHT_PARENTHES SEMICOLON COMMA DCOLON COLON DOTS DOT
+%token <strVal> ID
 
-%type <string *> KEYWORD
-%type <string *> OPERATOR
-%type <int> INTCONST
-%type <double> REAL
-%type <string *> STRING
-%type <string *> PUNCTUATION
-%type <string *> ID
-%type <string> op
-
-
-%right "="
-%left "or"
-%left "and"
-%nonassoc "==" "!="
-%nonassoc ">" ">=" "<" "<="
-%left "+" "-"
-%left "*" "/" "%"
-%right NOT UOP NEGATIVE
-%left "." ".."
-%left BRACKETS
-%left PARENTHESIS
+%right ASSIGN
+%left OR
+%left AND
+%nonassoc EQUAL NEQUAL
+%nonassoc GREATER GREATER_EQUAL LESS LESS_EQUAL
+%left PLUS MINUS
+%left MULTI DIV MOD
+%right NOT UMINUS UPLUS
+%left DOT DOTS
+%left LEFT_BRACKET RIGHT_BRACKET
+%left LEFT_PARENTHES RIGHT_PARENTHES
 
 %start program
 
 %%
 
-program: stmt
-    | program stmt
+program: stmntlist
 ;
 
-stmt:   expr PUNCTUATION { 
-        if(*$2 != ";") yyerror("Line not finished with ;"); YYERROR;
-    }
+stmntlist: 
+    | stmt
+    | stmntlist stmt
+;
+
+stmt: expr SEMICOLON
     | ifstmt
     | whilestmt
     | forstmt
     | returnstmt
-    | KEYWORD PUNCTUATION {
-        if(*$2 != ";") yyerror("Line not finished with ;"); YYERROR;
-
-        if(*$1 == "break") cout << "Found break statement" << endl;
-        else if(*$1 == "continue") cout << "Found continue statement" << endl;
-        else{
-            yyerror("Invalid statement");
-            YYERROR;
-        }
-    }
+    | BREAK SEMICOLON
+    | CONTINUE SEMICOLON
     | block
-    | funcdef	
-    | PUNCTUATION {if(*$1 != ";") yyerror("INVALID PUNCTUATION"); YYERROR;}
+    | funcdef
+    | SEMICOLON
 ;
 
 expr: assignexpr
@@ -85,128 +70,76 @@ expr: assignexpr
     | term
 ;
 
-op: OPERATOR {
-        string validOps[11] = {"+", "-", "/", "*", "%", ">", ">=", "<", "<=", "==", "!="};
-        bool found = false;
-        for (const string& op : validOps) {
-            if (*$1 == op) {
-                found = true;
-                $$ = op;
-                break;
-            }
-        }
-        if (!found) {
-            yyerror("Invalid operator");
-            YYERROR;
-        }
-    }
-    | KEYWORD {
-        if(*$1 != "or") $$ = "or";
-        else if(*$1 != "and") $$ = "and";
-        else yyerror("Invalid operator"); YYERROR;
-    }
+op: PLUS
+    | MINUS
+    | MULTI
+    | DIV
+    | MOD
+    | GREATER
+    | GREATER_EQUAL
+    | LESS
+    | LESS_EQUAL
+    | EQUAL
+    | NEQUAL
+    | AND
+    | OR 
 ;
 
-term: PUNCTUATION expr PUNCTUATION{
-        if(*$1 != "(") yyerror("Term does not begin with ("); YYERROR;
-        if(*$3 != ")") yyerror("Term does not end with )"); YYERROR;
-    } %prec PARENTHESIS
-    | OPERATOR expr{
-        if(*$1 != "-") yyerror("Term cannot does not begin -"); YYERROR;
-    } %prec NEGATIVE
-    | KEYWORD expr{
-        if(*$1 != "not") yyerror("Term does not begin with not"); YYERROR;
-    } %prec NOT
-    | OPERATOR lvalue{
-        if(*$1 != "++" || *$1 != "--") yyerror("Term must begin with \"++\" or \"--\""); YYERROR;
-    } %prec UOP
-    | lvalue OPERATOR{
-        if(*$2 != "++" || *$2 != "--") yyerror("Term must end with \"++\" or \"--\""); YYERROR;
-    } %prec UOP
+term: LEFT_PARENTHES expr RIGHT_PARENTHES
+    | MINUS expr
+    | NOT expr
+    | UPLUS lvalue
+    | lvalue UPLUS
+    | UMINUS lvalue
+    | lvalue UMINUS
     | primary
 ;
 
-assignexpr: lvalue OPERATOR expr {if(*$2 != "=") yyerror("Operator must be \"=\" in assignment expressions"); YYERROR;}
+assignexpr: lvalue ASSIGN expr
 ;
 
 primary: lvalue
     | call
     | objectdef
-    | OPERATOR funcdef OPERATOR{
-        if(*$1 != "(") yyerror("primary does not begin with ("); YYERROR;
-        if(*$3 != ")") yyerror("primary does not end with )"); YYERROR;
-    }
+    | LEFT_PARENTHES funcdef RIGHT_PARENTHES
     | const
 ;
 
 lvalue: ID
-    | KEYWORD ID{
-        if(*$1 != "local") yyerror("lvalue does not begin with keyword \"local\""); YYERROR;
-    }
-    | PUNCTUATION ID {
-        if(*$1 != "::") yyerror("lvalue does not begin with punctuation \"::\""); YYERROR;
-    }
+    | LOCAL ID
+    | DCOLON ID
     | member
 ;
 
-member: lvalue PUNCTUATION ID{
-        if(*$2 != ".") yyerror("punctuation in member must be \".\""); YYERROR;
-    }
-    | lvalue PUNCTUATION expr PUNCTUATION{
-        if(*$2 != "[") yyerror("member can only contain ["); YYERROR;
-        if(*$4 != "]") yyerror("member can only contain ]"); YYERROR;
-    }
-    | call PUNCTUATION ID{
-        if(*$2 != ".") yyerror("punctuation in member must be \".\""); YYERROR;
-    }
-    | call PUNCTUATION expr PUNCTUATION{
-        if(*$2 != "[") yyerror("member can only contain ["); YYERROR;
-        if(*$4 != "]") yyerror("member can only contain ]"); YYERROR; 
-    }
+member: lvalue DOT ID
+    | lvalue LEFT_BRACKET expr RIGHT_BRACKET
+    | call DOT ID
+    | call LEFT_BRACKET expr RIGHT_BRACKET
 ;
 
-call: call PUNCTUATION elist PUNCTUATION{
-        if(*$2 != "(") yyerror("Invalid punctuation"); YYERROR;
-        if(*$4 != ")") yyerror("Invalid punctuation"); YYERROR;
-    }
+call: call LEFT_PARENTHES elist RIGHT_PARENTHES
     | lvalue callsuffix
-    | PUNCTUATION funcdef PUNCTUATION PUNCTUATION elist PUNCTUATION{
-        if(*$1 != "(" || *$3 != ")") yyerror("Invalid call must be \"( function )\""); YYERROR;
-        if(*$4 != "(" || *$6 != ")") yyerror("Invalid call must be \"( function ) ( expr )\""); YYERROR;
-    }
+    | LEFT_PARENTHES funcdef RIGHT_PARENTHES LEFT_PARENTHES elist RIGHT_PARENTHES
 ;
 
 callsuffix: normcall
     | methodcall
 ;
 
-normcall: PUNCTUATION elist PUNCTUATION {
-        if(*$1 != "(") yyerror("normcall must begin with ("); YYERROR;
-        if(*$3 != ")") yyerror("normcall must end with )"); YYERROR; 
-    }
+normcall: LEFT_PARENTHES elist RIGHT_PARENTHES
 ;
 
-methodcall: PUNCTUATION ID PUNCTUATION elist PUNCTUATION {
-        if(*$1 != "..") yyerror("methodcall must begin with \"..\""); YYERROR;
-        if(*$3 != "(" || *$5 != ")") yyerror("Invalid methodcall must be like \"..id(elist)\""); YYERROR;
-    }
+methodcall: DOTS ID LEFT_PARENTHES elist RIGHT_PARENTHES
 ;
 
-elist: 
+elist:
     | expr
-    | elist PUNCTUATION expr{
-        if(*$2 != ",") yyerror("Invalid punctuation in elist"); YYERROR; 
-    }
+    | elist COMMA expr
 ;
 
-objectdef: PUNCTUATION PUNCTUATION{
-        if(*$1 != "[") yyerror("objectdef must begin with ["); YYERROR;
-        if(*$2 != "]") yyerror("objectdef must end with ]"); YYERROR;
-    } 
-    | PUNCTUATION elist PUNCTUATION{
-        if(*$1 != "[") yyerror("objectdef must begin with ["); YYERROR;
-        if(*$3 != "]") yyerror("objectdef must end with ]"); YYERROR;
-    }
+objectdef: LEFT_BRACKET RIGHT_BRACKET
+    | LEFT_BRACKET elist RIGHT_BRACKET
+    | LEFT_BRACKET indexed RIGHT_BRACKET
 ;
 
 indexed: indexedelemlist
@@ -214,78 +147,49 @@ indexed: indexedelemlist
 
 indexedelemlist: 
     | indexedelem
-    | indexedelemlist PUNCTUATION indexedelem {if(*$2 != ",") yyerror("punctuation must be , in indexed"); YYERROR;}
+    | indexedelem COMMA indexedelemlist
 ;
 
-indexedelem: PUNCTUATION expr PUNCTUATION expr PUNCTUATION {
-    if(*$1 != "{" || *$3 != "}") yyerror("indexedelem does not contain { or }"); YYERROR;
-    if(*$5 != ":") yyerror("indexedelem does not contain :"); YYERROR;
-}
+indexedelem: LEFT_CBRACKET expr COLON expr RIGHT_CBRACKET
 ;
 
-block: PUNCTUATION stmtlist PUNCTUATION {if(*$1 != "{" || *$3 != "}") yyerror("wrong punctuation in block"); YYERROR;}
+block: LEFT_CBRACKET stmntlist RIGHT_CBRACKET
 ;
 
-stmtlist: 
-    | stmt
-    | stmtlist stmt
+funcdef: FUNCTION LEFT_PARENTHES idlist RIGHT_PARENTHES block
+    | FUNCTION ID LEFT_PARENTHES idlist RIGHT_PARENTHES block
 ;
 
-funcdef: KEYWORD PUNCTUATION idlist PUNCTUATION block {
-        if(*$1 != "function") yyerror("Invalid keyword in funcdef"); YYERROR;
-        if(*$2 != "(" || *$4 != ")") yyerror("function must have (params)"); YYERROR;
-    }
-    | KEYWORD ID PUNCTUATION idlist PUNCTUATION block {
-        if(*$1 != "function") yyerror("Invalid keyword in funcdef"); YYERROR;
-        if(*$3 != "(" || *$5 != ")") yyerror("function must have (params)"); YYERROR;
-    } 
-;
-
-const: KEYWORD{
-    if(*$1 != "true" || *$1 != "false" || *$1 != "nil") yyerror("not a valid value"); YYERROR;
-    }
-    | INTCONST
+const: INTCONST
     | REAL
     | STRING
+    | NIL
+    | TRUE
+    | FALSE
 ;
 
-idlist: 
+idlist:
     | ID
-    | idlist PUNCTUATION ID {if(*$2 != ",") yyerror("Wrong punctuation in idlist"); YYERROR;}
+    | idlist COMMA ID
 ;
 
-ifstmt:  KEYWORD PUNCTUATION expr PUNCTUATION stmt{
-        if(*$1 != "if") yyerror("Invalid keyword in ifstmt"); YYERROR;
-        if(*$2 != "(" || *$4 != ")") yyerror("Invalid punctuation in ifstmt"); YYERROR;
-    }
-    | KEYWORD PUNCTUATION expr PUNCTUATION stmt KEYWORD stmt{
-        if(*$1 != "if" || *$6 != "else") yyerror("Invalid keyword in ifstmt"); YYERROR;
-        if(*$2 != "(" || *$4 != ")") yyerror("Invalid punctuation in ifstmt"); YYERROR; 
-    }
+ifstmt: IF LEFT_PARENTHES expr RIGHT_PARENTHES stmt
+    | ifstmt elsestmt
 ;
 
-whilestmt: KEYWORD PUNCTUATION expr PUNCTUATION stmt {
-        if(*$1 != "while") yyerror("Invalid keyword in whilestmt"); YYERROR;
-        if(*$2 != "(" || *$4 != ")") yyerror("Invalid punctuation in whilestmt"); YYERROR; 
-    }
+elsestmt: ELSE stmt
 ;
 
-forstmt: KEYWORD PUNCTUATION elist PUNCTUATION expr PUNCTUATION elist PUNCTUATION stmt{
-    if(*$1 != "for") yyerror("Invalid keyword in forstmt"); YYERROR;
-    if(*$2 != "(" || *$8 != ")") yyerror("forstmt does not contain ()"); YYERROR;
-    if(*$4 != ";" || *$6 != ";") yyerror("forstmt must be like for(elist; expr; elist) mprokoloko"); YYERROR;
-}
+whilestmt: WHILE LEFT_PARENTHES expr RIGHT_PARENTHES stmt
 ;
 
-returnstmt: KEYWORD PUNCTUATION {
-        if(*$1 != "return") yyerror("Den les return sto returnstmt"); YYERROR;
-        if(*$2 != ";") yyerror("Den exeis balei ; meta to return"); YYERROR;
-    }
-    | KEYWORD expr PUNCTUATION{
-        if(*$1 != "return") yyerror("Den les return sto returnstmt"); YYERROR;
-        if(*$3 != ";") yyerror("Den exeis balei ; meta to return"); YYERROR;
-    char *yaccProvidedMessage}
+forstmt: FOR LEFT_PARENTHES elist SEMICOLON expr SEMICOLON elist RIGHT_PARENTHES stmt
 ;
+
+returnstmt: RETURN SEMICOLON
+    | RETURN expr SEMICOLON
+;
+
 %%
 
 yyerror(char *yaccProvidedMessage){

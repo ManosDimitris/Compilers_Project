@@ -54,52 +54,51 @@ extern int yydebug;
     YYEOF = 0,                     /* "end of file"  */
     YYerror = 256,                 /* error  */
     YYUNDEF = 257,                 /* "invalid token"  */
-    INTCONST = 258,                /* INTCONST  */
-    REAL = 259,                    /* REAL  */
-    STRING = 260,                  /* STRING  */
-    IF = 261,                      /* IF  */
-    ELSE = 262,                    /* ELSE  */
-    WHILE = 263,                   /* WHILE  */
-    FOR = 264,                     /* FOR  */
-    FUNCTION = 265,                /* FUNCTION  */
-    RETURN = 266,                  /* RETURN  */
-    BREAK = 267,                   /* BREAK  */
-    CONTINUE = 268,                /* CONTINUE  */
-    AND = 269,                     /* AND  */
-    NOT = 270,                     /* NOT  */
-    OR = 271,                      /* OR  */
-    LOCAL = 272,                   /* LOCAL  */
-    TRUE = 273,                    /* TRUE  */
-    FALSE = 274,                   /* FALSE  */
-    NIL = 275,                     /* NIL  */
-    EQUAL = 276,                   /* EQUAL  */
-    ASSIGN = 277,                  /* ASSIGN  */
-    PPLUS = 278,                   /* PPLUS  */
-    PLUS = 279,                    /* PLUS  */
-    MMINUS = 280,                  /* MMINUS  */
-    MINUS = 281,                   /* MINUS  */
-    MULTI = 282,                   /* MULTI  */
-    DIV = 283,                     /* DIV  */
-    MOD = 284,                     /* MOD  */
-    NEQUAL = 285,                  /* NEQUAL  */
-    GREATER_EQUAL = 286,           /* GREATER_EQUAL  */
-    LESS_EQUAL = 287,              /* LESS_EQUAL  */
-    GREATER = 288,                 /* GREATER  */
-    LESS = 289,                    /* LESS  */
-    LEFT_CBRACKET = 290,           /* LEFT_CBRACKET  */
-    RIGHT_CBRACKET = 291,          /* RIGHT_CBRACKET  */
-    LEFT_BRACKET = 292,            /* LEFT_BRACKET  */
-    RIGHT_BRACKET = 293,           /* RIGHT_BRACKET  */
-    LEFT_PARENTHES = 294,          /* LEFT_PARENTHES  */
-    RIGHT_PARENTHES = 295,         /* RIGHT_PARENTHES  */
-    SEMICOLON = 296,               /* SEMICOLON  */
-    COMMA = 297,                   /* COMMA  */
-    DCOLON = 298,                  /* DCOLON  */
-    COLON = 299,                   /* COLON  */
-    DOTS = 300,                    /* DOTS  */
-    DOT = 301,                     /* DOT  */
-    ID = 302,                      /* ID  */
-    ASSIGNdw = 303                 /* ASSIGNdw  */
+    IF = 258,                      /* IF  */
+    ELSE = 259,                    /* ELSE  */
+    WHILE = 260,                   /* WHILE  */
+    FOR = 261,                     /* FOR  */
+    FUNCTION = 262,                /* FUNCTION  */
+    RETURN = 263,                  /* RETURN  */
+    BREAK = 264,                   /* BREAK  */
+    CONTINUE = 265,                /* CONTINUE  */
+    AND = 266,                     /* AND  */
+    OR = 267,                      /* OR  */
+    LOCAL = 268,                   /* LOCAL  */
+    TRUE = 269,                    /* TRUE  */
+    FALSE = 270,                   /* FALSE  */
+    NIL = 271,                     /* NIL  */
+    EQUAL = 272,                   /* EQUAL  */
+    ASSIGN = 273,                  /* ASSIGN  */
+    UPLUS = 274,                   /* UPLUS  */
+    PLUS = 275,                    /* PLUS  */
+    UMINUS = 276,                  /* UMINUS  */
+    MINUS = 277,                   /* MINUS  */
+    MULTI = 278,                   /* MULTI  */
+    DIV = 279,                     /* DIV  */
+    MOD = 280,                     /* MOD  */
+    NEQUAL = 281,                  /* NEQUAL  */
+    INTCONST = 282,                /* INTCONST  */
+    REAL = 283,                    /* REAL  */
+    STRING = 284,                  /* STRING  */
+    GREATER_EQUAL = 285,           /* GREATER_EQUAL  */
+    LESS_EQUAL = 286,              /* LESS_EQUAL  */
+    GREATER = 287,                 /* GREATER  */
+    LESS = 288,                    /* LESS  */
+    LEFT_CBRACKET = 289,           /* LEFT_CBRACKET  */
+    RIGHT_CBRACKET = 290,          /* RIGHT_CBRACKET  */
+    LEFT_BRACKET = 291,            /* LEFT_BRACKET  */
+    RIGHT_BRACKET = 292,           /* RIGHT_BRACKET  */
+    LEFT_PARENTHES = 293,          /* LEFT_PARENTHES  */
+    RIGHT_PARENTHES = 294,         /* RIGHT_PARENTHES  */
+    SEMICOLON = 295,               /* SEMICOLON  */
+    COMMA = 296,                   /* COMMA  */
+    DCOLON = 297,                  /* DCOLON  */
+    COLON = 298,                   /* COLON  */
+    DOTS = 299,                    /* DOTS  */
+    DOT = 300,                     /* DOT  */
+    ID = 301,                      /* ID  */
+    NOT = 302                      /* NOT  */
   };
   typedef enum yytokentype yytoken_kind_t;
 #endif
@@ -108,13 +107,13 @@ extern int yydebug;
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 union YYSTYPE
 {
-#line 33 "message.y"
+#line 18 "parser.y"
 
-    int int_val;
-    double real_val;
-    char* str_val;
+    std::string *strVal;
+    int intVal;
+    double realVal;
 
-#line 118 "parser.hpp"
+#line 117 "parser.hpp"
 
 };
 typedef union YYSTYPE YYSTYPE;
