@@ -50,21 +50,36 @@ void SymbolTable::insert(string name, int scope, int line) {
         temp->next = newEntry;
     }
 
-    ScopeList *new_scope = new ScopeList(name,scope,line);
+    ScopeList *new_scope = new ScopeList(newEntry);
     if(scopes == nullptr){
         scopes = new_scope;
     }else{
         ScopeList* tmp = scopes;
         ScopeList* prev = scopes;
         while(tmp->next != nullptr){
-            if(tmp->scope > new_scope->scope){
-                prev->next = new_scope;
-                new_scope->next = tmp;
-                break;
+            if(tmp->data->scope==new_scope->data->scope){
+                SymbolEntry* tmp_SymbolScope=tmp->data;
+            
+                while(tmp_SymbolScope->next!=nullptr){
+                    tmp_SymbolScope=tmp_SymbolScope->next;
+                }
+                tmp_SymbolScope->next=newEntry;
+                return;
+            }
+            else if(tmp->data->scope > new_scope->data->scope){
+                if (prev == nullptr) {
+                    new_scope->next = scopes;
+                    scopes = new_scope;
+                } else {
+                    prev->next = new_scope;
+                    new_scope->next = tmp;
+                }
+                return;
             }
             prev = tmp;
             tmp = tmp->next;
         }
+        prev->next=new_scope;
     }
 
 }

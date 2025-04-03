@@ -25,7 +25,7 @@ struct ScopeList
 {
     SymbolEntry *data;
     ScopeList* next;
-    ScopeList(int s) :  data(nullptr), next(nullptr) {}
+    ScopeList(SymbolEntry* s) :  data(s), next(nullptr) {}
 };
 
 
