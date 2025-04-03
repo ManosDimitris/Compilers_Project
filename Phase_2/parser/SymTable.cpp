@@ -2,9 +2,13 @@
 
 
 
-/*SymbolTable::SymbolTable() : table(CAPACITY) {}
+SymbolTable::SymbolTable() {
+    for (int i = 0; i < CAPACITY; i++) {
+        table[i] = nullptr;
+    }
+}
 
-void SymbolTable::display(){
+/*void SymbolTable::display(){
     for (int i = 0; i < CAPACITY; i++) {
         if (!table[i].empty()) {
             cout << "Index " << i << ": ";
@@ -30,19 +34,22 @@ void SymbolTable::display() {
     }
 }
 
-void SymbolTable::insert(string name , int scope , int line){
+void SymbolTable::insert(string name, int scope, int line) {
     int index = hashFunction(name);
-    if (table[index]==nullptr){
-        table[index]=&SymbolEntry(name,scope,line);
-    }
-    else{
-        SymbolEntry* temp_list=table[index];
-        while(temp_list->next!=NULL){
-            table[index]=&SymbolEntry(name,scope,line);
+    SymbolEntry* newEntry = new SymbolEntry(name, scope, line); // Allocate a new node
+
+    if (table[index] == nullptr) {
+        table[index] = newEntry; // If bucket is empty, insert at head
+    } 
+    else {
+        SymbolEntry* temp = table[index];
+        while (temp->next != nullptr) {
+            temp = temp->next;
         }
+        temp->next = newEntry;
     }
-    //table[index].push_back(SymbolEntry(name, scope, line));
 }
+
 
 
 int SymbolTable::hashFunction(string name){
