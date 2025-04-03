@@ -25,7 +25,7 @@ $(EXEC): $(LEX_OUT) $(YACC_OUT) $(SYM_TABLE_SRC)
 	$(CC) -o $@ $(LEX_OUT) $(YACC_OUT) $(SYM_TABLE_SRC)
 
 run: $(EXEC)
-	./$(EXEC)
+	
 
 clean:
 	rm -f $(EXEC) $(LEX_OUT) $(YACC_OUT) $(YACC_HDR)

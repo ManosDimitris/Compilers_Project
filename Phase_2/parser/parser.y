@@ -152,7 +152,7 @@ indexedelemlist: indexedelem
 indexedelem: LEFT_CBRACKET expr COLON expr RIGHT_CBRACKET
 ;
 
-block: LEFT_CBRACKET stmntlist RIGHT_CBRACKET
+block: LEFT_CBRACKET{scope++;} stmntlist RIGHT_CBRACKET{scope--;}
 ;
 
 funcdef: FUNCTION LEFT_PARENTHES idlist RIGHT_PARENTHES block
