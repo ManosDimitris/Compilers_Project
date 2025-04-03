@@ -15,14 +15,17 @@ struct SymbolEntry {
     string name;
     int scope;
     int line;
+    SymbolEntry *nextSc;
+    SymbolEntry *next;
     
-    SymbolEntry(string n, int s, int l) : name(n), scope(s), line(l) {}
+    SymbolEntry(string n, int s, int l) : name(n), scope(s), line(l) ,nextSc(NULL) ,next(NULL){}
 };
 
 
 class SymbolTable {
 private:
-    vector<list<SymbolEntry>> table;
+    SymbolEntry* table[CAPACITY];
+    //vector<list<SymbolEntry>> table;
     int hashFunction(string name);
 
 public:
