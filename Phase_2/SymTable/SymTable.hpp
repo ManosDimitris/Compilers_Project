@@ -54,7 +54,8 @@ public:
     bool lookup(string name);
 
     void ScopeHide(int scope);
-
+    
+    bool isFunction(string name, int scope);
 };
 
 #endif

@@ -9,9 +9,9 @@ YACC_SRC = ./parser/parser.y
 YACC_OUT = ./parser/parser.cpp
 YACC_HDR = ./parser/parser.hpp
 
-SYM_TABLE_SRC = ./parser/SymTable.cpp
+SYM_TABLE_SRC = ./SymTable/SymTable.cpp
 
-EXEC = Cucumber
+EXEC = compiler
 
 all: $(EXEC)
 

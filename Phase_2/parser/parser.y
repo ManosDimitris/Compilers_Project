@@ -4,7 +4,7 @@
     #include <cstring>
     #include <fstream>
     #include<vector>
-    #include"SymTable.hpp"
+    #include"../SymTable/SymTable.hpp"
     using namespace std;
 
     int yyerror(string yaccProvidedMessage);
@@ -122,10 +122,13 @@ lvalue: ID {
                     symTable.insert(*$1, "local_variable", scope, yylineno);
                 }
             }else{
-                bool found = false;
-                if(!symTable.lookup(*$1,0) && !symTable.lookup(*$1, scope) && found_Func)
-                    yyerror("Undefined refrence to " + *$1);
+                
+                if(!symTable.lookup(*$1,0) &&!symTable.lookup(*$1, scope) && found_Func) yyerror("Undefined refrence to " + *$1);
                 else if(hasLibFuncName(*$1)) yyerror("Variable " + *$1 + " cannot have the same name as a library function");
+                else if(symTable.isFunction(*$1,scope)){
+                        yyerror(*$1 + " Defined as function");
+                }
+                
             }
         }
     | LOCAL ID {
@@ -267,28 +270,40 @@ bool hasLibFuncName(string name){
 }
 
 int yyerror(string yaccProvidedMessage){
-    cerr << yaccProvidedMessage << " at line " << yylineno << endl;
+    cout << yaccProvidedMessage << " at line " << yylineno << endl;
     return 1;
 }
 
 int main(int argc, char* argv[]){
-     if (argc > 1) {
-        
-        yyin = fopen(argv[1], "r");
-        if (!yyin) {
-            cerr << "Error opening file: " << argv[1] << endl;
-            return 1;
-        }
-        ofstream file(argv[2]);
-        if(!file.is_open()){
-            cerr << "Error opening file: " << argv[2] << endl;
-            return 1;
-        }
-    } else {
-        yyin = stdin;
+     if (argc < 2) {
+        cerr << "Usage: " << argv[0] << " <input_file> [output_file]" << endl;
+        return 1;
     }
+
+    yyin = fopen(argv[1], "r");
+    if (!yyin) {
+        cerr << "Error opening input file: " << argv[1] << endl;
+        return 1;
+    }
+
+    streambuf* backup = cout.rdbuf();
+    ofstream file;
+    if (argc >= 3) {
+        file.open(argv[2]);
+        if (!file.is_open()) {
+            cerr << "Error opening output file: " << argv[2] << endl;
+            return 1;
+        }
+        cout.rdbuf(file.rdbuf());
+    }
+
     yyparse();
     symTable.display();
+
+    cout.rdbuf(backup); 
+    if (file.is_open()) file.close();
+    fclose(yyin);
+
     return 0;
 }
 

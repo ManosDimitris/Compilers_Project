@@ -124,3 +124,18 @@ void SymbolTable::ScopeHide(int scope){
     tmp->isActive = 0;
 
 }
+
+bool SymbolTable::isFunction(string name, int scope){
+    int index = SymTable_hash(name);
+
+    SymbolEntry* tmp = table[index];
+    while(tmp != nullptr){
+        if(tmp->isActive){
+            if((name == tmp->name) && tmp->type == "user function"){
+                return true;
+            }
+        } 
+        tmp = tmp->next;  
+    }
+    return false;//NOT FOUND DAHH}
+}
