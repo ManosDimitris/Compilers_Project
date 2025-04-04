@@ -588,11 +588,11 @@ static const yytype_uint8 yyrline[] =
       65,    66,    67,    68,    69,    72,    73,    74,    75,    76,
       77,    78,    79,    80,    81,    82,    83,    84,    85,    86,
       89,    90,    91,    92,    93,    94,    95,    96,    99,   104,
-     105,   106,   107,   108,   111,   120,   121,   126,   129,   130,
-     131,   132,   135,   136,   137,   140,   141,   144,   147,   150,
-     151,   152,   155,   156,   159,   162,   163,   166,   169,   169,
-     172,   174,   174,   172,   175,   178,   179,   180,   181,   182,
-     183,   186,   187,   188,   191,   192,   195,   198,   201,   202
+     105,   106,   107,   108,   111,   123,   131,   136,   139,   140,
+     141,   142,   145,   146,   147,   150,   151,   154,   157,   160,
+     161,   162,   165,   166,   169,   172,   173,   176,   179,   179,
+     182,   184,   184,   182,   185,   188,   189,   190,   191,   192,
+     193,   196,   197,   198,   201,   202,   205,   208,   211,   212
 };
 #endif
 
@@ -1371,67 +1371,77 @@ yyreduce:
   case 44: /* lvalue: ID  */
 #line 111 "parser/parser.y"
            {
-            if(!symTable.lookup(*(yyvsp[0].strVal),scope)){
-                if(scope == 0){
+            if(!(symTable.lookup(*(yyvsp[0].strVal)))){
+                if(scope == 0){         
                     symTable.insert(*(yyvsp[0].strVal), "global_variable", scope, yylineno);
                 }else{
                     symTable.insert(*(yyvsp[0].strVal), "local_variable", scope, yylineno);
                 }
-            } 
+            }else{
+                if(!symTable.lookup(*(yyvsp[0].strVal),0) && !symTable.lookup(*(yyvsp[0].strVal), scope))
+                    yyerror("Undefined refrence to " + *(yyvsp[0].strVal));
+            }
         }
-#line 1383 "parser/parser.cpp"
+#line 1386 "parser/parser.cpp"
     break;
 
   case 45: /* lvalue: LOCAL ID  */
-#line 120 "parser/parser.y"
-               { symTable.insert(*(yyvsp[0].strVal), "local_variable", scope, yylineno);}
-#line 1389 "parser/parser.cpp"
-    break;
-
-  case 46: /* lvalue: DCOLON ID  */
-#line 121 "parser/parser.y"
-                { 
-                if(!symTable.lookup(*(yyvsp[0].strVal),0)){
-                    yyerror("Undifined variable");
-                }
+#line 123 "parser/parser.y"
+               {
+        if(!symTable.lookup(*(yyvsp[0].strVal), scope)){ 
+            symTable.insert(*(yyvsp[0].strVal), "local_variable", scope, yylineno);
         }
+        else{
+            yyerror("redefinition of " + *(yyvsp[0].strVal));
+        }
+    }
 #line 1399 "parser/parser.cpp"
     break;
 
+  case 46: /* lvalue: DCOLON ID  */
+#line 131 "parser/parser.y"
+                { 
+                if(!symTable.lookup(*(yyvsp[0].strVal),0)){
+                    yyerror("Undefined refrence to " + *(yyvsp[0].strVal));
+                }
+        }
+#line 1409 "parser/parser.cpp"
+    break;
+
   case 68: /* $@1: %empty  */
-#line 169 "parser/parser.y"
+#line 179 "parser/parser.y"
                     {++scope;}
-#line 1405 "parser/parser.cpp"
+#line 1415 "parser/parser.cpp"
     break;
 
   case 69: /* block: LEFT_CBRACKET $@1 stmntlist RIGHT_CBRACKET  */
-#line 169 "parser/parser.y"
+#line 179 "parser/parser.y"
                                                        {scope--;}
-#line 1411 "parser/parser.cpp"
+#line 1421 "parser/parser.cpp"
     break;
 
   case 70: /* $@2: %empty  */
-#line 172 "parser/parser.y"
+#line 182 "parser/parser.y"
                  {
                     symTable.insert(*(yyvsp[0].strVal), "function", scope, yylineno);
                  }
-#line 1419 "parser/parser.cpp"
+#line 1429 "parser/parser.cpp"
     break;
 
   case 71: /* $@3: %empty  */
-#line 174 "parser/parser.y"
+#line 184 "parser/parser.y"
                                  {++scope;}
-#line 1425 "parser/parser.cpp"
+#line 1435 "parser/parser.cpp"
     break;
 
   case 72: /* $@4: %empty  */
-#line 174 "parser/parser.y"
+#line 184 "parser/parser.y"
                                                                   {scope--;}
-#line 1431 "parser/parser.cpp"
+#line 1441 "parser/parser.cpp"
     break;
 
 
-#line 1435 "parser/parser.cpp"
+#line 1445 "parser/parser.cpp"
 
       default: break;
     }
@@ -1624,7 +1634,7 @@ yyreturnlab:
   return yyresult;
 }
 
-#line 205 "parser/parser.y"
+#line 215 "parser/parser.y"
 
 
 int yyerror(string yaccProvidedMessage){

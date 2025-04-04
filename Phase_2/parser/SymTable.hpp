@@ -50,7 +50,11 @@ public:
 
     bool lookup(string name , int scope);
 
+    bool lookup(string name);
+
     void ScopeHide(int scope);
+
+    bool isActive_Lookup(string name, int scope);
 };
 
 #endif

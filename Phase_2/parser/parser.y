@@ -109,20 +109,28 @@ primary: lvalue
 ;
 
 lvalue: ID {
-            if(!symTable.lookup(*$1,scope)){
-                if(scope == 0){
+            if(!(symTable.lookup(*$1))){
+                if(scope == 0){         
                     symTable.insert(*$1, "global_variable", scope, yylineno);
                 }else{
                     symTable.insert(*$1, "local_variable", scope, yylineno);
                 }
             }else{
-                
+                if(!symTable.lookup(*$1,0) && !symTable.lookup(*$1, scope))
+                    yyerror("Undefined refrence to " + *$1);
             }
         }
-    | LOCAL ID { symTable.insert(*$2, "local_variable", scope, yylineno);}
+    | LOCAL ID {
+        if(!symTable.lookup(*$2, scope)){ 
+            symTable.insert(*$2, "local_variable", scope, yylineno);
+        }
+        else{
+            yyerror("redefinition of " + *$2);
+        }
+    }
     | DCOLON ID { 
                 if(!symTable.lookup(*$2,0)){
-                    yyerror("Undifined variable");
+                    yyerror("Undefined refrence to " + *$2);
                 }
         }
     | member

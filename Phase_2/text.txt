@@ -5,8 +5,9 @@ function f(){
     local x = 12;
     local m= 9;
     o = 7;
+    local m = 10;
     {
-        ::x = 1;
+        local m = 1;
         mpla = 190;
     }
 }

@@ -73,21 +73,37 @@ int SymbolTable::SymTable_hash(string name) {
 }
 
 bool SymbolTable::lookup(string name, int scope){
+    int index = SymTable_hash(name);
 
-    for (int i = 0; i < CAPACITY; i++){
-        SymbolEntry* tmp = table[i];
-        while(tmp != nullptr){
-            //PRIN KANEIS TO OTIDIPOTE TSEKARE AN EINAI ACTIVE
-            if(tmp->isActive){
-                if((name == tmp->name) && (tmp->scope == scope)){
-                    return 1; //FOUND
-                }
-            } 
-            tmp = tmp->next;  
-        }
+    SymbolEntry* tmp = table[index];
+    while(tmp != nullptr){
+            
+        if(tmp->isActive){
+            if(((name == tmp->name) && (tmp->scope == scope))){
+                return true; //FOUND
+            }
+        } 
+        tmp = tmp->next;  
     }
-    return 0;//NOT FOUND DAHH
+    return false;//NOT FOUND DAHH
 }
+
+bool SymbolTable::lookup(string name){
+    int index = SymTable_hash(name);
+
+    SymbolEntry* tmp = table[index];
+    while(tmp != nullptr){
+            
+        if(tmp->isActive){
+            if(name == tmp->name){
+                return true; //FOUND
+            }
+        } 
+        tmp = tmp->next;  
+    }
+    return false;//NOT FOUND DAHH
+}
+
 
 //KANEI HIDE KRIBEI KA8E SYMBOLO STO SCOPE OTAN KLINEI ENA BLOCK
 void SymbolTable::ScopeHide(int scope){
@@ -106,4 +122,15 @@ void SymbolTable::ScopeHide(int scope){
 
 }
 
+bool SymbolTable::isActive_Lookup(string name, int scope){
+    int index = SymTable_hash(name);
 
+    SymbolEntry *tmp = table[index];
+    while(tmp != nullptr){
+        if(tmp->name == name && tmp->scope){
+            if(tmp->isActive) return true;
+            break;
+        }
+    }
+    return false;
+}
