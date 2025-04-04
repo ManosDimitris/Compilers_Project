@@ -89,3 +89,8 @@ scopes = ScopeList (gia scope 0) -> ScopeList (gia scope 1) -> NULL
 scopes = ScopeList (gia scope 0) -> ScopeList (gia scope 1) -> NULL
         | vector : [x], [z] |       | vector : [m], [o]   |
 --
+
+--------------------------------------------------------------------------------------------------
+ AMA TO DEIS MPESA KANE ESY TA MA8HMATA CPP KAI C KAI OXI OI MALAKES STO PANEPISTIMIO RE GAMAS
+
+--------------------------------------------------------------------------------------------------

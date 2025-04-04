@@ -1,7 +1,12 @@
 x = 10;
 z = 9;
 
-{
-    m = 9;
+function f(){
+    local x = 12;
+    local m= 9;
     o = 7;
+    {
+        ::x = 1;
+        mpla = 190;
+    }
 }

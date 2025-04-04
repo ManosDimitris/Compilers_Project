@@ -17,16 +17,18 @@ struct SymbolEntry {
     string type;
     int scope;
     int line;
+    bool isActive; //Ebala active 
     SymbolEntry *next;
     
-    SymbolEntry(string n, string t, int s, int l) : name(n), type(t), scope(s), line(l) ,next(NULL){}
+    SymbolEntry(string n, string t, int s, int l, bool b) : name(n), type(t), scope(s), line(l), isActive(b) ,next(NULL){}
 };
 
 struct ScopeList
 {
     vector<SymbolEntry *> data_in_scope;
+    int isActive; //EBALA KAI EDW ENA ACTIVE GIA NA APENERGOPOIEI OLO TO SCOPE AN EXEI KLEISEI 
     ScopeList* next;
-    ScopeList(SymbolEntry* s) : next(nullptr) { data_in_scope.push_back(s); }
+    ScopeList(SymbolEntry* s, bool b) :  next(nullptr), isActive(b) { data_in_scope.push_back(s); }
     ScopeList() : next(nullptr){}
 };
 
@@ -46,7 +48,9 @@ public:
     
     void display();
 
-    //bool lookup();
+    bool lookup(string name , int scope);
+
+    void ScopeHide(int scope);
 };
 
 #endif

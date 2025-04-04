@@ -16,9 +16,13 @@ void SymbolTable::display() {
     int curr_scope = 0;
     while(temp != nullptr){
         cout << "----Scope " << curr_scope << "----" << endl;
-        for(int i = 0; i < scopes->data_in_scope.size(); i++){
+        
+        //ALASKA TO scope->data_in_scope.size() se temp->data_in_scope.size() giati etrwgw seg fault se parapanw scopes 
+        for(int i = 0; i < temp->data_in_scope.size(); i++){ 
             SymbolEntry *currEntry = temp->data_in_scope.at(i);
-            cout << "[ " << "Name: "<< currEntry->name << ", Type: " << currEntry->type << ", Scope: " << currEntry->scope << ", Line: " << currEntry->line << "]" << endl;
+            if(lookup(currEntry->name,currEntry->scope)){//TSEKARE AN BRISKETAI SWSTA KAI STON TABLE KAI AN EINAI ACTIVE SYMATNIKOOOO
+                cout << "[ " << "Name: "<< currEntry->name << ", Type: " << currEntry->type << ", Scope: " << currEntry->scope << ", Line: " << currEntry->line << "]" << endl;
+            }
         }
         curr_scope++;
         temp = temp -> next;
@@ -27,10 +31,10 @@ void SymbolTable::display() {
 
 void SymbolTable::insert(string name, string type, int scope, int line) {
     int index = SymTable_hash(name);
-    SymbolEntry* newEntry = new SymbolEntry(name, type, scope, line); // Allocate a new node
+    SymbolEntry* newEntry = new SymbolEntry(name, type, scope, line, 1); 
 
     if (table[index] == nullptr) {
-        table[index] = newEntry; // If bucket is empty, insert at head
+        table[index] = newEntry;
     } 
     else {
         SymbolEntry* temp = table[index];
@@ -41,7 +45,7 @@ void SymbolTable::insert(string name, string type, int scope, int line) {
     }
 
     if(scopes == nullptr){
-        ScopeList *new_scope = new ScopeList(newEntry);
+        ScopeList *new_scope = new ScopeList(newEntry,1);
         scopes = new_scope;
     }else{
         ScopeList *temp = scopes;
@@ -67,3 +71,39 @@ int SymbolTable::SymTable_hash(string name) {
     }
     return hash;  
 }
+
+bool SymbolTable::lookup(string name, int scope){
+
+    for (int i = 0; i < CAPACITY; i++){
+        SymbolEntry* tmp = table[i];
+        while(tmp != nullptr){
+            //PRIN KANEIS TO OTIDIPOTE TSEKARE AN EINAI ACTIVE
+            if(tmp->isActive){
+                if((name == tmp->name) && (tmp->scope == scope)){
+                    return 1; //FOUND
+                }
+            } 
+            tmp = tmp->next;  
+        }
+    }
+    return 0;//NOT FOUND DAHH
+}
+
+//KANEI HIDE KRIBEI KA8E SYMBOLO STO SCOPE OTAN KLINEI ENA BLOCK
+void SymbolTable::ScopeHide(int scope){
+    ScopeList *tmp = scopes;
+
+    for (int i = 0; i < scope && tmp != nullptr; i++) {
+        tmp = tmp->next;
+    }
+
+    if (tmp == nullptr) return;
+
+    for (int i = 0; i < tmp->data_in_scope.size(); i++) {
+        tmp->data_in_scope[i]->isActive = 0;
+    }
+    tmp->isActive = 0;
+
+}
+
+

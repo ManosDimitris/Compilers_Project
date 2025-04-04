@@ -96,7 +96,9 @@ term: LEFT_PARENTHES expr RIGHT_PARENTHES
     | primary
 ;
 
-assignexpr: lvalue ASSIGN expr
+assignexpr: lvalue ASSIGN expr{
+    
+}
 ;
 
 primary: lvalue
@@ -106,9 +108,23 @@ primary: lvalue
     | const
 ;
 
-lvalue: ID { symTable.insert(*$1, "global_variable", scope, yylineno);}
-    | LOCAL ID
-    | DCOLON ID
+lvalue: ID {
+            if(!symTable.lookup(*$1,scope)){
+                if(scope == 0){
+                    symTable.insert(*$1, "global_variable", scope, yylineno);
+                }else{
+                    symTable.insert(*$1, "local_variable", scope, yylineno);
+                }
+            }else{
+                
+            }
+        }
+    | LOCAL ID { symTable.insert(*$2, "local_variable", scope, yylineno);}
+    | DCOLON ID { 
+                if(!symTable.lookup(*$2,0)){
+                    yyerror("Undifined variable");
+                }
+        }
     | member
 ;
 
@@ -155,7 +171,9 @@ indexedelem: LEFT_CBRACKET expr COLON expr RIGHT_CBRACKET
 block: LEFT_CBRACKET{++scope;} stmntlist RIGHT_CBRACKET{scope--;}
 ;
 
-funcdef: FUNCTION LEFT_PARENTHES idlist RIGHT_PARENTHES block
+funcdef: FUNCTION{
+                    symTable.insert(*$1, "function", scope, yylineno);
+                 } LEFT_PARENTHES{++scope;} idlist RIGHT_PARENTHES{scope--;} block
     | FUNCTION ID LEFT_PARENTHES idlist RIGHT_PARENTHES block
 ;
 
