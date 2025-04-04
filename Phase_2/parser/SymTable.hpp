@@ -4,6 +4,7 @@
 #include <iostream>
 #include <vector>
 #include <list>
+#include <fstream>
 
 using namespace std;
 
@@ -54,7 +55,6 @@ public:
 
     void ScopeHide(int scope);
 
-    bool isActive_Lookup(string name, int scope);
 };
 
 #endif

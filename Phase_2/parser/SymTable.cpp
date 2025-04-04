@@ -1,10 +1,15 @@
 #include"SymTable.hpp"
 #include <string>
-
+#include <fstream>
 
 SymbolTable::SymbolTable() {
     for (int i = 0; i < CAPACITY; i++) {
         table[i] = nullptr;
+    }
+
+    string x[12] = {"print", "input", "objectmemberkeys", "objecttotalmembers", "objectcopy", "totalarguments", "argument", "typeof", "strtonum", "sqrt", "cos", "sin"};
+    for(int i = 0; i < 12; i++){
+        insert(x[i], "library function", 0, 0);
     }
     
 }
@@ -19,10 +24,8 @@ void SymbolTable::display() {
         
         //ALASKA TO scope->data_in_scope.size() se temp->data_in_scope.size() giati etrwgw seg fault se parapanw scopes 
         for(int i = 0; i < temp->data_in_scope.size(); i++){ 
-            SymbolEntry *currEntry = temp->data_in_scope.at(i);
-            if(lookup(currEntry->name,currEntry->scope)){//TSEKARE AN BRISKETAI SWSTA KAI STON TABLE KAI AN EINAI ACTIVE SYMATNIKOOOO
-                cout << "[ " << "Name: "<< currEntry->name << ", Type: " << currEntry->type << ", Scope: " << currEntry->scope << ", Line: " << currEntry->line << "]" << endl;
-            }
+            SymbolEntry *currEntry = temp->data_in_scope.at(i);//TSEKARE AN BRISKETAI SWSTA KAI STON TABLE KAI AN EINAI ACTIVE SYMATNIKOOOO
+            cout << "[ " << "Name: "<< currEntry->name << ", Type: " << currEntry->type << ", Scope: " << currEntry->scope << ", Line: " << currEntry->line << "]" << endl;
         }
         curr_scope++;
         temp = temp -> next;
@@ -120,17 +123,4 @@ void SymbolTable::ScopeHide(int scope){
     }
     tmp->isActive = 0;
 
-}
-
-bool SymbolTable::isActive_Lookup(string name, int scope){
-    int index = SymTable_hash(name);
-
-    SymbolEntry *tmp = table[index];
-    while(tmp != nullptr){
-        if(tmp->name == name && tmp->scope){
-            if(tmp->isActive) return true;
-            break;
-        }
-    }
-    return false;
 }

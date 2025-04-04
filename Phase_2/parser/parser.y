@@ -2,6 +2,7 @@
     #include <iostream>
     #include <string>
     #include <cstring>
+    #include <fstream>
     #include<vector>
     #include"SymTable.hpp"
     using namespace std;
@@ -15,6 +16,12 @@
 
     SymbolTable symTable;
     int scope = 0;
+    bool found_Func = false;
+    int curr_func = 1;
+
+    ostream *outStream;
+
+    bool hasLibFuncName(string name);
 %}
 
 %union{
@@ -50,7 +57,8 @@
 
 %%
 
-program: stmntlist
+program: 
+    |stmntlist
 ;
 
 stmntlist:  stmt
@@ -96,9 +104,7 @@ term: LEFT_PARENTHES expr RIGHT_PARENTHES
     | primary
 ;
 
-assignexpr: lvalue ASSIGN expr{
-    
-}
+assignexpr: lvalue ASSIGN expr
 ;
 
 primary: lvalue
@@ -116,17 +122,23 @@ lvalue: ID {
                     symTable.insert(*$1, "local_variable", scope, yylineno);
                 }
             }else{
-                if(!symTable.lookup(*$1,0) && !symTable.lookup(*$1, scope))
+                bool found = false;
+                if(!symTable.lookup(*$1,0) && !symTable.lookup(*$1, scope) && found_Func)
                     yyerror("Undefined refrence to " + *$1);
+                else if(hasLibFuncName(*$1)) yyerror("Variable " + *$1 + " cannot have the same name as a library function");
             }
         }
     | LOCAL ID {
-        if(!symTable.lookup(*$2, scope)){ 
-            symTable.insert(*$2, "local_variable", scope, yylineno);
+        if(scope != 0){
+            if(!symTable.lookup(*$2, scope) && !(hasLibFuncName(*$2))){ 
+                symTable.insert(*$2, "local_variable", scope, yylineno);
+            }
+            else{
+                if(hasLibFuncName(*$2)) yyerror("Variable " + *$2 + " cannot have the same name as a library function");
+                else yyerror("redefinition of " + *$2);
+            }
         }
-        else{
-            yyerror("redefinition of " + *$2);
-        }
+        else yyerror("Cannot declare local va riable with scope 0");
     }
     | DCOLON ID { 
                 if(!symTable.lookup(*$2,0)){
@@ -176,13 +188,29 @@ indexedelemlist: indexedelem
 indexedelem: LEFT_CBRACKET expr COLON expr RIGHT_CBRACKET
 ;
 
-block: LEFT_CBRACKET{++scope;} stmntlist RIGHT_CBRACKET{scope--;}
+block: LEFT_CBRACKET{++scope;} stmntlist RIGHT_CBRACKET{
+        symTable.ScopeHide(scope);
+        scope--;
+    }
+    | LEFT_CBRACKET RIGHT_CBRACKET
 ;
 
-funcdef: FUNCTION{
-                    symTable.insert(*$1, "function", scope, yylineno);
-                 } LEFT_PARENTHES{++scope;} idlist RIGHT_PARENTHES{scope--;} block
-    | FUNCTION ID LEFT_PARENTHES idlist RIGHT_PARENTHES block
+funcdef: FUNCTION{  
+        string name = "$" + to_string(curr_func);
+        symTable.insert(name, "user function", scope, yylineno);
+        curr_func++;
+    } LEFT_PARENTHES{++scope;} idlist RIGHT_PARENTHES{scope--;} {found_Func = true;} block { found_Func = false; }
+    
+    | FUNCTION ID {
+        bool isInSmtb = true;
+
+        isInSmtb = symTable.lookup(*$2, scope);
+
+        if(!isInSmtb && !hasLibFuncName(*$2)) symTable.insert(*$2, "user function", scope, yylineno);
+
+        if(hasLibFuncName(*$2)) yyerror("user function " + *$2 + " cannot have the same id as a library function");
+        else if (isInSmtb) yyerror("redefinition of " + *$2);
+    }LEFT_PARENTHES{++scope;} idlist RIGHT_PARENTHES {scope--;} {found_Func = true;} block { found_Func = false; }
 ;
 
 const: INTCONST
@@ -194,8 +222,24 @@ const: INTCONST
 ;
 
 idlist:
-    | ID 
-    | idlist COMMA ID
+    | ID {
+        if(!symTable.lookup(*$1, scope) && !hasLibFuncName(*$1)){ 
+            symTable.insert(*$1, "formal argument", scope, yylineno);
+        }
+        else{
+            if(hasLibFuncName(*$1)) yyerror("Argument " + *$1 + " cannot have the same id as a library function");
+            else yyerror("redefinition of " + *$1);
+        }
+    }
+    | idlist COMMA ID {
+        if(!symTable.lookup(*$3, scope) && !hasLibFuncName(*$3)){ 
+            symTable.insert(*$3, "formal argument", scope, yylineno);
+        }
+        else{
+            if(hasLibFuncName(*$3)) yyerror("Argument " + *$3 + " cannot have the same id as a library function");
+            else yyerror("redefinition of " + *$3);
+        }
+    }
 ;
 
 ifstmt: IF LEFT_PARENTHES expr RIGHT_PARENTHES stmt %prec THEN
@@ -205,17 +249,25 @@ ifstmt: IF LEFT_PARENTHES expr RIGHT_PARENTHES stmt %prec THEN
 whilestmt: WHILE LEFT_PARENTHES expr RIGHT_PARENTHES stmt
 ;
 
-forstmt: FOR LEFT_PARENTHES elist SEMICOLON expr SEMICOLON elist RIGHT_PARENTHES stmt
+forstmt: FOR LEFT_PARENTHES{++scope;} elist SEMICOLON expr SEMICOLON elist RIGHT_PARENTHES{scope--;} stmt
 ;
 
-returnstmt: RETURN SEMICOLON
-    | RETURN expr SEMICOLON
+returnstmt: RETURN SEMICOLON 
+    | RETURN expr SEMICOLON 
 ;
 
 %%
 
+bool hasLibFuncName(string name){
+    string funcs[12] = {"print", "input", "objectmemberkeys", "objecttotalmembers", "objectcopy", "totalarguments", "argument", "typeof", "strtonum", "sqrt", "cos", "sin"};
+    for(int i = 0; i < 12; i++){
+        if(funcs[i] == name) return true;
+    }
+    return false;
+}
+
 int yyerror(string yaccProvidedMessage){
-    cout << yaccProvidedMessage << " at line " << yylineno << endl;
+    cerr << yaccProvidedMessage << " at line " << yylineno << endl;
     return 1;
 }
 
@@ -225,6 +277,11 @@ int main(int argc, char* argv[]){
         yyin = fopen(argv[1], "r");
         if (!yyin) {
             cerr << "Error opening file: " << argv[1] << endl;
+            return 1;
+        }
+        ofstream file(argv[2]);
+        if(!file.is_open()){
+            cerr << "Error opening file: " << argv[2] << endl;
             return 1;
         }
     } else {

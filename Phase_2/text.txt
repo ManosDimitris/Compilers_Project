@@ -1,13 +1,19 @@
-x = 10;
-z = 9;
-
-function f(){
-    local x = 12;
-    local m= 9;
-    o = 7;
-    local m = 10;
-    {
-        local m = 1;
-        mpla = 190;
-    }
+{
+	x = 1;	//variable x declared at scope 1
+	{
+		x = 2;	//referes to the previous x and is visible
+        function i(){
+            local o = 0;
+        }
+        function f(p){
+            o = 9;
+        }
+        if(some == other){
+            x = 9;
+        }
+        for(var = 9; var < x; var++){
+            x = 8 ;
+            var++;
+        }
+	}
 }

@@ -74,7 +74,7 @@ STRING          \"(\\.|[^"\\])*\"
 ID             [a-zA-Z][a-zA-Z_0-9]*
 LINE_COMMENT       "//".*
 BLOCK_COMMENT       "/*"
-WHITESPACE     (" "|"\n")
+WHITESPACE     (" "|"\n"|"\t")
 INVALID_STRING  \"([^\"\\\n]|\\.)*
 
 
