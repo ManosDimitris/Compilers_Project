@@ -1,5 +1,5 @@
 #include"SymTable.hpp"
-
+#include <string>
 
 
 SymbolTable::SymbolTable() {
@@ -11,33 +11,23 @@ SymbolTable::SymbolTable() {
 
 
 void SymbolTable::display() {
-    for (int i = 1; i < CAPACITY; i++) {
-        if (table[i] != nullptr) {  
-            cout << "Index " << i << ": ";
-            SymbolEntry* current = table[i]; 
-            while (current != nullptr) {
-                cout << "[" << current->name << ", Scope: " << current->scope << ", Line: " << current->line << "] ";
-                current = current->next; 
-            }
-            cout << endl;
-        }
-    }
+    ScopeList *temp = scopes;
 
-    if (table[0]!= nullptr) {    
-        SymbolEntry* tmp = table[0]; 
-
-        while (tmp != nullptr) {
-            cout << "Index " << tmp->scope << ": ";
-            cout << "[" << tmp->name << ", Scope: " << tmp->scope << ", Line: " << tmp->line << "] " << endl;
-            tmp = tmp->nextSc; 
+    int curr_scope = 0;
+    while(temp != nullptr){
+        cout << "----Scope " << curr_scope << "----" << endl;
+        for(int i = 0; i < scopes->data_in_scope.size(); i++){
+            SymbolEntry *currEntry = temp->data_in_scope.at(i);
+            cout << "[ " << "Name: "<< currEntry->name << ", Type: " << currEntry->type << ", Scope: " << currEntry->scope << ", Line: " << currEntry->line << "]" << endl;
         }
-    
+        curr_scope++;
+        temp = temp -> next;
     }
 }
 
-void SymbolTable::insert(string name, int scope, int line) {
+void SymbolTable::insert(string name, string type, int scope, int line) {
     int index = SymTable_hash(name);
-    SymbolEntry* newEntry = new SymbolEntry(name, scope, line); // Allocate a new node
+    SymbolEntry* newEntry = new SymbolEntry(name, type, scope, line); // Allocate a new node
 
     if (table[index] == nullptr) {
         table[index] = newEntry; // If bucket is empty, insert at head
@@ -50,36 +40,21 @@ void SymbolTable::insert(string name, int scope, int line) {
         temp->next = newEntry;
     }
 
-    ScopeList *new_scope = new ScopeList(newEntry);
     if(scopes == nullptr){
+        ScopeList *new_scope = new ScopeList(newEntry);
         scopes = new_scope;
     }else{
-        ScopeList* tmp = scopes;
-        ScopeList* prev = scopes;
-        while(tmp->next != nullptr){
-            if(tmp->data->scope==new_scope->data->scope){
-                SymbolEntry* tmp_SymbolScope=tmp->data;
-            
-                while(tmp_SymbolScope->next!=nullptr){
-                    tmp_SymbolScope=tmp_SymbolScope->next;
-                }
-                tmp_SymbolScope->next=newEntry;
-                return;
+        ScopeList *temp = scopes;
+        for(int i = 0; i < scope; i++){
+            if(temp->next != nullptr){
+               temp = temp->next; 
             }
-            else if(tmp->data->scope > new_scope->data->scope){
-                if (prev == nullptr) {
-                    new_scope->next = scopes;
-                    scopes = new_scope;
-                } else {
-                    prev->next = new_scope;
-                    new_scope->next = tmp;
-                }
-                return;
+            else{
+                temp->next = new ScopeList();
+                temp = temp->next;
             }
-            prev = tmp;
-            tmp = tmp->next;
         }
-        prev->next=new_scope;
+        temp->data_in_scope.push_back(newEntry);
     }
 
 }
@@ -90,5 +65,5 @@ int SymbolTable::SymTable_hash(string name) {
     for (char c : name) {
         hash = (hash * HASH_MUL + c) % CAPACITY;
     }
-    return (hash == 0) ? 1 : hash;  
+    return hash;  
 }

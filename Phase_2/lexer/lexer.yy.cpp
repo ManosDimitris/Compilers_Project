@@ -1,6 +1,6 @@
-#line 2 "lexer/lexer.yy.cpp"
+#line 1 "lexer/lexer.yy.cpp"
 
-#line 4 "lexer/lexer.yy.cpp"
+#line 3 "lexer/lexer.yy.cpp"
 
 #define  YY_INT_ALIGNED short int
 
@@ -372,8 +372,8 @@ static void yynoreturn yy_fatal_error ( const char* msg  );
 	(yy_hold_char) = *yy_cp; \
 	*yy_cp = '\0'; \
 	(yy_c_buf_p) = yy_cp;
-#define YY_NUM_RULES 52
-#define YY_END_OF_BUFFER 53
+#define YY_NUM_RULES 51
+#define YY_END_OF_BUFFER 52
 /* This struct is not used in this scanner,
    but its presence is necessary. */
 struct yy_trans_info
@@ -383,19 +383,19 @@ struct yy_trans_info
 	};
 static const flex_int16_t yy_accept[116] =
     {   0,
-        0,    0,   53,   51,   42,   50,   51,   45,   24,   34,
-       35,   22,   19,   37,   21,   41,   23,   43,   43,   39,
-       36,   29,   17,   28,   47,   32,   33,   47,   47,   47,
-       47,   47,   47,   47,   47,   47,   47,   47,   47,   30,
-       31,   25,   45,    0,   46,    0,   18,   20,   40,   44,
-       49,   48,   44,   43,    0,   38,   27,   16,   26,   47,
-       47,   47,   47,   47,   47,   47,   47,    1,   47,   47,
-       47,   11,   47,   47,   47,    0,   48,   43,    9,   47,
-       47,   47,   47,    4,   47,   47,   15,   10,   47,   47,
-       47,   47,   47,    2,   47,   47,   47,   47,   13,   47,
+        0,    0,   52,   50,   49,   49,   50,   44,   24,   34,
+       35,   22,   19,   37,   21,   41,   23,   42,   42,   39,
+       36,   29,   17,   28,   46,   32,   33,   46,   46,   46,
+       46,   46,   46,   46,   46,   46,   46,   46,   46,   30,
+       31,   25,   44,    0,   45,    0,   18,   20,   40,   43,
+       48,   47,   43,   42,    0,   38,   27,   16,   26,   46,
+       46,   46,   46,   46,   46,   46,   46,    1,   46,   46,
+       46,   11,   46,   46,   46,    0,   47,   42,    9,   46,
+       46,   46,   46,    4,   46,   46,   15,   10,   46,   46,
+       46,   46,   46,    2,   46,   46,   46,   46,   13,   46,
 
-        7,   47,   14,   47,   12,   47,    3,   47,   47,    6,
-       47,   47,    8,    5,    0
+        7,   46,   14,   46,   12,   46,    3,   46,   46,    6,
+       46,   46,    8,    5,    0
     } ;
 
 static const YY_CHAR yy_ec[256] =
@@ -526,11 +526,11 @@ static const flex_int16_t yy_chk[198] =
     } ;
 
 /* Table of booleans, true if rule could match eol. */
-static const flex_int32_t yy_rule_can_match_eol[53] =
+static const flex_int32_t yy_rule_can_match_eol[52] =
     {   0,
 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
-    0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0,     };
+    0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0,     };
 
 static yy_state_type yy_last_accepting_state;
 static char *yy_last_accepting_cpos;
@@ -566,8 +566,8 @@ char *yytext;
     CommentNode *rootNode;
 
     void printTree(CommentNode *Node, int depth);
+#line 569 "lexer/lexer.yy.cpp"
 #line 570 "lexer/lexer.yy.cpp"
-#line 571 "lexer/lexer.yy.cpp"
 
 #define INITIAL 0
 
@@ -786,7 +786,7 @@ YY_DECL
 	{
 #line 83 "lexer/lexer.l"
 
-#line 790 "lexer/lexer.yy.cpp"
+#line 789 "lexer/lexer.yy.cpp"
 
 	while ( /*CONSTCOND*/1 )		/* loops until end-of-file is reached */
 		{
@@ -1059,30 +1059,24 @@ YY_RULE_SETUP
 {yylval.strVal = new string(yytext); return DOT;}
 	YY_BREAK
 case 42:
-/* rule 42 can match eol */
 YY_RULE_SETUP
 #line 135 "lexer/lexer.l"
-{yylineno++;}
+{yylval.intVal = stoi(yytext); return INTCONST;}
 	YY_BREAK
 case 43:
 YY_RULE_SETUP
 #line 136 "lexer/lexer.l"
-{yylval.intVal = stoi(yytext); return INTCONST;}
+{yylval.realVal = stod(yytext); return REAL;}
 	YY_BREAK
 case 44:
 YY_RULE_SETUP
 #line 137 "lexer/lexer.l"
-{yylval.realVal = stod(yytext); return REAL;}
-	YY_BREAK
-case 45:
-YY_RULE_SETUP
-#line 138 "lexer/lexer.l"
 { cout << "Invalid String" << endl; exit(1); }
 	YY_BREAK
-case 46:
-/* rule 46 can match eol */
+case 45:
+/* rule 45 can match eol */
 YY_RULE_SETUP
-#line 139 "lexer/lexer.l"
+#line 138 "lexer/lexer.l"
 {string_buff = yytext;
               unordered_map<char, string> escape_map = {
                 {'n', "\n"},
@@ -1118,19 +1112,19 @@ YY_RULE_SETUP
             }
         }
 	YY_BREAK
+case 46:
+YY_RULE_SETUP
+#line 173 "lexer/lexer.l"
+{yylval.strVal = new string(yytext); return ID; }
+	YY_BREAK
 case 47:
 YY_RULE_SETUP
 #line 174 "lexer/lexer.l"
-{yylval.strVal = new string(yytext); return ID; }
+{ /* Not returning anything since parser only eats up comments */ }
 	YY_BREAK
 case 48:
 YY_RULE_SETUP
 #line 175 "lexer/lexer.l"
-{ /* Not returning anything since parser only eats up comments */ }
-	YY_BREAK
-case 49:
-YY_RULE_SETUP
-#line 176 "lexer/lexer.l"
 {
                     int c;
                     int nested = 1;
@@ -1175,23 +1169,23 @@ YY_RULE_SETUP
                     }
             }
 	YY_BREAK
-case 50:
-/* rule 50 can match eol */
+case 49:
+/* rule 49 can match eol */
 YY_RULE_SETUP
-#line 220 "lexer/lexer.l"
+#line 219 "lexer/lexer.l"
 {}
+	YY_BREAK
+case 50:
+YY_RULE_SETUP
+#line 222 "lexer/lexer.l"
+{ cout << "Not recognised expression: " << yytext << endl; }
 	YY_BREAK
 case 51:
 YY_RULE_SETUP
 #line 223 "lexer/lexer.l"
-{ cout << "Not recognised expression: " << yytext << endl; }
-	YY_BREAK
-case 52:
-YY_RULE_SETUP
-#line 224 "lexer/lexer.l"
 ECHO;
 	YY_BREAK
-#line 1195 "lexer/lexer.yy.cpp"
+#line 1188 "lexer/lexer.yy.cpp"
 case YY_STATE_EOF(INITIAL):
 	yyterminate();
 
@@ -2208,4 +2202,4 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 224 "lexer/lexer.l"
+#line 223 "lexer/lexer.l"

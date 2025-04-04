@@ -132,7 +132,6 @@ INVALID_STRING  \"([^\"\\\n]|\\.)*
 
 
 
-\n        {yylineno++;}
 {INTCONST}   {yylval.intVal = stoi(yytext); return INTCONST;}
 {REAL}   {yylval.realVal = stod(yytext); return REAL;}
 {INVALID_STRING} { cout << "Invalid String" << endl; exit(1); }

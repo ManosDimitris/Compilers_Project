@@ -106,7 +106,7 @@ primary: lvalue
     | const
 ;
 
-lvalue: ID { symTable.insert(*$1, scope, yylineno);}
+lvalue: ID { symTable.insert(*$1, "global_variable", scope, yylineno);}
     | LOCAL ID
     | DCOLON ID
     | member
@@ -152,7 +152,7 @@ indexedelemlist: indexedelem
 indexedelem: LEFT_CBRACKET expr COLON expr RIGHT_CBRACKET
 ;
 
-block: LEFT_CBRACKET{scope++;} stmntlist RIGHT_CBRACKET{scope--;}
+block: LEFT_CBRACKET{++scope;} stmntlist RIGHT_CBRACKET{scope--;}
 ;
 
 funcdef: FUNCTION LEFT_PARENTHES idlist RIGHT_PARENTHES block

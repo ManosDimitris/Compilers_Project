@@ -1354,13 +1354,13 @@ yyreduce:
     {
   case 44: /* lvalue: ID  */
 #line 109 "parser/parser.y"
-           { symTable.insert(*(yyvsp[0].strVal), scope, yylineno);}
+           { symTable.insert(*(yyvsp[0].strVal), "global_variable", scope, yylineno);}
 #line 1359 "parser/parser.cpp"
     break;
 
   case 68: /* $@1: %empty  */
 #line 155 "parser/parser.y"
-                    {scope++;}
+                    {++scope;}
 #line 1365 "parser/parser.cpp"
     break;
 

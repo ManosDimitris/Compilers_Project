@@ -14,18 +14,20 @@ using namespace std;
 
 struct SymbolEntry {
     string name;
+    string type;
     int scope;
     int line;
     SymbolEntry *next;
     
-    SymbolEntry(string n, int s, int l) : name(n), scope(s), line(l) ,next(NULL){}
+    SymbolEntry(string n, string t, int s, int l) : name(n), type(t), scope(s), line(l) ,next(NULL){}
 };
 
 struct ScopeList
 {
-    SymbolEntry *data;
+    vector<SymbolEntry *> data_in_scope;
     ScopeList* next;
-    ScopeList(SymbolEntry* s) :  data(s), next(nullptr) {}
+    ScopeList(SymbolEntry* s) : next(nullptr) { data_in_scope.push_back(s); }
+    ScopeList() : next(nullptr){}
 };
 
 
@@ -34,16 +36,17 @@ class SymbolTable {
 private:
     SymbolEntry* table[CAPACITY];
     ScopeList* scopes;
-    //vector<list<SymbolEntry>> table;
     int SymTable_hash(string name);
 
 public:
 
     SymbolTable();
     
-    void insert(string name, int scope, int line);
+    void insert(string name, string type, int scope, int line);
     
     void display();
+
+    //bool lookup();
 };
 
 #endif
