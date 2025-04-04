@@ -42,7 +42,7 @@ scopes = ScopeList (gia scope 0) -> NULL
 
 -/////////-
 
-Parser auksanei to scope (brike brackets) kai briskei to z (des text.txt)
+Parser auksanei to scope (brike brackets) kai briskei to m (des text.txt)
 
 to insert tsekarei to ScopeList kai blepei oti den einai null:
 
