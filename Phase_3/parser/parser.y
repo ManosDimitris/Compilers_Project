@@ -18,7 +18,7 @@
     int scope = 0;
     bool found_Func = false, isCall = false;
     int curr_func = 1;
-
+    bool returnSTMT = false;
     ostream *outStream;
 
     bool hasLibFuncName(string name);
@@ -125,10 +125,9 @@ lvalue: ID {
                 
                 if(!symTable.lookup(*$1,0) &&!symTable.lookup(*$1, scope) && found_Func) yyerror("Undefined refrence to " + *$1);
                 else if(hasLibFuncName(*$1)) yyerror("Variable " + *$1 + " cannot have the same name as a library function");
-                else if(symTable.isFunction(*$1,scope)){
+                else if(symTable.isFunction(*$1,scope) && !returnSTMT){
                         yyerror(*$1 + " Defined as function");
                 }
-                
             }
         }
     | LOCAL ID {
@@ -158,6 +157,7 @@ member: lvalue DOT ID
 ;
 
 call: call LEFT_PARENTHES elist RIGHT_PARENTHES
+    | member LEFT_PARENTHES elist RIGHT_PARENTHES 
     | ID callsuffix
     | LEFT_PARENTHES funcdef RIGHT_PARENTHES LEFT_PARENTHES elist RIGHT_PARENTHES
 ;
@@ -251,11 +251,15 @@ ifstmt: IF LEFT_PARENTHES expr RIGHT_PARENTHES stmt %prec THEN
 whilestmt: WHILE LEFT_PARENTHES expr RIGHT_PARENTHES stmt
 ;
 
-forstmt: FOR LEFT_PARENTHES{++scope;} elist SEMICOLON expr SEMICOLON elist RIGHT_PARENTHES{scope--;} stmt
+forstmt: FOR LEFT_PARENTHES elist SEMICOLON expr SEMICOLON elist RIGHT_PARENTHES stmt
 ;
 
 returnstmt: RETURN SEMICOLON 
-    | RETURN expr SEMICOLON 
+    | RETURN{
+        returnSTMT = 1;
+    } expr{
+        returnSTMT = 0;
+    } SEMICOLON 
 ;
 
 %%
