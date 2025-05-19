@@ -89,7 +89,7 @@ expr: assignexpr
     | expr LESS_EQUAL expr
     | expr EQUAL expr
     | expr NEQUAL expr
-    | expr AND expr 
+    | expr AND expr
     | expr OR expr
     | term
 ;
@@ -104,7 +104,9 @@ term: LEFT_PARENTHES expr RIGHT_PARENTHES
     | primary
 ;
 
-assignexpr: lvalue ASSIGN expr
+assignexpr: lvalue ASSIGN expr{
+
+}
 ;
 
 primary: lvalue

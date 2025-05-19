@@ -8,7 +8,7 @@
 using namespace std;
 
 //O opcode ton quads
-typedef enum iopcode {
+enum iopcode {
     assign, add, sub, mul, div_i, mod, uminus,
     and_i, or_i, not_i,
     if_eq, if_noteq, if_lesseq, if_greatereq, if_less, if_greater,
@@ -19,7 +19,7 @@ typedef enum iopcode {
 };
 
 //Ta types ton expressions poy einai apodekta
-typedef enum expr_t {
+enum expr_t {
     var_e,
     tableitem_e, 
     programfunc_e, 
@@ -35,7 +35,7 @@ typedef enum expr_t {
 };
 
 //Anaparista ola ta expressions tis aplha
-typedef struct expr{
+struct expr{
     expr_t type;
     SymbolEntry* sym;
     expr* index;
@@ -43,30 +43,47 @@ typedef struct expr{
     double numConst;
     std::string strConst;
     bool boolConst;
+
+    expr* next;
 };
 
 /*  Ta quad toy ka8e kodika exoyn to akolou8w typo:
 *    Εντολή: αποτέλεσμα, τελεστής1, τελεστής2;
 */
- typedef struct quad {
+struct quad {
     iopcode op;
     expr* arg1;
     expr* arg2;
     expr* result;
     unsigned int label;
     unsigned int line;
+
+    quad();
+    quad(iopcode op, expr* arg1, expr* arg2, expr* result, unsigned int label, unsigned int line) : 
+    op(op), arg1(arg1), arg2(arg2), result(result), label(label), line(line){}
 };
 
 
 //Lista me ola ta quads tou prgrammatos  
-extern vector<quad> quads;
+extern vector<quad *> quads;
 
 
 /*-------------------------------------------*/
 /*---------- Function Declarations ----------*/
 /*-------------------------------------------*/
 
+void emit(iopcode opm, 
+    expr* arg1,
+    expr* arg2,
+    expr* result,
+    unsigned int label,
+    unsigned int line);
 
 expr* NewExpr(expr_t t);
+
+void printQuads();
+
+string iopcodeToString(enum iopcode op);
+
 //...
 #endif
