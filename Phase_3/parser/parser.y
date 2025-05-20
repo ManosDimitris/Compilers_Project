@@ -35,7 +35,7 @@
     struct expr* exprVal;
 }
 
-%type <exprVal> expr assignexpr term lvalue
+%type <exprVal> expr assignexpr term lvalue const primary
 
 %token <strVal> IF ELSE WHILE FOR FUNCTION RETURN BREAK CONTINUE AND OR LOCAL TRUE FALSE NIL
 %token <strVal> EQUAL ASSIGN UPLUS PLUS UMINUS MINUS MULTI DIV MOD NEQUAL
@@ -98,7 +98,7 @@ expr: assignexpr
     | expr NEQUAL expr
     | expr AND expr
     | expr OR expr
-    | term
+    | term {$$ = $1;}
 ;
 
 term: LEFT_PARENTHES expr RIGHT_PARENTHES
@@ -108,7 +108,7 @@ term: LEFT_PARENTHES expr RIGHT_PARENTHES
     | lvalue UPLUS
     | UMINUS lvalue
     | lvalue UMINUS
-    | primary
+    | primary {$$ = $1;}
 ;
 
 assignexpr: lvalue ASSIGN expr{
@@ -119,11 +119,11 @@ assignexpr: lvalue ASSIGN expr{
 }
 ;
 
-primary: lvalue
+primary: lvalue {$$ = $1;}
     | call
     | objectdef
     | LEFT_PARENTHES funcdef RIGHT_PARENTHES
-    | const
+    | const {$$ = $1;}
 ;
 
 lvalue: ID {
@@ -236,7 +236,7 @@ funcdef: FUNCTION{
     }LEFT_PARENTHES{++scope;} idlist RIGHT_PARENTHES {scope--;} {found_Func = true;} block { found_Func = false; }
 ;
 
-const: INTCONST
+const: INTCONST {$$ = NewExpr(constnum_e);}
     | REAL
     | STRING
     | NIL
