@@ -8,6 +8,8 @@ LEX_OUT = ./lexer/lexer.yy.cpp
 YACC_SRC = ./parser/parser.y
 YACC_OUT = ./parser/parser.cpp
 YACC_HDR = ./parser/parser.hpp
+QUAD_SRC = ./quad/quad.cpp
+
 
 SYM_TABLE_SRC = ./SymTable/SymTable.cpp
 
@@ -21,8 +23,8 @@ $(LEX_OUT): $(LEX_SRC)
 $(YACC_OUT): $(YACC_SRC)
 	$(YACC) -y -d -o $@ $<
 
-$(EXEC): $(LEX_OUT) $(YACC_OUT) $(SYM_TABLE_SRC)
-	$(CC) -o $@ $(LEX_OUT) $(YACC_OUT) $(SYM_TABLE_SRC)
+$(EXEC): $(LEX_OUT) $(YACC_OUT) $(SYM_TABLE_SRC) $(QUAD_SRC)
+	$(CC) -o $@ $(LEX_OUT) $(YACC_OUT) $(SYM_TABLE_SRC) $(QUAD_SRC)
 
 run: $(EXEC)
 	

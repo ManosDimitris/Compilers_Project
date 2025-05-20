@@ -72,7 +72,16 @@ extern vector<quad *> quads;
 /*---------- Function Declarations ----------*/
 /*-------------------------------------------*/
 
-void emit(iopcode opm, 
+/**
+ * @param op
+ * @param arg1
+ * @param arg2
+ * @param result
+ * @param label
+ * @param line
+ * 
+ */
+void emit(iopcode op, 
     expr* arg1,
     expr* arg2,
     expr* result,
@@ -84,6 +93,6 @@ expr* NewExpr(expr_t t);
 void printQuads();
 
 string iopcodeToString(enum iopcode op);
-
+string to_string_or_type(expr* e) ;
 //...
 #endif

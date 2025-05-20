@@ -5,6 +5,7 @@
     #include <fstream>
     #include<vector>
     #include"../SymTable/SymTable.hpp"
+    #include"../quad/quad.hpp"
     using namespace std;
 
     int yyerror(string yaccProvidedMessage);
@@ -22,13 +23,19 @@
     ostream *outStream;
 
     bool hasLibFuncName(string name);
+
+    /*THE VEVTOR OF THE QUADS*/
+    vector<quad *> quads;
 %}
 
 %union{
     std::string *strVal;
     int intVal;
     double realVal;
+    struct expr* exprVal;
 }
+
+%type <exprVal> expr assignexpr term lvalue
 
 %token <strVal> IF ELSE WHILE FOR FUNCTION RETURN BREAK CONTINUE AND OR LOCAL TRUE FALSE NIL
 %token <strVal> EQUAL ASSIGN UPLUS PLUS UMINUS MINUS MULTI DIV MOD NEQUAL
@@ -105,7 +112,10 @@ term: LEFT_PARENTHES expr RIGHT_PARENTHES
 ;
 
 assignexpr: lvalue ASSIGN expr{
-
+    
+    $$ = NewExpr(var_e);
+    emit(assign, $3, nullptr, $1, 0, yylineno);
+    $$ = $1;
 }
 ;
 
@@ -130,6 +140,15 @@ lvalue: ID {
                 else if(symTable.isFunction(*$1,scope) && !returnSTMT){
                         yyerror(*$1 + " Defined as function");
                 }
+            }
+            
+            SymbolEntry* entry = symTable.returnSymbol(*$1);
+            if(!entry){
+                yyerror("Undefined Variable: " + *$1);
+                $$ = nullptr;
+            } else {
+                $$ = NewExpr(var_e);  
+                $$->sym = entry;
             }
         }
     | LOCAL ID {
@@ -304,6 +323,7 @@ int main(int argc, char* argv[]){
 
     yyparse();
     symTable.display();
+    printQuads();
 
     cout.rdbuf(backup); 
     if (file.is_open()) file.close();

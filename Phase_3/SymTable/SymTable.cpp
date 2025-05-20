@@ -139,3 +139,20 @@ bool SymbolTable::isFunction(string name, int scope){
     }
     return false;//NOT FOUND DAHH}
 }
+
+
+SymbolEntry* SymbolTable::returnSymbol(string name){
+    int index = SymTable_hash(name);
+
+    SymbolEntry* tmp = table[index];
+    while(tmp != nullptr){
+            
+        if(tmp->isActive){
+            if(name == tmp->name){
+                return tmp;
+            }
+        } 
+        tmp = tmp->next;  
+    }
+    return nullptr;
+}

@@ -61,8 +61,8 @@ string iopcodeToString(enum iopcode op) {
 
 
 void printQuads(){
-    cout<< "Line" << "\t" << "op\t" << "result\t" <<  "arg1\t" << "arg2\t" << "Label"<< endl;
+    cout<< "Line" << "\t" << "op\t " << "result\t" <<  "arg1\t" << "arg2\t" << "Label"<< endl;
     for(int i = 0; i < quads.size(); i++){
-        cout << quads[i]->line << "\t" << iopcodeToString(quads[i]->op) << "\t" << quads[i]->result->type << "\t" << quads[i]->arg1->type << "\t\t\t " << endl;
+        cout << quads[i]->line << "\t" << iopcodeToString(quads[i]->op) << "\t "  << quads[i]->result->type << "\t" << quads[i]->arg1->type << "\t\t\t " << endl;
     }
 }

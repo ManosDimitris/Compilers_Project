@@ -56,6 +56,8 @@ public:
     void ScopeHide(int scope);
     
     bool isFunction(string name, int scope);
+
+    SymbolEntry* returnSymbol(string name);
 };
 
 #endif
