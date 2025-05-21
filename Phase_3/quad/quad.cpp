@@ -83,7 +83,7 @@ string iopcodeToString(iopcode op) {
 void printQuads(){
     string result = "", arg1 = "", arg2 = "", label = "";
 
-    cout<< "quad#\t" << "op\t " << "result\t" <<  "arg1\t" << "arg2\t" << "label"<< endl;
+    cout<< "quad#\t" << "op\t " << "result\t" << "arg1\t" << "arg2\t" << "label"<< endl;
     cout << "----------------------------------------------" << endl;
     for(int i = 0; i < quads.size(); i++){
         if(quads[i]->result != nullptr) result = exprtToString(quads[i]->result);
