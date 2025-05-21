@@ -3,9 +3,9 @@
     #include <string>
     #include <cstring>
     #include <fstream>
-    #include<vector>
-    #include"../SymTable/SymTable.hpp"
-    #include"../quad/quad.hpp"
+    #include <vector>
+    #include "../SymTable/SymTable.hpp"
+    #include "../quad/quad.hpp"
     using namespace std;
 
     int yyerror(string yaccProvidedMessage);
@@ -35,7 +35,7 @@
     struct expr* exprVal;
 }
 
-%type <exprVal> expr assignexpr term lvalue const primary call objectdef funcdef
+%type <exprVal> expr assignexpr term lvalue const primary call objectdef funcdef member callsuffix normcall methodcall elist
 
 %token <strVal> IF ELSE WHILE FOR FUNCTION RETURN BREAK CONTINUE AND OR LOCAL TRUE FALSE NIL
 %token <strVal> EQUAL ASSIGN UPLUS PLUS UMINUS MINUS MULTI DIV MOD NEQUAL
@@ -85,11 +85,26 @@ stmt: expr SEMICOLON
 ;
 
 expr: assignexpr
-    | expr PLUS expr
-    | expr MINUS expr
-    | expr MULTI expr
-    | expr DIV expr
-    | expr MOD expr
+    | expr PLUS expr{
+        $$ = NewExpr(arithexpr_e);
+        emit(add, $1, $3, $$, 0, yylineno);
+    }
+    | expr MINUS expr{
+        $$ = NewExpr(arithexpr_e);
+        emit(sub, $1, $3, $$, 0, yylineno);
+    }
+    | expr MULTI expr{
+        $$ = NewExpr(arithexpr_e);
+        emit(mul, $1, $3, $$, 0, yylineno);
+    }
+    | expr DIV expr{
+        $$ = NewExpr(arithexpr_e);
+        emit(div_i, $1, $3, $$, 0, yylineno);
+    }
+    | expr MOD expr{
+        $$ = NewExpr(arithexpr_e);
+        emit(mod, $1, $3, $$, 0, yylineno);
+    }
     | expr GREATER expr
     | expr GREATER_EQUAL expr
     | expr LESS expr
@@ -168,7 +183,7 @@ lvalue: ID {
                     yyerror("Undefined refrence to " + *$2);
                 }
         }
-    | member
+    | member{ $$ = $1;}
 ;
 
 member: lvalue DOT ID
@@ -179,20 +194,20 @@ member: lvalue DOT ID
 
 call: call LEFT_PARENTHES elist RIGHT_PARENTHES
     | member LEFT_PARENTHES elist RIGHT_PARENTHES 
-    | ID callsuffix
-    | LEFT_PARENTHES funcdef RIGHT_PARENTHES LEFT_PARENTHES elist RIGHT_PARENTHES
+    | ID callsuffix{ $$ = $2;}
+    | LEFT_PARENTHES funcdef RIGHT_PARENTHES LEFT_PARENTHES elist RIGHT_PARENTHES 
 ;
-callsuffix: normcall
-    | methodcall
+callsuffix: normcall { $$ = $1;}
+    | methodcall{ $$ = $1; }
 ;
 
-normcall: LEFT_PARENTHES elist RIGHT_PARENTHES
+normcall: LEFT_PARENTHES elist RIGHT_PARENTHES{ $$ = $2;}
 ;
 
 methodcall: DOTS ID LEFT_PARENTHES elist RIGHT_PARENTHES
 ;
 
-elist:
+elist :{$$ = $1;}
     | expr
     | elist COMMA expr
 ;
@@ -240,11 +255,25 @@ const: INTCONST {
         $$ = NewExpr(constnum_e);
         $$->numConst = $1;
     }
-    | REAL
-    | STRING
-    | NIL
-    | TRUE
-    | FALSE
+    | REAL{
+        $$ = NewExpr(constnum_e);
+        $$->realVal = $1;
+    }
+    | STRING{
+        $$ = NewExpr(conststring_e);
+        $$->strConst = $1;
+    }
+    | NIL{
+        $$ = NewExpr(nil_e);
+    }
+    | TRUE {
+        $$ = NewExpr(constbool_e);
+        $$->boolConst = true;
+    }
+    | FALSE{
+        $$ = NewExpr(constbool_e);
+        $$->boolConst = false;
+    }
 ;
 
 idlist:
