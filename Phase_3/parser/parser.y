@@ -73,37 +73,47 @@ stmntlist:  stmt
 ;
 
 stmt: expr SEMICOLON
-    | ifstmt
-    | whilestmt
+    | ifstmt{ressettemp();}
+    | whilestmt{ressettemp();}
     | forstmt
     | returnstmt
     | BREAK SEMICOLON
     | CONTINUE SEMICOLON
-    | block
-    | funcdef
+    | block{ressettemp();}
+    | funcdef{ressettemp();}
     | SEMICOLON
 ;
 
 expr: assignexpr
     | expr PLUS expr{
         $$ = NewExpr(arithexpr_e);
-        emit(add, $1, $3, $$, 0, yylineno);
+        expr* newTmp = newtemp();
+        $$->sym = newTmp->sym;
+        emit(add, $1, $3, newTmp, 0, yylineno);
     }
     | expr MINUS expr{
         $$ = NewExpr(arithexpr_e);
-        emit(sub, $1, $3, $$, 0, yylineno);
+        expr* newTmp = newtemp();
+        $$->sym = newTmp->sym;
+        emit(sub, $1, $3, newTmp, 0, yylineno);
     }
     | expr MULTI expr{
         $$ = NewExpr(arithexpr_e);
-        emit(mul, $1, $3, $$, 0, yylineno);
+        expr* newTmp = newtemp();
+        $$->sym = newTmp->sym;
+        emit(mul, $1, $3, newTmp, 0, yylineno);
     }
     | expr DIV expr{
         $$ = NewExpr(arithexpr_e);
-        emit(div_i, $1, $3, $$, 0, yylineno);
+        expr* newTmp = newtemp();
+        $$->sym = newTmp->sym;
+        emit(div_i, $1, $3, newTmp, 0, yylineno);
     }
     | expr MOD expr{
         $$ = NewExpr(arithexpr_e);
-        emit(mod, $1, $3, $$, 0, yylineno);
+        expr* newTmp = newtemp();
+        $$->sym = newTmp->sym;
+        emit(mod, $1, $3, newTmp, 0, yylineno);
     }
     | expr GREATER expr
     | expr GREATER_EQUAL expr
@@ -207,8 +217,8 @@ normcall: LEFT_PARENTHES elist RIGHT_PARENTHES{ $$ = $2;}
 methodcall: DOTS ID LEFT_PARENTHES elist RIGHT_PARENTHES
 ;
 
-elist :{$$ = $1;}
-    | expr
+elist :
+    | expr {$$ = $1;}
     | elist COMMA expr
 ;
 
@@ -257,11 +267,11 @@ const: INTCONST {
     }
     | REAL{
         $$ = NewExpr(constnum_e);
-        $$->realVal = $1;
+        $$->numConst = $1;
     }
     | STRING{
         $$ = NewExpr(conststring_e);
-        $$->strConst = $1;
+        $$->strConst = *$1;
     }
     | NIL{
         $$ = NewExpr(nil_e);

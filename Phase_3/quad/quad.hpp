@@ -7,7 +7,7 @@
 
 using namespace std;
 
-extern unsigned int temp_counter = 0;
+extern unsigned int temp_counter;
 
 //O opcode ton quads
 enum iopcode {

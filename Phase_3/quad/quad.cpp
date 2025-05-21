@@ -6,6 +6,7 @@
 extern SymbolTable symTable;
 extern int scope;
 extern int yylineno;
+unsigned int temp_counter = 0;
 
 expr* NewExpr(expr_t t){
     expr *new_expr = new expr;
@@ -40,7 +41,7 @@ string exprtToString(expr* expr){
         case tableitem_e: return "tableitem_e"; 
         case programfunc_e: return "programfunc_e";
         case libraryfunc_e: return "libraryfunc_e";
-        case arithexpr_e: return "arithexpr_e";
+        case arithexpr_e: return expr->sym->name;
         case boolexpr_e: return "boolexpr_e"; 
         case assignexpr_e: return "assignexpr_e";
         case newtable_e: return "newtable_e";
@@ -102,13 +103,20 @@ void printQuads(){
 }
 
 string newtempname(){
-    return "_t" + to_string(temp_counter);
+    return "_t" + to_string(temp_counter++);
 }
 
 expr* newtemp(){
     string name = newtempname();
-    symTable.insert(name,"temp_variable",scope,yylineno);
-    SymbolEntry* newTemp =symTable.returnSymbol(name); //<- Ayto einai xazw alla den allasw tin insert na epistrefei SymbolEntry*
+    SymbolEntry* newTemp;
+
+    if(symTable.lookup(name,scope)){
+        newTemp =symTable.returnSymbol(name);
+    }else{
+        symTable.insert(name,"temp_variable",scope,yylineno);
+        newTemp =symTable.returnSymbol(name); //<- Ayto einai xazw alla den allasw tin insert na epistrefei SymbolEntry*
+    }
+    
     expr* e = NewExpr(var_e);
     e->sym = newTemp;
     return e;
