@@ -86,34 +86,49 @@ stmt: expr SEMICOLON
 
 expr: assignexpr
     | expr PLUS expr{
-        $$ = NewExpr(arithexpr_e);
-        expr* newTmp = newtemp();
-        $$->sym = newTmp->sym;
-        emit(add, $1, $3, newTmp, 0, yylineno);
+        if(($1->type == constnum_e || $1->type == var_e) && ($3->type == constnum_e || $3->type == var_e)){
+            $$ = NewExpr(arithexpr_e);
+            expr* newTmp = newtemp();
+            $$->sym = newTmp->sym;
+            emit(add, $1, $3, newTmp, 0, yylineno);
+        }
+        else yyerror("Runtime Error: expression was not a number");
     }
     | expr MINUS expr{
-        $$ = NewExpr(arithexpr_e);
-        expr* newTmp = newtemp();
-        $$->sym = newTmp->sym;
-        emit(sub, $1, $3, newTmp, 0, yylineno);
+        if($1->type == constnum_e && $3->type == constnum_e){
+            $$ = NewExpr(arithexpr_e);
+            expr* newTmp = newtemp();
+            $$->sym = newTmp->sym;
+            emit(sub, $1, $3, newTmp, 0, yylineno);
+        }
+        else yyerror("Runtime Error: expression was not a number");
     }
     | expr MULTI expr{
-        $$ = NewExpr(arithexpr_e);
-        expr* newTmp = newtemp();
-        $$->sym = newTmp->sym;
-        emit(mul, $1, $3, newTmp, 0, yylineno);
+        if(($1->type == constnum_e || $1->type == var_e) && ($3->type == constnum_e || $3->type == var_e)){
+            $$ = NewExpr(arithexpr_e);
+            expr* newTmp = newtemp();
+            $$->sym = newTmp->sym;
+            emit(mul, $1, $3, newTmp, 0, yylineno);
+        }
+        else yyerror("Runtime Error: expression was not a number");
     }
     | expr DIV expr{
-        $$ = NewExpr(arithexpr_e);
-        expr* newTmp = newtemp();
-        $$->sym = newTmp->sym;
-        emit(div_i, $1, $3, newTmp, 0, yylineno);
+        if($1->type == constnum_e && $3->type == constnum_e){
+            $$ = NewExpr(arithexpr_e);
+            expr* newTmp = newtemp();
+            $$->sym = newTmp->sym;
+            emit(div_i, $1, $3, newTmp, 0, yylineno);
+        }
+        else yyerror("Runtime Error: expression was not a number");
     }
     | expr MOD expr{
-        $$ = NewExpr(arithexpr_e);
-        expr* newTmp = newtemp();
-        $$->sym = newTmp->sym;
-        emit(mod, $1, $3, newTmp, 0, yylineno);
+        if($1->type == constnum_e && $3->type == constnum_e){
+            $$ = NewExpr(arithexpr_e);
+            expr* newTmp = newtemp();
+            $$->sym = newTmp->sym;
+            emit(mod, $1, $3, newTmp, 0, yylineno);
+        }
+        else yyerror("Runtime Error: expression was not a number");
     }
     | expr GREATER expr
     | expr GREATER_EQUAL expr
