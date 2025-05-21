@@ -8,6 +8,7 @@
 using namespace std;
 
 extern unsigned int temp_counter;
+extern unsigned int curr_quad;
 
 //O opcode ton quads
 enum iopcode {

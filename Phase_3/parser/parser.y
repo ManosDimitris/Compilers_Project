@@ -86,58 +86,139 @@ stmt: expr SEMICOLON
 
 expr: assignexpr
     | expr PLUS expr{
-        if(($1->type == constnum_e || $1->type == var_e) && ($3->type == constnum_e || $3->type == var_e)){
-            $$ = NewExpr(arithexpr_e);
-            expr* newTmp = newtemp();
-            $$->sym = newTmp->sym;
-            emit(add, $1, $3, newTmp, 0, yylineno);
-        }
-        else yyerror("Runtime Error: expression was not a number");
+        $$ = NewExpr(arithexpr_e);
+        expr* newTmp = newtemp();
+        $$->sym = newTmp->sym;
+        emit(add, $1, $3, newTmp, 0, yylineno);
     }
     | expr MINUS expr{
-        if($1->type == constnum_e && $3->type == constnum_e){
-            $$ = NewExpr(arithexpr_e);
-            expr* newTmp = newtemp();
-            $$->sym = newTmp->sym;
-            emit(sub, $1, $3, newTmp, 0, yylineno);
-        }
-        else yyerror("Runtime Error: expression was not a number");
+        $$ = NewExpr(arithexpr_e);
+        expr* newTmp = newtemp();
+        $$->sym = newTmp->sym;
+        emit(sub, $1, $3, newTmp, 0, yylineno);
     }
     | expr MULTI expr{
-        if(($1->type == constnum_e || $1->type == var_e) && ($3->type == constnum_e || $3->type == var_e)){
-            $$ = NewExpr(arithexpr_e);
-            expr* newTmp = newtemp();
-            $$->sym = newTmp->sym;
-            emit(mul, $1, $3, newTmp, 0, yylineno);
-        }
-        else yyerror("Runtime Error: expression was not a number");
+        $$ = NewExpr(arithexpr_e);
+        expr* newTmp = newtemp();
+        $$->sym = newTmp->sym;
+        emit(mul, $1, $3, newTmp, 0, yylineno);
     }
     | expr DIV expr{
-        if($1->type == constnum_e && $3->type == constnum_e){
-            $$ = NewExpr(arithexpr_e);
-            expr* newTmp = newtemp();
-            $$->sym = newTmp->sym;
-            emit(div_i, $1, $3, newTmp, 0, yylineno);
-        }
-        else yyerror("Runtime Error: expression was not a number");
+        $$ = NewExpr(arithexpr_e);
+        expr* newTmp = newtemp();
+        $$->sym = newTmp->sym;
+        emit(div_i, $1, $3, newTmp, 0, yylineno);
     }
     | expr MOD expr{
-        if($1->type == constnum_e && $3->type == constnum_e){
-            $$ = NewExpr(arithexpr_e);
-            expr* newTmp = newtemp();
-            $$->sym = newTmp->sym;
-            emit(mod, $1, $3, newTmp, 0, yylineno);
-        }
-        else yyerror("Runtime Error: expression was not a number");
+        $$ = NewExpr(arithexpr_e);
+        expr* newTmp = newtemp();
+        $$->sym = newTmp->sym;
+        emit(mod, $1, $3, newTmp, 0, yylineno);
     }
-    | expr GREATER expr
-    | expr GREATER_EQUAL expr
-    | expr LESS expr
-    | expr LESS_EQUAL expr
-    | expr EQUAL expr
-    | expr NEQUAL expr
-    | expr AND expr
-    | expr OR expr
+    | expr GREATER expr{
+        $$ = NewExpr(boolexpr_e);
+        expr* bool_expr1 = NewExpr(constbool_e), *bool_expr2 = NewExpr(constbool_e);
+        expr* new_Tmp = newtemp();
+
+        bool_expr1->boolConst = false;
+
+        emit(if_greater, $1, $3, nullptr, curr_quad + 3, yylineno);
+        emit(assign, bool_expr1, nullptr, new_Tmp, 0, yylineno);
+        emit(jump, nullptr, nullptr, nullptr, curr_quad + 2, yylineno);
+        bool_expr2->boolConst = true;
+        emit(assign, bool_expr2, nullptr, new_Tmp, 0, yylineno);
+
+        $$->sym = new_Tmp->sym;
+    }
+    | expr GREATER_EQUAL expr{
+        $$ = NewExpr(boolexpr_e);
+        expr* bool_expr1 = NewExpr(constbool_e), *bool_expr2 = NewExpr(constbool_e);
+        expr* new_Tmp = newtemp();
+
+        bool_expr1->boolConst = false;
+
+        emit(if_greatereq, $1, $3, nullptr, curr_quad + 3, yylineno);
+        emit(assign, bool_expr1, nullptr, new_Tmp, 0, yylineno);
+        emit(jump, nullptr, nullptr, nullptr, curr_quad + 2, yylineno);
+        bool_expr2->boolConst = true;
+        emit(assign, bool_expr2, nullptr, new_Tmp, 0, yylineno);
+
+        $$->sym = new_Tmp->sym;
+    }
+    | expr LESS expr{
+        $$ = NewExpr(boolexpr_e);
+        expr* bool_expr1 = NewExpr(constbool_e), *bool_expr2 = NewExpr(constbool_e);
+        expr* new_Tmp = newtemp();
+
+        bool_expr1->boolConst = false;
+
+        emit(if_less, $1, $3, nullptr, curr_quad + 3, yylineno);
+        emit(assign, bool_expr1, nullptr, new_Tmp, 0, yylineno);
+        emit(jump, nullptr, nullptr, nullptr, curr_quad + 2, yylineno);
+        bool_expr2->boolConst = true;
+        emit(assign, bool_expr2, nullptr, new_Tmp, 0, yylineno);
+
+        $$->sym = new_Tmp->sym;
+    }
+    | expr LESS_EQUAL expr{
+        $$ = NewExpr(boolexpr_e);
+        expr* bool_expr1 = NewExpr(constbool_e), *bool_expr2 = NewExpr(constbool_e);
+        expr* new_Tmp = newtemp();
+
+        bool_expr1->boolConst = false;
+
+        emit(if_lesseq, $1, $3, nullptr, curr_quad + 3, yylineno);
+        emit(assign, bool_expr1, nullptr, new_Tmp, 0, yylineno);
+        emit(jump, nullptr, nullptr, nullptr, curr_quad + 2, yylineno);
+        bool_expr2->boolConst = true;
+        emit(assign, bool_expr2, nullptr, new_Tmp, 0, yylineno);
+
+        $$->sym = new_Tmp->sym;
+    }
+    | expr EQUAL expr{
+        $$ = NewExpr(boolexpr_e);
+        expr* bool_expr1 = NewExpr(constbool_e), *bool_expr2 = NewExpr(constbool_e);
+        expr* new_Tmp = newtemp();
+
+        bool_expr1->boolConst = false;
+
+        emit(if_eq, $1, $3, nullptr, curr_quad + 3, yylineno);
+        emit(assign, bool_expr1, nullptr, new_Tmp, 0, yylineno);
+        emit(jump, nullptr, nullptr, nullptr, curr_quad + 2, yylineno);
+        bool_expr2->boolConst = true;
+        emit(assign, bool_expr2, nullptr, new_Tmp, 0, yylineno);
+
+        $$->sym = new_Tmp->sym;
+    }
+    | expr NEQUAL expr{
+        $$ = NewExpr(boolexpr_e);
+        expr* bool_expr1 = NewExpr(constbool_e), *bool_expr2 = NewExpr(constbool_e);
+        expr* new_Tmp = newtemp();
+
+        bool_expr1->boolConst = false;
+
+        emit(if_noteq, $1, $3, nullptr, curr_quad + 3, yylineno);
+        emit(assign, bool_expr1, nullptr, new_Tmp, 0, yylineno);
+        emit(jump, nullptr, nullptr, nullptr, curr_quad + 2, yylineno);
+        bool_expr2->boolConst = true;
+        emit(assign, bool_expr2, nullptr, new_Tmp, 0, yylineno);
+
+        $$->sym = new_Tmp->sym;
+    }
+    | expr AND expr{
+        $$ = NewExpr(boolexpr_e);
+        expr* new_Tmp = newtemp();
+        emit(and_i, $1, $3, new_Tmp, 0, yylineno);
+
+        $$->sym = new_Tmp->sym;
+    }
+    | expr OR expr{
+        $$ = NewExpr(boolexpr_e);
+        expr* new_Tmp = newtemp();
+        emit(or_i, $1, $3, new_Tmp, 0, yylineno);
+
+        $$->sym = new_Tmp->sym;
+    }
     | term {$$ = $1;}
 ;
 

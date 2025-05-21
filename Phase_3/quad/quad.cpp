@@ -7,6 +7,7 @@ extern SymbolTable symTable;
 extern int scope;
 extern int yylineno;
 unsigned int temp_counter = 0;
+unsigned int curr_quad = 1;
 
 expr* NewExpr(expr_t t){
     expr *new_expr = new expr;
@@ -32,6 +33,7 @@ void emit(iopcode op,
         quad *p = new quad(op, arg1, arg2, result, label, line);
 
         quads.push_back(p);
+        curr_quad++;
 }
 
 string exprtToString(expr* expr){
@@ -42,7 +44,7 @@ string exprtToString(expr* expr){
         case programfunc_e: return "programfunc_e";
         case libraryfunc_e: return "libraryfunc_e";
         case arithexpr_e: return expr->sym->name;
-        case boolexpr_e: return "boolexpr_e"; 
+        case boolexpr_e: return expr->sym->name; 
         case assignexpr_e: return "assignexpr_e";
         case newtable_e: return "newtable_e";
         case constnum_e: oss << fixed << setprecision(1) << expr->numConst; return oss.str(); 
