@@ -3,9 +3,9 @@
     #include <string>
     #include <cstring>
     #include <fstream>
-    #include<vector>
-    #include"../SymTable/SymTable.hpp"
-    #include"../quad/quad.hpp"
+    #include <vector>
+    #include "../SymTable/SymTable.hpp"
+    #include "../quad/quad.hpp"
     using namespace std;
 
     int yyerror(string yaccProvidedMessage);
@@ -240,11 +240,25 @@ const: INTCONST {
         $$ = NewExpr(constnum_e);
         $$->numConst = $1;
     }
-    | REAL
-    | STRING
-    | NIL
-    | TRUE
-    | FALSE
+    | REAL{
+        $$ = NewExpr(constnum_e);
+        $$->realVal = $1;
+    }
+    | STRING{
+        $$ = NewExpr(conststring_e);
+        $$->strConst = $1;
+    }
+    | NIL{
+        $$ = NewExpr(nil_e);
+    }
+    | TRUE {
+        $$ = NewExpr(constbool_e);
+        $$->boolConst = true;
+    }
+    | FALSE{
+        $$ = NewExpr(constbool_e);
+        $$->boolConst = false;
+    }
 ;
 
 idlist:
