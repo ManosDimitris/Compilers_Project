@@ -1,4 +1,7 @@
 #include "quad.hpp"
+#include <iomanip>
+#include <string>
+#include <sstream>
 
 expr* NewExpr(expr_t t){
     expr *new_expr = new expr;
@@ -26,8 +29,25 @@ void emit(iopcode op,
         quads.push_back(p);
 }
 
-
-string iopcodeToString(enum iopcode op) {
+string exprtToString(expr* expr){
+    ostringstream oss;
+    switch (expr->type){
+        case var_e: return expr->sym->name;
+        case tableitem_e: return "tableitem_e"; 
+        case programfunc_e: return "programfunc_e";
+        case libraryfunc_e: return "libraryfunc_e";
+        case arithexpr_e: return "arithexpr_e";
+        case boolexpr_e: return "boolexpr_e"; 
+        case assignexpr_e: return "assignexpr_e";
+        case newtable_e: return "newtable_e";
+        case constnum_e: oss << fixed << setprecision(1) << expr->numConst; return oss.str(); 
+        case constbool_e: return (expr->boolConst) ? "True" : "false"; 
+        case conststring_e: return expr->strConst;
+        case nil_e: return "nil_e";
+        default: return "invalid expression";
+    };
+}
+string iopcodeToString(iopcode op) {
     switch(op) {
         case assign:        return "assign";
         case add:           return "add";
@@ -61,8 +81,18 @@ string iopcodeToString(enum iopcode op) {
 
 
 void printQuads(){
-    cout<< "Line" << "\t" << "op\t " << "result\t" <<  "arg1\t" << "arg2\t" << "Label"<< endl;
+    string result = "", arg1 = "", arg2 = "", label = "";
+
+    cout<< "quad#\t" << "op\t " << "result\t" <<  "arg1\t" << "arg2\t" << "label"<< endl;
+    cout << "----------------------------------------------" << endl;
     for(int i = 0; i < quads.size(); i++){
-        cout << quads[i]->line << "\t" << iopcodeToString(quads[i]->op) << "\t "  << quads[i]->result->type << "\t" << quads[i]->arg1->type << "\t\t\t " << endl;
+        if(quads[i]->result != nullptr) result = exprtToString(quads[i]->result);
+        if(quads[i]->arg1 != nullptr) arg1 = exprtToString(quads[i]->arg1);
+        if(quads[i]->arg2 != nullptr) arg2 = exprtToString(quads[i]->arg2);
+        if(quads[i]->label != 0) label = to_string(quads[i]->label);
+
+        cout << i+1 << "\t" << iopcodeToString(quads[i]->op) << "\t" << result << "\t" << arg1 << "\t" << arg2 << "\t" << label << endl;
+
+        result = "", arg1 = "", arg2 = "", label = "";
     }
 }
