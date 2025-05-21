@@ -7,6 +7,8 @@
 
 using namespace std;
 
+extern unsigned int temp_counter = 0;
+
 //O opcode ton quads
 enum iopcode {
     assign, add, sub, mul, div_i, mod, uminus,
@@ -94,5 +96,10 @@ void printQuads();
 
 string iopcodeToString(enum iopcode op);
 string to_string_or_type(expr* e) ;
+
+string newtempname();
+expr* newtemp();
+void ressettemp();
+
 //...
 #endif

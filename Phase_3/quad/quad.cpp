@@ -1,7 +1,11 @@
 #include "quad.hpp"
+#include "../SymTable/SymTable.hpp"
 #include <iomanip>
 #include <string>
 #include <sstream>
+extern SymbolTable symTable;
+extern int scope;
+extern int yylineno;
 
 expr* NewExpr(expr_t t){
     expr *new_expr = new expr;
@@ -95,4 +99,21 @@ void printQuads(){
 
         result = "", arg1 = "", arg2 = "", label = "";
     }
+}
+
+string newtempname(){
+    return "_t" + to_string(temp_counter);
+}
+
+expr* newtemp(){
+    string name = newtempname();
+    symTable.insert(name,"temp_variable",scope,yylineno);
+    SymbolEntry* newTemp =symTable.returnSymbol(name); //<- Ayto einai xazw alla den allasw tin insert na epistrefei SymbolEntry*
+    expr* e = NewExpr(var_e);
+    e->sym = newTemp;
+    return e;
+}
+
+void ressettemp(){
+    temp_counter = 0;
 }
