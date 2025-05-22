@@ -235,12 +235,16 @@ term: LEFT_PARENTHES expr RIGHT_PARENTHES {$$ = $2;}
 assignexpr: lvalue ASSIGN expr{
     
     $$ = NewExpr(var_e);
-    emit(assign, $3, nullptr, $1, 0, yylineno);
+    if($1->type == tableitem_e){
+        emit(tablesetelem, $3, $1->index, $1, 0, yylineno);
+    }else{
+        emit(assign, $3, nullptr, $1, 0, yylineno);
+    }
     $$ = $1;
 }
 ;
 
-primary: lvalue {$$ = $1;}
+primary: lvalue {$$ = emit_iftableitem($1);}
     | call {$$ = $1;}
     | objectdef {$$ = $1;}
     | LEFT_PARENTHES funcdef RIGHT_PARENTHES {$$ = $2;}
@@ -292,8 +296,15 @@ lvalue: ID {
     | member{ $$ = $1;}
 ;
 
-member: lvalue DOT ID
-    | lvalue LEFT_BRACKET expr RIGHT_BRACKET
+member: lvalue DOT ID{
+        $$ = member_item ($1,*$3);
+}
+    | lvalue LEFT_BRACKET expr RIGHT_BRACKET{
+        $1 = emit_iftableitem($1);
+        $$ = NewExpr(tableitem_e);
+        $$->sym = $1->sym;
+        $$->index = $3;
+    }
     | call DOT ID
     | call LEFT_BRACKET expr RIGHT_BRACKET
 ;

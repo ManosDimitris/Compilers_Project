@@ -36,6 +36,32 @@ void emit(iopcode op,
         curr_quad++;
 }
 
+expr* member_item (expr* lv, string name){
+    lv = emit_iftableitem(lv); // Emit code if r-value use of table item
+    expr* ti = NewExpr(tableitem_e); // Make a new expression
+    ti->sym = lv->sym;
+    ti->index = newexpr_conststring(name); // Const string index
+    return ti;
+}
+
+expr* emit_iftableitem(expr *e){
+    if(e->type != tableitem_e) return e;
+    
+    expr* result = NewExpr(var_e);
+    result = newtemp();
+    emit(tablegetelem,e,e->index,result,0,yylineno);
+    return result;
+    
+}
+
+expr* newexpr_conststring(string name){
+    expr* e = NewExpr(conststring_e);
+    e->strConst = name;
+    return e;
+}
+
+
+
 string exprtToString(expr* expr){
     ostringstream oss;
     switch (expr->type){
@@ -87,20 +113,41 @@ string iopcodeToString(iopcode op) {
 }
 
 
-void printQuads(){
-    string result = "", arg1 = "", arg2 = "", label = "";
+void printQuads() {
+    const int col1 = 6;   // quad#
+    const int col2 = 15;  // op
+    const int col3 = 12;  // result
+    const int col4 = 12;  // arg1
+    const int col5 = 12;  // arg2
+    const int col6 = 12;  // label
 
-    cout<< "quad#\t" << "op\t " << "result\t" << "arg1\t" << "arg2\t" << "label"<< endl;
-    cout << "----------------------------------------------" << endl;
-    for(int i = 0; i < quads.size(); i++){
-        if(quads[i]->result != nullptr) result = exprtToString(quads[i]->result);
-        if(quads[i]->arg1 != nullptr) arg1 = exprtToString(quads[i]->arg1);
-        if(quads[i]->arg2 != nullptr) arg2 = exprtToString(quads[i]->arg2);
-        if(quads[i]->label != 0) label = to_string(quads[i]->label);
+    cout << left
+         << setw(col1) << "quad#"
+         << setw(col2) << "op"
+         << setw(col3) << "result"
+         << setw(col4) << "arg1"
+         << setw(col5) << "arg2"
+         << setw(col6) << "label"
+         << endl;
 
-        cout << i+1 << "\t" << iopcodeToString(quads[i]->op) << "\t" << result << "\t" << arg1 << "\t" << arg2 << "\t" << label << endl;
+    cout << string(col1 + col2 + col3 + col4 + col5 + col6, '-') << endl;
 
-        result = "", arg1 = "", arg2 = "", label = "";
+    for (size_t i = 0; i < quads.size(); ++i) {
+        string result = "", arg1 = "", arg2 = "", label = "";
+
+        if (quads[i]->result) result = exprtToString(quads[i]->result);
+        if (quads[i]->arg1)   arg1 = exprtToString(quads[i]->arg1);
+        if (quads[i]->arg2)   arg2 = exprtToString(quads[i]->arg2);
+        if (quads[i]->label)  label = to_string(quads[i]->label);
+
+        cout << left
+             << setw(col1) << i + 1
+             << setw(col2) << iopcodeToString(quads[i]->op)
+             << setw(col3) << result
+             << setw(col4) << arg1
+             << setw(col5) << arg2
+             << setw(col6) << label
+             << endl;
     }
 }
 

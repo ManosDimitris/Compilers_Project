@@ -90,6 +90,9 @@ void emit(iopcode op,
     expr* result,
     unsigned int label,
     unsigned int line);
+    
+expr* emit_iftableitem(expr *e);
+
 
 expr* NewExpr(expr_t t);
 
@@ -97,10 +100,11 @@ void printQuads();
 
 string iopcodeToString(enum iopcode op);
 string to_string_or_type(expr* e) ;
+expr* newexpr_conststring(string name);
 
 string newtempname();
 expr* newtemp();
 void ressettemp();
-
+expr* member_item (expr* lv, string name);
 //...
 #endif
