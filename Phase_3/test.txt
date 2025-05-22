@@ -13,3 +13,8 @@ ass = x > y and y <= 0;
 
 x = a["t"];
 a["t"] = 10;
+
+function foo(a,b){
+    a = a + 5;
+    b = a + 2;
+}
