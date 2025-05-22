@@ -1,24 +1,8 @@
-a = 10;
-c = b = 5;
 
-a = 1 + 5;
-
-{
-    c = 1 + 5 * 4;
+break;
+while(l < 10){
+    continue;
+    a = 12+0;
 }
-
-x=10+15;
-
-ass = x > y and y <= 0;
-
-l = -5 + 10;
-
 o = i++;
 
-x = a["t"];
-a["t"] = 10;
-
-function foo(a,b){
-    a = a + 5;
-    b = a + 2;
-}
