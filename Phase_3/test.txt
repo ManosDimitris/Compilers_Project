@@ -9,4 +9,7 @@ a = 1 + 5;
 
 x=10+15;
 
-ass = x > y and y <= o;
+ass = x > y and y <= 0;
+
+x = a["t"];
+a["t"] = 10;
