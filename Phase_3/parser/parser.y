@@ -502,13 +502,18 @@ ifstmt: IF LEFT_PARENTHES expr RIGHT_PARENTHES stmt %prec THEN
     | ifstmt ELSE stmt
 ;
 
-whilestmt: WHILE LEFT_PARENTHES expr RIGHT_PARENTHES{
-            breakAvailable.push(curr_quad);
-            continueAvailable.push(curr_quad);
-    } stmt{
-            breakAvailable.pop();
-            continueAvailable.pop();
-    }
+
+whilestmt: WHILE LEFT_PARENTHES expr RIGHT_PARENTHES stmt{
+    int testLabel = nextquad();
+    expr* temp_e =NewExpr(constbool_e);
+    emit(if_eq,$3,temp_e,nullptr,nextquad() + 2,yylineno);
+    int jumpLabel=nextquad();
+    emit(jump, nullptr, nullptr,nullptr, 0,yylineno);
+
+    emit(jump, nullptr, nullptr,nullptr, testLabel,yylineno);
+
+    patchlabel(jumpLabel, nextquad());
+}
 ;
 
 forstmt: FOR LEFT_PARENTHES elist SEMICOLON expr SEMICOLON elist RIGHT_PARENTHES stmt

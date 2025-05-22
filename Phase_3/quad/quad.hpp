@@ -102,6 +102,9 @@ string iopcodeToString(enum iopcode op);
 string to_string_or_type(expr* e) ;
 expr* newexpr_conststring(string name);
 
+void patchlabel(int index, int label);
+int nextquad();
+
 string newtempname();
 expr* newtemp();
 void ressettemp();
