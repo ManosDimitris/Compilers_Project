@@ -18,6 +18,14 @@ o = i++;
 x = a["t"];
 a["t"] = 10;
 
+if(a >= i){
+    k = 1;
+    n = "kool";
+}else{
+    p = 99;
+    j = 88;
+}
+
 function foo(a,b){
     a = a + 5;
     b = a + 2;

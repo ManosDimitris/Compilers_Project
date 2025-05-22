@@ -179,3 +179,12 @@ expr* newtemp(){
 void ressettemp(){
     temp_counter = 0;
 }
+
+/* IF STUFF */
+void patchLabel(unsigned int quadNo, unsigned int label){
+    if(quadNo < curr_quad && quads[quadNo] == NULL){
+        cout << "Quad does not exist";
+        exit(1);
+    }
+    quads[quadNo - 2]->label = label;
+}
