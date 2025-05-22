@@ -67,7 +67,7 @@ string exprtToString(expr* expr){
     switch (expr->type){
         case var_e: return expr->sym->name;
         case tableitem_e: return "tableitem_e"; 
-        case programfunc_e: return "programfunc_e";
+        case programfunc_e: return expr->sym->name;
         case libraryfunc_e: return "libraryfunc_e";
         case arithexpr_e: return expr->sym->name;
         case boolexpr_e: return expr->sym->name; 
@@ -114,12 +114,13 @@ string iopcodeToString(iopcode op) {
 
 
 void printQuads() {
-    const int col1 = 6;   // quad#
-    const int col2 = 15;  // op
-    const int col3 = 12;  // result
-    const int col4 = 12;  // arg1
-    const int col5 = 12;  // arg2
-    const int col6 = 12;  // label
+    const int col1 = 8;   
+    const int col2 = 15; 
+    const int col3 = 12;  
+    const int col4 = 12;  
+    const int col5 = 12;  
+    const int col6 = 12;  
+    const int col7 = 12;
 
     cout << left
          << setw(col1) << "quad#"
@@ -128,17 +129,20 @@ void printQuads() {
          << setw(col4) << "arg1"
          << setw(col5) << "arg2"
          << setw(col6) << "label"
+         << setw(col7) << "line"
          << endl;
 
     cout << string(col1 + col2 + col3 + col4 + col5 + col6, '-') << endl;
 
     for (size_t i = 0; i < quads.size(); ++i) {
-        string result = "", arg1 = "", arg2 = "", label = "";
+        string result = "", arg1 = "", arg2 = "", label = "", line ="";
 
         if (quads[i]->result) result = exprtToString(quads[i]->result);
         if (quads[i]->arg1)   arg1 = exprtToString(quads[i]->arg1);
         if (quads[i]->arg2)   arg2 = exprtToString(quads[i]->arg2);
         if (quads[i]->label)  label = to_string(quads[i]->label);
+        if (quads[i]->line)  line = to_string(quads[i]->line);
+        line = "["+ line + "]";
 
         cout << left
              << setw(col1) << i + 1
@@ -147,6 +151,7 @@ void printQuads() {
              << setw(col4) << arg1
              << setw(col5) << arg2
              << setw(col6) << label
+             << setw(col7) << line
              << endl;
     }
 }

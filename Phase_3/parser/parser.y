@@ -21,7 +21,7 @@
     int curr_func = 1;
     bool returnSTMT = false;
     ostream *outStream;
-
+    expr* curr_func_expr = nullptr; 
     bool hasLibFuncName(string name);
 
     /*THE VEVTOR OF THE QUADS*/
@@ -402,18 +402,37 @@ funcdef: FUNCTION{
         string name = "$" + to_string(curr_func);
         symTable.insert(name, "user function", scope, yylineno);
         curr_func++;
-    } LEFT_PARENTHES{++scope;} idlist RIGHT_PARENTHES{scope--;} {found_Func = true;} block { found_Func = false; }
+        emit(funcstart, nullptr, nullptr, NewExpr(programfunc_e), 0, yylineno);
+
+        } LEFT_PARENTHES{++scope;} idlist RIGHT_PARENTHES{scope--;} {found_Func = true;} block {
+            found_Func = false; 
+            $$ = NewExpr(programfunc_e);
+            $$->sym = symTable.returnSymbol("$" + to_string(curr_func - 1));
+            emit(funcend, nullptr, nullptr, $$, 0, yylineno);
+        }
     
     | FUNCTION ID {
         bool isInSmtb = true;
 
         isInSmtb = symTable.lookup(*$2, scope);
 
-        if(!isInSmtb && !hasLibFuncName(*$2)) symTable.insert(*$2, "user function", scope, yylineno);
-
+        if(!isInSmtb && !hasLibFuncName(*$2)) {
+            symTable.insert(*$2, "user function", scope, yylineno);
+            curr_func_expr = NewExpr(programfunc_e);
+            curr_func_expr->sym = symTable.returnSymbol(*$2);
+            emit(funcstart, nullptr, nullptr, curr_func_expr, 0, yylineno);
+        }
         if(hasLibFuncName(*$2)) yyerror("user function " + *$2 + " cannot have the same id as a library function");
         else if (isInSmtb) yyerror("redefinition of " + *$2);
-    }LEFT_PARENTHES{++scope;} idlist RIGHT_PARENTHES {scope--;} {found_Func = true;} block { found_Func = false; }
+
+
+    }LEFT_PARENTHES{++scope;} idlist RIGHT_PARENTHES {scope--;} {found_Func = true;} block { found_Func = false;
+      if(curr_func_expr != nullptr){
+            emit(funcend, nullptr, nullptr, curr_func_expr, 0, yylineno);
+            $$ = curr_func_expr;
+            curr_func_expr = nullptr;  
+        }
+     }
 ;
 
 const: INTCONST {
