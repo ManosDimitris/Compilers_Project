@@ -2,6 +2,7 @@
     #include <iostream>
     #include <string>
     #include <cstring>
+    #include <stack>
     #include <fstream>
     #include <vector>
     #include "../SymTable/SymTable.hpp"
@@ -21,8 +22,12 @@
     int curr_func = 1;
     bool returnSTMT = false;
     ostream *outStream;
+    //Helper expr* var to print the curr function name
     expr* curr_func_expr = nullptr; 
     bool hasLibFuncName(string name);
+    
+    stack<int> breakAvailable;
+    stack<int> continueAvailable;
 
     /*THE VEVTOR OF THE QUADS*/
     vector<quad *> quads;
@@ -77,8 +82,20 @@ stmt: expr SEMICOLON
     | whilestmt{ressettemp();}
     | forstmt
     | returnstmt
-    | BREAK SEMICOLON
-    | CONTINUE SEMICOLON
+    | BREAK SEMICOLON{
+        if(breakAvailable.empty()){
+            yyerror("Break not in loop");
+        }else{
+            emit(jump, nullptr, nullptr, nullptr, breakAvailable.top(), yylineno);
+        }
+    }
+    | CONTINUE SEMICOLON{
+         if(continueAvailable.empty()){
+            yyerror("Continue not in loop");
+        }else{
+            emit(jump, nullptr, nullptr, nullptr, breakAvailable.top(), yylineno);
+        }
+    }
     | block{ressettemp();}
     | funcdef{ressettemp();}
     | SEMICOLON
@@ -484,6 +501,7 @@ idlist:
 ifstmt: IF LEFT_PARENTHES expr RIGHT_PARENTHES stmt %prec THEN
     | ifstmt ELSE stmt
 ;
+
 
 whilestmt: WHILE LEFT_PARENTHES expr RIGHT_PARENTHES stmt{
     int testLabel = nextquad();
