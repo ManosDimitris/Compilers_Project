@@ -223,12 +223,60 @@ expr: assignexpr
 ;
 
 term: LEFT_PARENTHES expr RIGHT_PARENTHES {$$ = $2;}
-    | MINUS expr {$$ = $2;}
-    | NOT expr {$$ = $2;}
-    | UPLUS lvalue {$$ = $2;}
-    | lvalue UPLUS {$$ = $1;}
-    | UMINUS lvalue {$$ = $2;}
-    | lvalue UMINUS {$$ = $1;}
+    | MINUS expr {
+        $$ = NewExpr(var_e);
+        expr* new_Tmp = newtemp();
+
+        emit(uminus, $2, nullptr, new_Tmp, 0, yylineno);
+
+        $$->sym = new_Tmp->sym;
+    }
+    | NOT expr {
+        $$ = NewExpr(var_e);
+        expr* new_Tmp = newtemp();
+
+        emit(not_i, $2, nullptr, new_Tmp, 0, yylineno);
+
+        $$->sym = new_Tmp->sym;
+    }
+    | UPLUS lvalue {
+        $$ = NewExpr(var_e);
+        expr* new_Tmp = newtemp();
+        expr* one = NewExpr(constnum_e);
+        one->numConst = 1;
+        emit(add, $2, one, new_Tmp, 0, yylineno);
+        emit(assign, new_Tmp, nullptr, $2, 0, yylineno);
+
+        $$->sym = $2->sym;
+    }
+    | lvalue UPLUS {
+        $$ = NewExpr(var_e);
+        expr* new_Tmp = newtemp();
+        expr* one = NewExpr(constnum_e);
+        one->numConst = 1;
+        emit(assign, new_Tmp, nullptr, $1, 0, yylineno);
+        $$->sym = $1->sym;
+        emit(add, $1, one, new_Tmp, 0, yylineno);
+    }
+    | UMINUS lvalue {
+        $$ = NewExpr(var_e);
+        expr* new_Tmp = newtemp();
+        expr* one = NewExpr(constnum_e);
+        one->numConst = -1;
+        emit(add, $2, one, new_Tmp, 0, yylineno);
+        emit(assign, new_Tmp, nullptr, $2, 0, yylineno);
+
+        $$->sym = $2->sym;
+    }
+    | lvalue UMINUS {
+        $$ = NewExpr(var_e);
+        expr* new_Tmp = newtemp();
+        expr* one = NewExpr(constnum_e);
+        one->numConst = -1;
+        emit(assign, new_Tmp, nullptr, $1, 0, yylineno);
+        $$->sym = $1->sym;
+        emit(add, $1, one, new_Tmp, 0, yylineno);
+    }
     | primary {$$ = $1;}
 ;
 

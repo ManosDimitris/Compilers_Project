@@ -605,13 +605,13 @@ static const yytype_int16 yyrline[] =
        0,    67,    67,    68,    71,    72,    75,    76,    77,    78,
       79,    80,    81,    82,    83,    84,    87,    88,    94,   100,
      106,   112,   118,   133,   148,   163,   178,   193,   208,   215,
-     222,   225,   226,   227,   228,   229,   230,   231,   232,   235,
-     247,   248,   249,   250,   251,   254,   279,   291,   296,   299,
-     302,   308,   309,   312,   313,   314,   315,   317,   318,   321,
-     324,   327,   328,   329,   332,   333,   336,   339,   340,   343,
-     346,   346,   350,   353,   357,   357,   357,   353,   359,   368,
-     368,   368,   359,   371,   375,   379,   383,   386,   390,   396,
-     397,   406,   417,   418,   421,   424,   427,   428,   430,   428
+     222,   225,   226,   234,   242,   252,   261,   271,   280,   283,
+     295,   296,   297,   298,   299,   302,   327,   339,   344,   347,
+     350,   356,   357,   360,   361,   362,   363,   365,   366,   369,
+     372,   375,   376,   377,   380,   381,   384,   387,   388,   391,
+     394,   394,   398,   401,   405,   405,   405,   401,   407,   416,
+     416,   416,   407,   419,   423,   427,   431,   434,   438,   444,
+     445,   454,   465,   466,   469,   472,   475,   476,   478,   476
 };
 #endif
 
@@ -1605,48 +1605,96 @@ yyreduce:
 
   case 32: /* term: MINUS expr  */
 #line 226 "parser/parser.y"
-                 {(yyval.exprVal) = (yyvsp[0].exprVal);}
-#line 1610 "parser/parser.cpp"
+                 {
+        (yyval.exprVal) = NewExpr(var_e);
+        expr* new_Tmp = newtemp();
+
+        emit(uminus, (yyvsp[0].exprVal), nullptr, new_Tmp, 0, yylineno);
+
+        (yyval.exprVal)->sym = new_Tmp->sym;
+    }
+#line 1617 "parser/parser.cpp"
     break;
 
   case 33: /* term: NOT expr  */
-#line 227 "parser/parser.y"
-               {(yyval.exprVal) = (yyvsp[0].exprVal);}
-#line 1616 "parser/parser.cpp"
+#line 234 "parser/parser.y"
+               {
+        (yyval.exprVal) = NewExpr(var_e);
+        expr* new_Tmp = newtemp();
+
+        emit(not_i, (yyvsp[0].exprVal), nullptr, new_Tmp, 0, yylineno);
+
+        (yyval.exprVal)->sym = new_Tmp->sym;
+    }
+#line 1630 "parser/parser.cpp"
     break;
 
   case 34: /* term: UPLUS lvalue  */
-#line 228 "parser/parser.y"
-                   {(yyval.exprVal) = (yyvsp[0].exprVal);}
-#line 1622 "parser/parser.cpp"
+#line 242 "parser/parser.y"
+                   {
+        (yyval.exprVal) = NewExpr(var_e);
+        expr* new_Tmp = newtemp();
+        expr* one = NewExpr(constnum_e);
+        one->numConst = 1;
+        emit(add, (yyvsp[0].exprVal), one, new_Tmp, 0, yylineno);
+        emit(assign, new_Tmp, nullptr, (yyvsp[0].exprVal), 0, yylineno);
+
+        (yyval.exprVal)->sym = (yyvsp[0].exprVal)->sym;
+    }
+#line 1645 "parser/parser.cpp"
     break;
 
   case 35: /* term: lvalue UPLUS  */
-#line 229 "parser/parser.y"
-                   {(yyval.exprVal) = (yyvsp[-1].exprVal);}
-#line 1628 "parser/parser.cpp"
+#line 252 "parser/parser.y"
+                   {
+        (yyval.exprVal) = NewExpr(var_e);
+        expr* new_Tmp = newtemp();
+        expr* one = NewExpr(constnum_e);
+        one->numConst = 1;
+        emit(assign, new_Tmp, nullptr, (yyvsp[-1].exprVal), 0, yylineno);
+        (yyval.exprVal)->sym = (yyvsp[-1].exprVal)->sym;
+        emit(add, (yyvsp[-1].exprVal), one, new_Tmp, 0, yylineno);
+    }
+#line 1659 "parser/parser.cpp"
     break;
 
   case 36: /* term: UMINUS lvalue  */
-#line 230 "parser/parser.y"
-                    {(yyval.exprVal) = (yyvsp[0].exprVal);}
-#line 1634 "parser/parser.cpp"
+#line 261 "parser/parser.y"
+                    {
+        (yyval.exprVal) = NewExpr(var_e);
+        expr* new_Tmp = newtemp();
+        expr* one = NewExpr(constnum_e);
+        one->numConst = -1;
+        emit(add, (yyvsp[0].exprVal), one, new_Tmp, 0, yylineno);
+        emit(assign, new_Tmp, nullptr, (yyvsp[0].exprVal), 0, yylineno);
+
+        (yyval.exprVal)->sym = (yyvsp[0].exprVal)->sym;
+    }
+#line 1674 "parser/parser.cpp"
     break;
 
   case 37: /* term: lvalue UMINUS  */
-#line 231 "parser/parser.y"
-                    {(yyval.exprVal) = (yyvsp[-1].exprVal);}
-#line 1640 "parser/parser.cpp"
+#line 271 "parser/parser.y"
+                    {
+        (yyval.exprVal) = NewExpr(var_e);
+        expr* new_Tmp = newtemp();
+        expr* one = NewExpr(constnum_e);
+        one->numConst = -1;
+        emit(assign, new_Tmp, nullptr, (yyvsp[-1].exprVal), 0, yylineno);
+        (yyval.exprVal)->sym = (yyvsp[-1].exprVal)->sym;
+        emit(add, (yyvsp[-1].exprVal), one, new_Tmp, 0, yylineno);
+    }
+#line 1688 "parser/parser.cpp"
     break;
 
   case 38: /* term: primary  */
-#line 232 "parser/parser.y"
+#line 280 "parser/parser.y"
               {(yyval.exprVal) = (yyvsp[0].exprVal);}
-#line 1646 "parser/parser.cpp"
+#line 1694 "parser/parser.cpp"
     break;
 
   case 39: /* assignexpr: lvalue ASSIGN expr  */
-#line 235 "parser/parser.y"
+#line 283 "parser/parser.y"
                               {
     
     (yyval.exprVal) = NewExpr(var_e);
@@ -1657,41 +1705,41 @@ yyreduce:
     }
     (yyval.exprVal) = (yyvsp[-2].exprVal);
 }
-#line 1661 "parser/parser.cpp"
+#line 1709 "parser/parser.cpp"
     break;
 
   case 40: /* primary: lvalue  */
-#line 247 "parser/parser.y"
+#line 295 "parser/parser.y"
                 {(yyval.exprVal) = emit_iftableitem((yyvsp[0].exprVal));}
-#line 1667 "parser/parser.cpp"
+#line 1715 "parser/parser.cpp"
     break;
 
   case 41: /* primary: call  */
-#line 248 "parser/parser.y"
+#line 296 "parser/parser.y"
            {(yyval.exprVal) = (yyvsp[0].exprVal);}
-#line 1673 "parser/parser.cpp"
+#line 1721 "parser/parser.cpp"
     break;
 
   case 42: /* primary: objectdef  */
-#line 249 "parser/parser.y"
+#line 297 "parser/parser.y"
                 {(yyval.exprVal) = (yyvsp[0].exprVal);}
-#line 1679 "parser/parser.cpp"
+#line 1727 "parser/parser.cpp"
     break;
 
   case 43: /* primary: LEFT_PARENTHES funcdef RIGHT_PARENTHES  */
-#line 250 "parser/parser.y"
+#line 298 "parser/parser.y"
                                              {(yyval.exprVal) = (yyvsp[-1].exprVal);}
-#line 1685 "parser/parser.cpp"
+#line 1733 "parser/parser.cpp"
     break;
 
   case 44: /* primary: const  */
-#line 251 "parser/parser.y"
+#line 299 "parser/parser.y"
             {(yyval.exprVal) = (yyvsp[0].exprVal);}
-#line 1691 "parser/parser.cpp"
+#line 1739 "parser/parser.cpp"
     break;
 
   case 45: /* lvalue: ID  */
-#line 254 "parser/parser.y"
+#line 302 "parser/parser.y"
            {
             if(!(symTable.lookup(*(yyvsp[0].strVal)))){
                 if(scope == 0){         
@@ -1717,11 +1765,11 @@ yyreduce:
                 (yyval.exprVal)->sym = entry;
             }
         }
-#line 1721 "parser/parser.cpp"
+#line 1769 "parser/parser.cpp"
     break;
 
   case 46: /* lvalue: LOCAL ID  */
-#line 279 "parser/parser.y"
+#line 327 "parser/parser.y"
                {
         if(scope != 0){
             if(!symTable.lookup(*(yyvsp[0].strVal), scope) && !(hasLibFuncName(*(yyvsp[0].strVal)))){ 
@@ -1734,125 +1782,125 @@ yyreduce:
         }
         else yyerror("Cannot declare local va riable with scope 0");
     }
-#line 1738 "parser/parser.cpp"
+#line 1786 "parser/parser.cpp"
     break;
 
   case 47: /* lvalue: DCOLON ID  */
-#line 291 "parser/parser.y"
+#line 339 "parser/parser.y"
                 { 
                 if(!symTable.lookup(*(yyvsp[0].strVal),0)){
                     yyerror("Undefined refrence to " + *(yyvsp[0].strVal));
                 }
         }
-#line 1748 "parser/parser.cpp"
+#line 1796 "parser/parser.cpp"
     break;
 
   case 48: /* lvalue: member  */
-#line 296 "parser/parser.y"
+#line 344 "parser/parser.y"
             { (yyval.exprVal) = (yyvsp[0].exprVal);}
-#line 1754 "parser/parser.cpp"
+#line 1802 "parser/parser.cpp"
     break;
 
   case 49: /* member: lvalue DOT ID  */
-#line 299 "parser/parser.y"
+#line 347 "parser/parser.y"
                      {
         (yyval.exprVal) = member_item ((yyvsp[-2].exprVal),*(yyvsp[0].strVal));
 }
-#line 1762 "parser/parser.cpp"
+#line 1810 "parser/parser.cpp"
     break;
 
   case 50: /* member: lvalue LEFT_BRACKET expr RIGHT_BRACKET  */
-#line 302 "parser/parser.y"
+#line 350 "parser/parser.y"
                                             {
         (yyvsp[-3].exprVal) = emit_iftableitem((yyvsp[-3].exprVal));
         (yyval.exprVal) = NewExpr(tableitem_e);
         (yyval.exprVal)->sym = (yyvsp[-3].exprVal)->sym;
         (yyval.exprVal)->index = (yyvsp[-1].exprVal);
     }
-#line 1773 "parser/parser.cpp"
+#line 1821 "parser/parser.cpp"
     break;
 
   case 55: /* call: ID callsuffix  */
-#line 314 "parser/parser.y"
+#line 362 "parser/parser.y"
                    { (yyval.exprVal) = (yyvsp[0].exprVal);}
-#line 1779 "parser/parser.cpp"
+#line 1827 "parser/parser.cpp"
     break;
 
   case 57: /* callsuffix: normcall  */
-#line 317 "parser/parser.y"
+#line 365 "parser/parser.y"
                      { (yyval.exprVal) = (yyvsp[0].exprVal);}
-#line 1785 "parser/parser.cpp"
+#line 1833 "parser/parser.cpp"
     break;
 
   case 58: /* callsuffix: methodcall  */
-#line 318 "parser/parser.y"
+#line 366 "parser/parser.y"
                 { (yyval.exprVal) = (yyvsp[0].exprVal); }
-#line 1791 "parser/parser.cpp"
+#line 1839 "parser/parser.cpp"
     break;
 
   case 59: /* normcall: LEFT_PARENTHES elist RIGHT_PARENTHES  */
-#line 321 "parser/parser.y"
+#line 369 "parser/parser.y"
                                               { (yyval.exprVal) = (yyvsp[-1].exprVal);}
-#line 1797 "parser/parser.cpp"
+#line 1845 "parser/parser.cpp"
     break;
 
   case 62: /* elist: expr  */
-#line 328 "parser/parser.y"
+#line 376 "parser/parser.y"
            {(yyval.exprVal) = (yyvsp[0].exprVal);}
-#line 1803 "parser/parser.cpp"
+#line 1851 "parser/parser.cpp"
     break;
 
   case 70: /* $@1: %empty  */
-#line 346 "parser/parser.y"
+#line 394 "parser/parser.y"
                     {++scope;}
-#line 1809 "parser/parser.cpp"
+#line 1857 "parser/parser.cpp"
     break;
 
   case 71: /* block: LEFT_CBRACKET $@1 stmntlist RIGHT_CBRACKET  */
-#line 346 "parser/parser.y"
+#line 394 "parser/parser.y"
                                                        {
         symTable.ScopeHide(scope);
         scope--;
     }
-#line 1818 "parser/parser.cpp"
+#line 1866 "parser/parser.cpp"
     break;
 
   case 73: /* $@2: %empty  */
-#line 353 "parser/parser.y"
+#line 401 "parser/parser.y"
                  {  
         string name = "$" + to_string(curr_func);
         symTable.insert(name, "user function", scope, yylineno);
         curr_func++;
     }
-#line 1828 "parser/parser.cpp"
+#line 1876 "parser/parser.cpp"
     break;
 
   case 74: /* $@3: %empty  */
-#line 357 "parser/parser.y"
+#line 405 "parser/parser.y"
                     {++scope;}
-#line 1834 "parser/parser.cpp"
+#line 1882 "parser/parser.cpp"
     break;
 
   case 75: /* $@4: %empty  */
-#line 357 "parser/parser.y"
+#line 405 "parser/parser.y"
                                                      {scope--;}
-#line 1840 "parser/parser.cpp"
+#line 1888 "parser/parser.cpp"
     break;
 
   case 76: /* $@5: %empty  */
-#line 357 "parser/parser.y"
+#line 405 "parser/parser.y"
                                                                 {found_Func = true;}
-#line 1846 "parser/parser.cpp"
+#line 1894 "parser/parser.cpp"
     break;
 
   case 77: /* funcdef: FUNCTION $@2 LEFT_PARENTHES $@3 idlist RIGHT_PARENTHES $@4 $@5 block  */
-#line 357 "parser/parser.y"
+#line 405 "parser/parser.y"
                                                                                            { found_Func = false; }
-#line 1852 "parser/parser.cpp"
+#line 1900 "parser/parser.cpp"
     break;
 
   case 78: /* $@6: %empty  */
-#line 359 "parser/parser.y"
+#line 407 "parser/parser.y"
                   {
         bool isInSmtb = true;
 
@@ -1863,88 +1911,88 @@ yyreduce:
         if(hasLibFuncName(*(yyvsp[0].strVal))) yyerror("user function " + *(yyvsp[0].strVal) + " cannot have the same id as a library function");
         else if (isInSmtb) yyerror("redefinition of " + *(yyvsp[0].strVal));
     }
-#line 1867 "parser/parser.cpp"
+#line 1915 "parser/parser.cpp"
     break;
 
   case 79: /* $@7: %empty  */
-#line 368 "parser/parser.y"
+#line 416 "parser/parser.y"
                    {++scope;}
-#line 1873 "parser/parser.cpp"
+#line 1921 "parser/parser.cpp"
     break;
 
   case 80: /* $@8: %empty  */
-#line 368 "parser/parser.y"
+#line 416 "parser/parser.y"
                                                      {scope--;}
-#line 1879 "parser/parser.cpp"
+#line 1927 "parser/parser.cpp"
     break;
 
   case 81: /* $@9: %empty  */
-#line 368 "parser/parser.y"
+#line 416 "parser/parser.y"
                                                                 {found_Func = true;}
-#line 1885 "parser/parser.cpp"
+#line 1933 "parser/parser.cpp"
     break;
 
   case 82: /* funcdef: FUNCTION ID $@6 LEFT_PARENTHES $@7 idlist RIGHT_PARENTHES $@8 $@9 block  */
-#line 368 "parser/parser.y"
+#line 416 "parser/parser.y"
                                                                                            { found_Func = false; }
-#line 1891 "parser/parser.cpp"
+#line 1939 "parser/parser.cpp"
     break;
 
   case 83: /* const: INTCONST  */
-#line 371 "parser/parser.y"
+#line 419 "parser/parser.y"
                 {
         (yyval.exprVal) = NewExpr(constnum_e);
         (yyval.exprVal)->numConst = (yyvsp[0].intVal);
     }
-#line 1900 "parser/parser.cpp"
+#line 1948 "parser/parser.cpp"
     break;
 
   case 84: /* const: REAL  */
-#line 375 "parser/parser.y"
+#line 423 "parser/parser.y"
           {
         (yyval.exprVal) = NewExpr(constnum_e);
         (yyval.exprVal)->numConst = (yyvsp[0].realVal);
     }
-#line 1909 "parser/parser.cpp"
+#line 1957 "parser/parser.cpp"
     break;
 
   case 85: /* const: STRING  */
-#line 379 "parser/parser.y"
+#line 427 "parser/parser.y"
             {
         (yyval.exprVal) = NewExpr(conststring_e);
         (yyval.exprVal)->strConst = *(yyvsp[0].strVal);
     }
-#line 1918 "parser/parser.cpp"
+#line 1966 "parser/parser.cpp"
     break;
 
   case 86: /* const: NIL  */
-#line 383 "parser/parser.y"
+#line 431 "parser/parser.y"
          {
         (yyval.exprVal) = NewExpr(nil_e);
     }
-#line 1926 "parser/parser.cpp"
+#line 1974 "parser/parser.cpp"
     break;
 
   case 87: /* const: TRUE  */
-#line 386 "parser/parser.y"
+#line 434 "parser/parser.y"
            {
         (yyval.exprVal) = NewExpr(constbool_e);
         (yyval.exprVal)->boolConst = true;
     }
-#line 1935 "parser/parser.cpp"
+#line 1983 "parser/parser.cpp"
     break;
 
   case 88: /* const: FALSE  */
-#line 390 "parser/parser.y"
+#line 438 "parser/parser.y"
            {
         (yyval.exprVal) = NewExpr(constbool_e);
         (yyval.exprVal)->boolConst = false;
     }
-#line 1944 "parser/parser.cpp"
+#line 1992 "parser/parser.cpp"
     break;
 
   case 90: /* idlist: ID  */
-#line 397 "parser/parser.y"
+#line 445 "parser/parser.y"
          {
         if(!symTable.lookup(*(yyvsp[0].strVal), scope) && !hasLibFuncName(*(yyvsp[0].strVal))){ 
             symTable.insert(*(yyvsp[0].strVal), "formal argument", scope, yylineno);
@@ -1954,11 +2002,11 @@ yyreduce:
             else yyerror("redefinition of " + *(yyvsp[0].strVal));
         }
     }
-#line 1958 "parser/parser.cpp"
+#line 2006 "parser/parser.cpp"
     break;
 
   case 91: /* idlist: idlist COMMA ID  */
-#line 406 "parser/parser.y"
+#line 454 "parser/parser.y"
                       {
         if(!symTable.lookup(*(yyvsp[0].strVal), scope) && !hasLibFuncName(*(yyvsp[0].strVal))){ 
             symTable.insert(*(yyvsp[0].strVal), "formal argument", scope, yylineno);
@@ -1968,27 +2016,27 @@ yyreduce:
             else yyerror("redefinition of " + *(yyvsp[0].strVal));
         }
     }
-#line 1972 "parser/parser.cpp"
+#line 2020 "parser/parser.cpp"
     break;
 
   case 97: /* $@10: %empty  */
-#line 428 "parser/parser.y"
+#line 476 "parser/parser.y"
             {
         returnSTMT = 1;
     }
-#line 1980 "parser/parser.cpp"
+#line 2028 "parser/parser.cpp"
     break;
 
   case 98: /* $@11: %empty  */
-#line 430 "parser/parser.y"
+#line 478 "parser/parser.y"
           {
         returnSTMT = 0;
     }
-#line 1988 "parser/parser.cpp"
+#line 2036 "parser/parser.cpp"
     break;
 
 
-#line 1992 "parser/parser.cpp"
+#line 2040 "parser/parser.cpp"
 
       default: break;
     }
@@ -2181,7 +2229,7 @@ yyreturnlab:
   return yyresult;
 }
 
-#line 435 "parser/parser.y"
+#line 483 "parser/parser.y"
 
 
 bool hasLibFuncName(string name){
