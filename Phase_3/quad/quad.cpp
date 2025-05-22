@@ -60,6 +60,13 @@ expr* newexpr_conststring(string name){
     return e;
 }
 
+void patchlabel(int index, int label) {
+    quads.at(index)->label = label;
+}
+
+int nextquad() {
+    return quads.size();
+}
 
 
 string exprtToString(expr* expr){
