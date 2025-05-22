@@ -41,6 +41,7 @@
 }
 
 %type <exprVal> expr assignexpr term lvalue const primary call objectdef funcdef member callsuffix normcall methodcall elist
+%type <intVal> ifprefix ifstmt;
 
 %token <strVal> IF ELSE WHILE FOR FUNCTION RETURN BREAK CONTINUE AND OR LOCAL TRUE FALSE NIL
 %token <strVal> EQUAL ASSIGN UPLUS PLUS UMINUS MINUS MULTI DIV MOD NEQUAL
@@ -498,8 +499,28 @@ idlist:
     }
 ;
 
-ifstmt: IF LEFT_PARENTHES expr RIGHT_PARENTHES stmt %prec THEN
-    | ifstmt ELSE stmt
+ifstmt: ifprefix stmt{
+        patchLabel($1, curr_quad);
+        $$ = $1;
+    } %prec THEN
+    | ifstmt ELSE {
+        patchLabel($1, curr_quad + 1);
+        emit(jump, nullptr, nullptr, nullptr, 0, yylineno);
+        $1 = curr_quad;
+    }stmt{
+        patchLabel($1, curr_quad);
+    }
+;
+
+ifprefix: IF LEFT_PARENTHES expr RIGHT_PARENTHES {
+        expr *boolExpr = NewExpr(constbool_e);
+        boolExpr->boolConst = true;
+
+        emit(if_eq, $3, boolExpr, nullptr, curr_quad + 2, yylineno);
+        emit(jump, nullptr, nullptr, nullptr, 0, yylineno);
+
+        $$ = curr_quad;
+    }
 ;
 
 

@@ -109,5 +109,8 @@ string newtempname();
 expr* newtemp();
 void ressettemp();
 expr* member_item (expr* lv, string name);
-//...
+
+
+void patchLabel(unsigned int quadNo, unsigned int label);
+
 #endif
