@@ -1,8 +1,4 @@
-TODO: 
-
-- H MALAKIA ME TO ASSIGN
-- NA KANOYME TO LOOKUP() 
-
+To compile run:
 ```bash
 make all
 ```
