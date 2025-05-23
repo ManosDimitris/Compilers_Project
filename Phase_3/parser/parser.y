@@ -33,6 +33,7 @@
     vector<quad *> quads;
 %}
 
+
 %union{
     std::string *strVal;
     int intVal;
@@ -223,18 +224,44 @@ expr: assignexpr
 
         $$->sym = new_Tmp->sym;
     }
-    | expr AND expr{
-        $$ = NewExpr(boolexpr_e);
-        expr* new_Tmp = newtemp();
-        emit(and_i, $1, $3, new_Tmp, 0, yylineno);
+    | expr AND {
+        expr* boolConst = NewExpr(constbool_e);
+        boolConst->boolConst = false;
+        emit(if_eq, $1, boolConst, nullptr, 0, yylineno);
+        $<intVal>$ = curr_quad;
+    } expr{
+        expr* trueConst = NewExpr(constbool_e), *falseConst = NewExpr(constbool_e), *new_Tmp = newtemp();;
+        trueConst->boolConst = true;
+        falseConst->boolConst = false;
 
-        $$->sym = new_Tmp->sym;
+        emit(if_eq, $4, falseConst, nullptr, curr_quad + 2, yylineno);
+        emit(jump, nullptr, nullptr, nullptr, curr_quad + 3, yylineno);
+        emit(assign, falseConst, nullptr, new_Tmp, 0, yylineno);
+        patchLabel($<intVal>3, curr_quad - 1);
+        emit(jump, nullptr, nullptr, nullptr, curr_quad + 2, yylineno);
+        emit(assign, trueConst, nullptr, new_Tmp, 0, yylineno);
+
+        $$ = NewExpr(boolexpr_e);
+        $$->sym = new_Tmp->sym;;
     }
-    | expr OR expr{
-        $$ = NewExpr(boolexpr_e);
-        expr* new_Tmp = newtemp();
-        emit(or_i, $1, $3, new_Tmp, 0, yylineno);
+    |  expr OR {
+        expr* boolConst = NewExpr(constbool_e);
+        boolConst->boolConst = true;
+        emit(if_eq, $1, boolConst, nullptr, 0, yylineno);
+        $<intVal>$ = curr_quad;
+    } expr {
+        expr* trueConst = NewExpr(constbool_e), *falseConst = NewExpr(constbool_e), *new_Tmp = newtemp();;
+        trueConst->boolConst = true;
+        falseConst->boolConst = false;
 
+        emit(if_eq, $4, trueConst, nullptr, curr_quad + 2, yylineno);
+        emit(jump, nullptr, nullptr, nullptr, curr_quad + 3, yylineno);
+        emit(assign, trueConst, nullptr, new_Tmp, 0, yylineno);
+        patchLabel($<intVal>3, curr_quad - 1);
+        emit(jump, nullptr, nullptr, nullptr, curr_quad + 2, yylineno);
+        emit(assign, falseConst, nullptr, new_Tmp, 0, yylineno);
+
+        $$ = NewExpr(boolexpr_e);
         $$->sym = new_Tmp->sym;
     }
     | term {$$ = $1;}
