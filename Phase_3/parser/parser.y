@@ -19,15 +19,18 @@
     SymbolTable symTable;
     int scope = 0;
     bool found_Func = false, isCall = false;
-    int curr_func = 1;
+    int curr_func = 1, loopCount = 0;
     bool returnSTMT = false;
     ostream *outStream;
     //Helper expr* var to print the curr function name
     expr* curr_func_expr = nullptr; 
     bool hasLibFuncName(string name);
     
-    stack<int> breakAvailable;
-    stack<int> continueAvailable;
+    struct LoopContext {
+        std::list<unsigned int> breakList;
+        std::list<unsigned int> continueList;
+    };
+    stack<LoopContext> loopStack;
 
     /*THE VEVTOR OF THE QUADS*/
     vector<quad *> quads;
@@ -41,7 +44,7 @@
     struct expr* exprVal;
 }
 
-%type <exprVal> expr assignexpr term lvalue const primary call objectdef funcdef member callsuffix normcall methodcall elist
+%type <exprVal> expr assignexpr term lvalue const primary call objectdef funcdef member callsuffix normcall elist
 %type <intVal> ifprefix ifstmt;
 
 %token <strVal> IF ELSE WHILE FOR FUNCTION RETURN BREAK CONTINUE AND OR LOCAL TRUE FALSE NIL
@@ -85,17 +88,19 @@ stmt: expr SEMICOLON
     | forstmt
     | returnstmt
     | BREAK SEMICOLON{
-        if(breakAvailable.empty()){
+        if(found_Func || loopCount == 0){
             yyerror("Break not in loop");
         }else{
-            emit(jump, nullptr, nullptr, nullptr, breakAvailable.top(), yylineno);
+            emit(jump, nullptr, nullptr, nullptr, 0, yylineno);
+            loopStack.top().breakList.push_back(curr_quad - 1);
         }
     }
     | CONTINUE SEMICOLON{
-         if(continueAvailable.empty()){
+         if(found_Func || loopCount == 0){
             yyerror("Continue not in loop");
         }else{
-            emit(jump, nullptr, nullptr, nullptr, breakAvailable.top(), yylineno);
+            emit(jump, nullptr, nullptr, nullptr, 0, yylineno);
+            loopStack.top().continueList.push_back(curr_quad - 1);
         }
     }
     | block{ressettemp();}
@@ -402,24 +407,91 @@ member: lvalue DOT ID{
     | call LEFT_BRACKET expr RIGHT_BRACKET
 ;
 
-call: call LEFT_PARENTHES elist RIGHT_PARENTHES
+call: call callsuffix{
+        expr* new_Tmp = newtemp();
+        emit(call, $1, nullptr, nullptr, 0, yylineno);
+        emit(getretval, nullptr, nullptr, new_Tmp, 0, yylineno);
+
+        $$ = NewExpr(programfunc_e);
+        $$->sym = new_Tmp->sym;
+    }
+    | lvalue DOTS ID callsuffix{
+        SymbolEntry *sym = symTable.returnSymbol(*$3);
+        if(!sym){
+            symTable.insert(*$3, "user function", scope, yylineno);
+            sym = symTable.returnSymbol(*$3);
+        }
+        expr* func = NewExpr(programfunc_e), *new_Tmp = newtemp();
+        func->sym = sym;
+        emit(call, func, nullptr, nullptr, 0, yylineno);
+        emit(getretval, nullptr, nullptr, new_Tmp, 0, yylineno);
+        if(!hasLibFuncName(*$3)){
+            $$ = NewExpr(programfunc_e);
+            $$->sym = new_Tmp->sym;
+        }else{
+            $$ = NewExpr(libraryfunc_e);
+            $$->sym = new_Tmp->sym;
+        }
+        
+    }
     | member LEFT_PARENTHES elist RIGHT_PARENTHES 
-    | ID callsuffix{ $$ = $2;}
-    | LEFT_PARENTHES funcdef RIGHT_PARENTHES LEFT_PARENTHES elist RIGHT_PARENTHES 
+    | ID callsuffix{
+        SymbolEntry *sym = symTable.returnSymbol(*$1);
+        if(!sym){
+            symTable.insert(*$1, "user function", scope, yylineno);
+            sym = symTable.returnSymbol(*$1);
+        }
+        expr* func = NewExpr(programfunc_e), *new_Tmp = newtemp();
+        func->sym = sym;
+        emit(call, func, nullptr, nullptr, 0, yylineno);
+        emit(getretval, nullptr, nullptr, new_Tmp, 0, yylineno);
+        if(!hasLibFuncName(*$1)){
+            $$ = NewExpr(programfunc_e);
+            $$->sym = new_Tmp->sym;
+        }else{
+            $$ = NewExpr(libraryfunc_e);
+            $$->sym = new_Tmp->sym;
+        }
+        
+    }
+    | LEFT_PARENTHES funcdef RIGHT_PARENTHES callsuffix{
+        expr* new_Tmp = newtemp();
+        emit(call, $2, nullptr, nullptr, 0, yylineno);
+        emit(getretval, nullptr, nullptr, new_Tmp, 0, yylineno);
+
+        $$ = NewExpr(programfunc_e);
+        $$->sym = new_Tmp->sym;
+    }
+    | DOTS ID callsuffix{}
 ;
 callsuffix: normcall { $$ = $1;}
-    | methodcall{ $$ = $1; }
+   // | methodcall{ $$ = $1; }
 ;
 
-normcall: LEFT_PARENTHES elist RIGHT_PARENTHES{ $$ = $2;}
+normcall: LEFT_PARENTHES elist RIGHT_PARENTHES{
+    if($2 != nullptr){
+        expr* tmp = $2->next;
+        while(tmp != nullptr){
+            emit(param, tmp, nullptr, nullptr, 0, yylineno);
+            tmp = tmp->next;
+        }
+    }
+}
 ;
 
-methodcall: DOTS ID LEFT_PARENTHES elist RIGHT_PARENTHES
-;
+elist : { $$ = nullptr; }
+    | expr {
+        $$ = NewExpr(newtable_e);
+        $$->next = $1;
+    }
+    | elist COMMA expr {
+        expr* tmp = $1;
 
-elist :
-    | expr {$$ = $1;}
-    | elist COMMA expr
+        while(tmp->next != nullptr){
+            tmp = tmp->next; 
+        }
+        tmp->next = $3;
+    }
 ;
 
 objectdef: LEFT_BRACKET elist RIGHT_BRACKET
@@ -446,14 +518,16 @@ block: LEFT_CBRACKET{++scope;} stmntlist RIGHT_CBRACKET{
 funcdef: FUNCTION{  
         string name = "$" + to_string(curr_func);
         symTable.insert(name, "user function", scope, yylineno);
+        curr_func_expr = NewExpr(programfunc_e);
+        curr_func_expr->sym = symTable.returnSymbol(name);
         curr_func++;
-        emit(funcstart, nullptr, nullptr, NewExpr(programfunc_e), 0, yylineno);
+        emit(funcstart, nullptr, nullptr, curr_func_expr, 0, yylineno);
 
         } LEFT_PARENTHES{++scope;} idlist RIGHT_PARENTHES{scope--;} {found_Func = true;} block {
             found_Func = false; 
-            $$ = NewExpr(programfunc_e);
-            $$->sym = symTable.returnSymbol("$" + to_string(curr_func - 1));
-            emit(funcend, nullptr, nullptr, $$, 0, yylineno);
+            emit(funcend, nullptr, nullptr, curr_func_expr, 0, yylineno);
+            $$ = curr_func_expr;
+            curr_func_expr = nullptr;
         }
     
     | FUNCTION ID {
@@ -551,20 +625,35 @@ ifprefix: IF LEFT_PARENTHES expr RIGHT_PARENTHES {
 ;
 
 
-whilestmt: WHILE LEFT_PARENTHES expr RIGHT_PARENTHES stmt{
-    int testLabel = nextquad();
+whilestmt: WHILE { $<intVal>$ = curr_quad; } LEFT_PARENTHES expr RIGHT_PARENTHES{
     expr* temp_e =NewExpr(constbool_e);
-    emit(if_eq,$3,temp_e,nullptr,nextquad() + 2,yylineno);
-    int jumpLabel=nextquad();
-    emit(jump, nullptr, nullptr,nullptr, 0,yylineno);
+    temp_e->boolConst = true;
+    emit(if_eq,$4,temp_e,nullptr, curr_quad + 2, yylineno);
+    emit(jump, nullptr, nullptr,nullptr,0, yylineno);
+    $<intVal>$=curr_quad;
+} stmt{
+    
+    emit(jump, nullptr, nullptr,nullptr, $<intVal>2 ,yylineno);
 
-    emit(jump, nullptr, nullptr,nullptr, testLabel,yylineno);
-
-    patchlabel(jumpLabel, nextquad());
+    patchLabel($<intVal>6, curr_quad);
 }
 ;
 
-forstmt: FOR LEFT_PARENTHES elist SEMICOLON expr SEMICOLON elist RIGHT_PARENTHES stmt
+forstmt: FOR LEFT_PARENTHES elist SEMICOLON { $<intVal>$ = curr_quad;} expr SEMICOLON {
+    expr* boolConstexpr = NewExpr(constbool_e);
+    boolConstexpr->boolConst = true;
+    
+    emit(if_eq, $6, boolConstexpr, nullptr, 0, yylineno);
+    $<intVal>$ = curr_quad;
+    emit(jump, nullptr, nullptr, nullptr, 0, yylineno);
+} {$<intVal>$ = curr_quad;} elist{
+    patchLabel($<intVal>8, curr_quad + 1);
+    emit(jump, nullptr, nullptr, nullptr, $<intVal>5, yylineno);
+    $<intVal>$ = curr_quad;
+} RIGHT_PARENTHES stmt {
+    patchLabel($<intVal>8 + 1, $<intVal>11 + 1);
+    emit(jump, nullptr, nullptr, nullptr, $<intVal>9, yylineno);
+}
 ;
 
 returnstmt: RETURN SEMICOLON 
