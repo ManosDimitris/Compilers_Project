@@ -601,7 +601,7 @@ idlist:
 ;
 
 ifstmt: ifprefix stmt{
-        patchLabel($1, curr_quad);
+        patchLabel($1,  curr_quad);
         $$ = $1;
     } %prec THEN
     | ifstmt ELSE {
