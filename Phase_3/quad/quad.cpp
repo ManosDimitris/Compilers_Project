@@ -22,7 +22,15 @@ expr* NewExpr(expr_t t){
     return new_expr;
 }
 
-
+/**
+ * @param iopcode 
+ * @param arg1
+ * @param arg2
+ * @param result
+ * @param label
+ * @param line
+ * 
+ */
 void emit(iopcode op, 
     expr* arg1, 
     expr* arg2, 
@@ -64,12 +72,12 @@ string exprtToString(expr* expr){
     ostringstream oss;
     switch (expr->type){
         case var_e: return expr->sym->name;
-        case tableitem_e: return "tableitem_e"; 
+        case tableitem_e: return expr->sym->name; 
         case programfunc_e: return expr->sym->name;
         case libraryfunc_e: return "libraryfunc_e";
         case arithexpr_e: return expr->sym->name;
         case boolexpr_e: return expr->sym->name; 
-        case assignexpr_e: return "assignexpr_e";
+        case assignexpr_e: return expr->sym->name;
         case newtable_e: return "newtable_e";
         case constnum_e: oss << fixed << setprecision(1) << expr->numConst; return oss.str(); 
         case constbool_e: return (expr->boolConst) ? "True" : "false"; 
