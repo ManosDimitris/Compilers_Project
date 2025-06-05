@@ -21,6 +21,8 @@
     bool found_Func = false, isCall = false;
     int curr_func = 1, loopCount = 0;
     bool returnSTMT = false;
+
+    stack<bool> returnAvailabe; 
     ostream *outStream;
     //Helper expr* var to print the curr function name
     bool hasLibFuncName(string name);
@@ -324,6 +326,8 @@ assignexpr: lvalue ASSIGN expr{
         $$->type = assignexpr_e;
     }else{
        emit(assign, $3, nullptr, $1, 0, yylineno);
+       expr* tmp = newtemp();
+        emit(assign,$1,nullptr,tmp,0,yylineno);
         $$ = NewExpr(assignexpr_e);
         $$->sym = $1->sym;
     }
@@ -543,7 +547,7 @@ funcdef: FUNCTION{
     
     | FUNCTION ID {
         bool isInSmtb = true;
-
+        returnAvailabe.push(1);
         isInSmtb = symTable.lookup(*$2, scope);
 
         if(!isInSmtb && !hasLibFuncName(*$2)) {
@@ -562,6 +566,7 @@ funcdef: FUNCTION{
             $$ = curr_func_expr.top();
             curr_func_expr.pop(); 
         }
+        returnAvailabe.pop();
      }
 ;
 
@@ -667,12 +672,20 @@ forstmt: FOR LEFT_PARENTHES elist SEMICOLON { $<intVal>$ = curr_quad;} expr SEMI
 }
 ;
 
-returnstmt: RETURN SEMICOLON 
-    | RETURN{
-        returnSTMT = 1;
-    } expr{
-        returnSTMT = 0;
-    } SEMICOLON 
+returnstmt: RETURN SEMICOLON{
+        if(returnAvailabe.top()){
+            emit(ret, nullptr, nullptr, nullptr, 0, yylineno);
+        }else{
+            yyerror("Return statement outside of fucntion.");
+        }
+    } 
+    | RETURN expr SEMICOLON {
+        if(returnAvailabe.top()){
+        emit(ret, nullptr, nullptr, $2, 0, yylineno);}
+        else{
+            yyerror("Return statement outside of fucntion.");
+        }
+    }
 ;
 
 %%
