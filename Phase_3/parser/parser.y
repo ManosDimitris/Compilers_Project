@@ -673,12 +673,18 @@ forstmt: FOR LEFT_PARENTHES elist SEMICOLON { $<intVal>$ = curr_quad;} expr SEMI
 ;
 
 returnstmt: RETURN SEMICOLON{
-    if(returnAvailabe.top())
-    emit(ret, nullptr, nullptr, nullptr, 0, yylineno);
+        if(returnAvailabe.top()){
+            emit(ret, nullptr, nullptr, nullptr, 0, yylineno);
+        }else{
+            yyerror("Return statement outside of fucntion.");
+        }
     } 
     | RETURN expr SEMICOLON {
-        if(returnAvailabe.top())
-        emit(ret, nullptr, nullptr, $2, 0, yylineno);
+        if(returnAvailabe.top()){
+        emit(ret, nullptr, nullptr, $2, 0, yylineno);}
+        else{
+            yyerror("Return statement outside of fucntion.");
+        }
     }
 ;
 

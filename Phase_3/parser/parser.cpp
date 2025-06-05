@@ -629,7 +629,7 @@ static const yytype_int16 yyrline[] =
      520,   523,   526,   526,   530,   533,   541,   541,   541,   533,
      548,   563,   563,   563,   548,   573,   577,   581,   585,   588,
      592,   598,   599,   608,   619,   623,   623,   632,   644,   644,
-     644,   658,   658,   665,   665,   658,   675,   679
+     644,   658,   658,   665,   665,   658,   675,   682
 };
 #endif
 
@@ -2358,23 +2358,29 @@ yyreduce:
   case 106: /* returnstmt: RETURN SEMICOLON  */
 #line 675 "parser/parser.y"
                             {
-    if(returnAvailabe.top())
-    emit(ret, nullptr, nullptr, nullptr, 0, yylineno);
+        if(returnAvailabe.top()){
+            emit(ret, nullptr, nullptr, nullptr, 0, yylineno);
+        }else{
+            yyerror("Return statement outside of fucntion.");
+        }
     }
-#line 2365 "parser/parser.cpp"
+#line 2368 "parser/parser.cpp"
     break;
 
   case 107: /* returnstmt: RETURN expr SEMICOLON  */
-#line 679 "parser/parser.y"
+#line 682 "parser/parser.y"
                             {
-        if(returnAvailabe.top())
-        emit(ret, nullptr, nullptr, (yyvsp[-1].exprVal), 0, yylineno);
+        if(returnAvailabe.top()){
+        emit(ret, nullptr, nullptr, (yyvsp[-1].exprVal), 0, yylineno);}
+        else{
+            yyerror("Return statement outside of fucntion.");
+        }
     }
-#line 2374 "parser/parser.cpp"
+#line 2380 "parser/parser.cpp"
     break;
 
 
-#line 2378 "parser/parser.cpp"
+#line 2384 "parser/parser.cpp"
 
       default: break;
     }
@@ -2567,7 +2573,7 @@ yyreturnlab:
   return yyresult;
 }
 
-#line 685 "parser/parser.y"
+#line 691 "parser/parser.y"
 
 
 bool hasLibFuncName(string name){
