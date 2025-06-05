@@ -87,22 +87,8 @@ stmt: expr SEMICOLON
     | whilestmt{ressettemp();}
     | forstmt
     | returnstmt
-    | BREAK SEMICOLON{
-        if(found_Func || loopCount == 0){
-            yyerror("Break not in loop");
-        }else{
-            emit(jump, nullptr, nullptr, nullptr, 0, yylineno);
-            loopStack.top().breakList.push_back(curr_quad - 1);
-        }
-    }
-    | CONTINUE SEMICOLON{
-         if(found_Func || loopCount == 0){
-            yyerror("Continue not in loop");
-        }else{
-            emit(jump, nullptr, nullptr, nullptr, 0, yylineno);
-            loopStack.top().continueList.push_back(curr_quad - 1);
-        }
-    }
+    | BREAK SEMICOLON
+    | CONTINUE SEMICOLON
     | block{ressettemp();}
     | funcdef{ressettemp();}
     | SEMICOLON
@@ -626,7 +612,7 @@ idlist:
 ;
 
 ifstmt: ifprefix stmt{
-        patchLabel($1, curr_quad);
+        patchLabel($1,  curr_quad);
         $$ = $1;
     } %prec THEN
     | ifstmt ELSE {
