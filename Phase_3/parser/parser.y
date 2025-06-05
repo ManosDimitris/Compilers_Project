@@ -23,7 +23,6 @@
     bool returnSTMT = false;
     ostream *outStream;
     //Helper expr* var to print the curr function name
-    expr* curr_func_expr = nullptr; 
     bool hasLibFuncName(string name);
     
     struct LoopContext {
@@ -31,6 +30,7 @@
         std::list<unsigned int> continueList;
     };
     stack<LoopContext> loopStack;
+    stack<expr*> curr_func_expr;
 
     /*THE VEVTOR OF THE QUADS*/
     vector<quad *> quads;
@@ -332,13 +332,16 @@ term: LEFT_PARENTHES expr RIGHT_PARENTHES {$$ = $2;}
 
 assignexpr: lvalue ASSIGN expr{
     
-    $$ = NewExpr(var_e);
-    if($1->type == tableitem_e){
-        emit(tablesetelem, $3, $1->index, $1, 0, yylineno);
+    if($1->type == tableitem_e){    
+        emit(tablesetelem, $1, $1->index, $3, 0, yylineno);
+        $$ = emit_iftableitem($1);
+        $$->type = assignexpr_e;
     }else{
-        emit(assign, $3, nullptr, $1, 0, yylineno);
+       emit(assign, $3, nullptr, $1, 0, yylineno);
+        $$ = NewExpr(assignexpr_e);
+        $$->sym = $1->sym;
     }
-    $$ = $1;
+    
 }
 ;
 
@@ -434,8 +437,30 @@ call: call callsuffix{
         }
         
     }
-    | member LEFT_PARENTHES elist RIGHT_PARENTHES 
+    | member LEFT_PARENTHES elist RIGHT_PARENTHES{
+        if($1->type == tableitem_e){
+            expr* tableMember = newtemp();
+            emit(tablegetelem, $1, $1, tableMember, 0,yylineno );
+            $1 = tableMember;
+        }
+
+
+         if($3 != nullptr){
+            expr* tmp = $3->next;
+            while(tmp != nullptr){
+                emit(param, tmp, nullptr, nullptr, 0, yylineno);
+                tmp = tmp->next;
+            }
+        }
+        emit(call, $1, NULL, nullptr, 0,yylineno);        
+    
+        expr* result = newtemp();
+        emit(getretval, result, NULL, NULL, 0, yylineno);
+
+        $$ = result;
+    }
     | ID callsuffix{
+        
         SymbolEntry *sym = symTable.returnSymbol(*$1);
         if(!sym){
             symTable.insert(*$1, "user function", scope, yylineno);
@@ -518,16 +543,16 @@ block: LEFT_CBRACKET{++scope;} stmntlist RIGHT_CBRACKET{
 funcdef: FUNCTION{  
         string name = "$" + to_string(curr_func);
         symTable.insert(name, "user function", scope, yylineno);
-        curr_func_expr = NewExpr(programfunc_e);
-        curr_func_expr->sym = symTable.returnSymbol(name);
+        curr_func_expr.push(NewExpr(programfunc_e));
+        curr_func_expr.top()->sym = symTable.returnSymbol(name);
         curr_func++;
-        emit(funcstart, nullptr, nullptr, curr_func_expr, 0, yylineno);
+        emit(funcstart, nullptr, nullptr, curr_func_expr.top(), 0, yylineno);
 
         } LEFT_PARENTHES{++scope;} idlist RIGHT_PARENTHES{scope--;} {found_Func = true;} block {
             found_Func = false; 
-            emit(funcend, nullptr, nullptr, curr_func_expr, 0, yylineno);
-            $$ = curr_func_expr;
-            curr_func_expr = nullptr;
+            emit(funcend, nullptr, nullptr, curr_func_expr.top(), 0, yylineno);
+            $$ = curr_func_expr.top();
+            curr_func_expr.pop();
         }
     
     | FUNCTION ID {
@@ -537,19 +562,19 @@ funcdef: FUNCTION{
 
         if(!isInSmtb && !hasLibFuncName(*$2)) {
             symTable.insert(*$2, "user function", scope, yylineno);
-            curr_func_expr = NewExpr(programfunc_e);
-            curr_func_expr->sym = symTable.returnSymbol(*$2);
-            emit(funcstart, nullptr, nullptr, curr_func_expr, 0, yylineno);
+            curr_func_expr.push(NewExpr(programfunc_e));
+            curr_func_expr.top()->sym = symTable.returnSymbol(*$2);
+            emit(funcstart, nullptr, nullptr, curr_func_expr.top(), 0, yylineno);
         }
         if(hasLibFuncName(*$2)) yyerror("user function " + *$2 + " cannot have the same id as a library function");
         else if (isInSmtb) yyerror("redefinition of " + *$2);
 
 
     }LEFT_PARENTHES{++scope;} idlist RIGHT_PARENTHES {scope--;} {found_Func = true;} block { found_Func = false;
-      if(curr_func_expr != nullptr){
-            emit(funcend, nullptr, nullptr, curr_func_expr, 0, yylineno);
-            $$ = curr_func_expr;
-            curr_func_expr = nullptr;  
+      if(curr_func_expr.top() != nullptr){
+            emit(funcend, nullptr, nullptr, curr_func_expr.top(), 0, yylineno);
+            $$ = curr_func_expr.top();
+            curr_func_expr.pop(); 
         }
      }
 ;
