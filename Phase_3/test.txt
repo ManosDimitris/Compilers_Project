@@ -1,0 +1,8 @@
+function iamafunction(a, b) { 
+	a + b;
+	return 10;
+	9-0;
+    function (){
+        return 1;
+    }
+}
