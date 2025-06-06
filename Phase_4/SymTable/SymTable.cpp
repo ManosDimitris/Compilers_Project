@@ -2,6 +2,16 @@
 #include <string>
 #include <fstream>
 
+
+scopespace_t SymbolTable::currscopespace(){
+    if(scopeSpaceCounter == 1)
+        return programvar;
+    else if(scopeSpaceCounter % 2 == 0)
+        return formalarg;
+    else
+        return functionlocal;
+}
+
 SymbolTable::SymbolTable() {
     for (int i = 0; i < CAPACITY; i++) {
         table[i] = nullptr;
@@ -35,6 +45,24 @@ void SymbolTable::display() {
 void SymbolTable::insert(string name, string type, int scope, int line) {
     int index = SymTable_hash(name);
     SymbolEntry* newEntry = new SymbolEntry(name, type, scope, line, 1); 
+
+    if(type != "user function" && type != "library function"){
+        newEntry->scopespace = currscopespace();
+        switch (newEntry->scopespace)
+        {
+        case programvar:
+            programVarOffset++;
+            break;
+        case formalarg:
+            formalArgOffset++;
+            break;
+        case functionlocal:
+            funcVarOffset++;
+            break;
+        default:
+            break;
+        }
+    }
 
     if (table[index] == nullptr) {
         table[index] = newEntry;
