@@ -2,6 +2,9 @@
 #include <string>
 #include <fstream>
 
+unsigned int programVarOffset = 0;
+unsigned int funcVarOffset = 0;
+unsigned int formalArgOffset = 0;
 
 scopespace_t SymbolTable::currscopespace(){
     if(scopeSpaceCounter == 1)
@@ -50,17 +53,20 @@ void SymbolTable::insert(string name, string type, int scope, int line) {
         newEntry->scopespace = currscopespace();
         switch (newEntry->scopespace)
         {
-        case programvar:
-            programVarOffset++;
-            break;
-        case formalarg:
-            formalArgOffset++;
-            break;
-        case functionlocal:
-            funcVarOffset++;
-            break;
-        default:
-            break;
+            case programvar:
+                programVarOffset++;
+                newEntry->offset = programvar;
+                break;
+            case formalarg:
+                formalArgOffset++;
+                newEntry->offset = formalarg;
+                break;
+            case functionlocal:
+                funcVarOffset++;
+                newEntry->offset = funcVarOffset;
+                break;
+            default:
+                break;
         }
     }
 
