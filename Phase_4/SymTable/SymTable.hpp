@@ -11,14 +11,22 @@ using namespace std;
 #define CAPACITY 509
 #define HASH_MUL 65599
 
+/* Scope Spaces */
+enum scopespace_t{
+    programvar,
+    functionlocal,
+    formalarg
+};
 
+extern unsigned int scopeSpaceCounter;
 
 struct SymbolEntry {
     string name;
     string type;
     int scope;
     int line;
-    bool isActive; //Ebala active 
+    bool isActive; //Ebala active
+    scopespace_t scopespace;
     SymbolEntry *next;
     
     SymbolEntry(string n, string t, int s, int l, bool b) : name(n), type(t), scope(s), line(l), isActive(b) ,next(NULL){}
@@ -40,7 +48,11 @@ private:
     SymbolEntry* table[CAPACITY];
     ScopeList* scopes;
     int SymTable_hash(string name);
-
+    
+    unsigned int programVarOffset = 0;
+    unsigned int funcVarOffset = 0;
+    unsigned int formalArgOffset = 0;
+    scopespace_t currscopespace();
 public:
 
     SymbolTable();

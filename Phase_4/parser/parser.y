@@ -21,6 +21,7 @@
     bool found_Func = false, isCall = false;
     int curr_func = 1, loopCount = 0;
     bool returnSTMT = false;
+    unsigned int scopeSpaceCounter = 1;
 
     stack<bool> returnAvailabe; 
     ostream *outStream;
@@ -382,7 +383,7 @@ lvalue: ID {
         }
     | LOCAL ID {
         if(scope != 0){
-            if(!symTable.lookup(*$2, scope) && !(hasLibFuncName(*$2))){ 
+            if(!symTable.lookup(*$2, scope) && !(hasLibFuncName(*$2))){
                 symTable.insert(*$2, "local_variable", scope, yylineno);
             }
             else{
@@ -555,13 +556,15 @@ funcdef: FUNCTION{
         curr_func++;
         emit(funcstart, nullptr, nullptr, curr_func_expr.top(), 0, yylineno);
 
-        } LEFT_PARENTHES{++scope;} idlist RIGHT_PARENTHES{scope--;} {found_Func = true;} block {
+        } LEFT_PARENTHES{++scope; ++scopeSpaceCounter;} idlist RIGHT_PARENTHES{scope--;} {found_Func = true; ++scopeSpaceCounter;} block {
             found_Func = false; 
             emit(funcend, nullptr, nullptr, curr_func_expr.top(), 0, yylineno);
             $$ = curr_func_expr.top();
             curr_func_expr.pop();
 
             loopStack.pop();
+
+            scopeSpaceCounter -= 2;
         }
     
     | FUNCTION ID {
@@ -583,7 +586,7 @@ funcdef: FUNCTION{
         else if (isInSmtb) yyerror("redefinition of " + *$2);
 
 
-    }LEFT_PARENTHES{++scope;} idlist RIGHT_PARENTHES {scope--;} {found_Func = true;} block { found_Func = false;
+    }LEFT_PARENTHES{++scope; ++scopeSpaceCounter;} idlist RIGHT_PARENTHES {scope--;} {found_Func = true; ++scopeSpaceCounter;} block { found_Func = false;
       if(curr_func_expr.top() != nullptr){
             emit(funcend, nullptr, nullptr, curr_func_expr.top(), 0, yylineno);
             $$ = curr_func_expr.top();
@@ -591,6 +594,8 @@ funcdef: FUNCTION{
         }
         returnAvailabe.pop();
         loopStack.pop();
+
+        scopeSpaceCounter -= 2;
      }
 ;
 
