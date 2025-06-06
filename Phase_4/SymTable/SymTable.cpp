@@ -53,17 +53,20 @@ void SymbolTable::insert(string name, string type, int scope, int line) {
         newEntry->scopespace = currscopespace();
         switch (newEntry->scopespace)
         {
-        case programvar:
-            programVarOffset++;
-            break;
-        case formalarg:
-            formalArgOffset++;
-            break;
-        case functionlocal:
-            funcVarOffset++;
-            break;
-        default:
-            break;
+            case programvar:
+                programVarOffset++;
+                newEntry->offset = programvar;
+                break;
+            case formalarg:
+                formalArgOffset++;
+                newEntry->offset = formalarg;
+                break;
+            case functionlocal:
+                funcVarOffset++;
+                newEntry->offset = funcVarOffset;
+                break;
+            default:
+                break;
         }
     }
 

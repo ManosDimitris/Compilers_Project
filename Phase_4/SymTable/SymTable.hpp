@@ -30,6 +30,7 @@ struct SymbolEntry {
     int line;
     bool isActive; //Ebala active
     scopespace_t scopespace;
+    unsigned int offset;
     SymbolEntry *next;
     
     SymbolEntry(string n, string t, int s, int l, bool b) : name(n), type(t), scope(s), line(l), isActive(b) ,next(NULL){}
