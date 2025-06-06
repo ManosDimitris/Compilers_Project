@@ -2,6 +2,9 @@
 #include <string>
 #include <fstream>
 
+unsigned int programVarOffset = 0;
+unsigned int funcVarOffset = 0;
+unsigned int formalArgOffset = 0;
 
 scopespace_t SymbolTable::currscopespace(){
     if(scopeSpaceCounter == 1)

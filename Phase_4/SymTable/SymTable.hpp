@@ -19,6 +19,9 @@ enum scopespace_t{
 };
 
 extern unsigned int scopeSpaceCounter;
+extern unsigned int programVarOffset;
+extern unsigned int funcVarOffset;
+extern unsigned int formalArgOffset;
 
 struct SymbolEntry {
     string name;
@@ -48,10 +51,7 @@ private:
     SymbolEntry* table[CAPACITY];
     ScopeList* scopes;
     int SymTable_hash(string name);
-    
-    unsigned int programVarOffset = 0;
-    unsigned int funcVarOffset = 0;
-    unsigned int formalArgOffset = 0;
+
     scopespace_t currscopespace();
 public:
 
