@@ -28,8 +28,9 @@
     bool hasLibFuncName(string name);
     
     struct LoopContext {
-        std::list<unsigned int> breakList;
-        std::list<unsigned int> continueList;
+        bool isLoop;
+        list<unsigned int> breakList;
+        list<unsigned int> continueList;
     };
     stack<LoopContext> loopStack;
     stack<expr*> curr_func_expr;
@@ -89,8 +90,20 @@ stmt: expr SEMICOLON
     | whilestmt{ressettemp();}
     | forstmt
     | returnstmt
-    | BREAK SEMICOLON
-    | CONTINUE SEMICOLON
+    | BREAK SEMICOLON {
+        if(loopStack.top().isLoop){
+            emit(jump, nullptr, nullptr, nullptr, 0, yylineno);
+            loopStack.top().breakList.push_back(curr_quad);
+        }
+        else yyerror("Break not in a loop");
+    }
+    | CONTINUE SEMICOLON{
+        if(loopStack.top().isLoop){
+            emit(jump, nullptr, nullptr, nullptr, 0, yylineno);
+            loopStack.top().continueList.push_back(curr_quad);
+        }
+        else yyerror("Continue not in a loop");
+    }
     | block{ressettemp();}
     | funcdef{ressettemp();}
     | SEMICOLON
@@ -530,7 +543,11 @@ block: LEFT_CBRACKET{++scope;} stmntlist RIGHT_CBRACKET{
     | LEFT_CBRACKET RIGHT_CBRACKET
 ;
 
-funcdef: FUNCTION{  
+funcdef: FUNCTION{
+        LoopContext ctx;
+        ctx.isLoop = false;
+        loopStack.push(ctx);
+
         string name = "$" + to_string(curr_func);
         symTable.insert(name, "user function", scope, yylineno);
         curr_func_expr.push(NewExpr(programfunc_e));
@@ -543,9 +560,15 @@ funcdef: FUNCTION{
             emit(funcend, nullptr, nullptr, curr_func_expr.top(), 0, yylineno);
             $$ = curr_func_expr.top();
             curr_func_expr.pop();
+
+            loopStack.pop();
         }
     
     | FUNCTION ID {
+        LoopContext ctx;
+        ctx.isLoop = false;
+        loopStack.push(ctx);
+
         bool isInSmtb = true;
         returnAvailabe.push(1);
         isInSmtb = symTable.lookup(*$2, scope);
@@ -567,6 +590,7 @@ funcdef: FUNCTION{
             curr_func_expr.pop(); 
         }
         returnAvailabe.pop();
+        loopStack.pop();
      }
 ;
 
@@ -642,6 +666,10 @@ ifprefix: IF LEFT_PARENTHES expr RIGHT_PARENTHES {
 
 
 whilestmt: WHILE { $<intVal>$ = curr_quad; } LEFT_PARENTHES expr RIGHT_PARENTHES{
+    LoopContext ctx;
+    ctx.isLoop = true;
+    loopStack.push(ctx);
+    
     expr* temp_e =NewExpr(constbool_e);
     temp_e->boolConst = true;
     emit(if_eq,$4,temp_e,nullptr, curr_quad + 2, yylineno);
@@ -652,10 +680,25 @@ whilestmt: WHILE { $<intVal>$ = curr_quad; } LEFT_PARENTHES expr RIGHT_PARENTHES
     emit(jump, nullptr, nullptr,nullptr, $<intVal>2 ,yylineno);
 
     patchLabel($<intVal>6, curr_quad);
+
+    /*Patching breaks and continues*/
+    for(int index : loopStack.top().breakList){
+        patchLabel(index, curr_quad);
+    }
+
+    for(int index : loopStack.top().continueList){
+        patchLabel(index, $<intVal>2);
+    }
+
+    loopStack.pop();
 }
 ;
 
 forstmt: FOR LEFT_PARENTHES elist SEMICOLON { $<intVal>$ = curr_quad;} expr SEMICOLON {
+    LoopContext ctx;
+    ctx.isLoop = true;
+    loopStack.push(ctx);
+
     expr* boolConstexpr = NewExpr(constbool_e);
     boolConstexpr->boolConst = true;
     
@@ -669,6 +712,18 @@ forstmt: FOR LEFT_PARENTHES elist SEMICOLON { $<intVal>$ = curr_quad;} expr SEMI
 } RIGHT_PARENTHES stmt {
     patchLabel($<intVal>8 + 1, $<intVal>11 + 1);
     emit(jump, nullptr, nullptr, nullptr, $<intVal>9, yylineno);
+
+
+    /*Patching breaks and continues*/
+    for(int index : loopStack.top().breakList){
+        patchLabel(index, curr_quad);
+    }
+
+    for(int index : loopStack.top().continueList){
+        patchLabel(index, $<intVal>5);
+    }
+
+    loopStack.pop();
 }
 ;
 
