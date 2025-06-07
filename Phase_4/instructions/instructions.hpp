@@ -3,6 +3,7 @@
 #include <string>
 #include <vector>
 #include "../SymTable/SymTable.hpp"
+#include "../quad/quad.hpp"
 
 using namespace std;
 
@@ -62,5 +63,6 @@ unsigned int consts_newString(string s);
 unsigned int libfuncs_newUsed(string s);
 unsigned int userfuncs_newFunc(SymbolEntry* s);
 
+void make_operant(expr* e, vmarg* arg);
 
 #endif

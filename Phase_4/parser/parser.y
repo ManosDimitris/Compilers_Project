@@ -470,17 +470,19 @@ call: call callsuffix{
             symTable.insert(*$1, "user function", scope, yylineno);
             sym = symTable.returnSymbol(*$1);
         }
-        expr* func = NewExpr(programfunc_e), *new_Tmp = newtemp();
+        expr* func, *new_Tmp = newtemp();
+        if(!hasLibFuncName(*$1)){
+            func = NewExpr(programfunc_e);
+            $$ = NewExpr(programfunc_e);
+        }
+        else{
+            func = NewExpr(libraryfunc_e);
+            $$ = NewExpr(libraryfunc_e);
+        }
         func->sym = sym;
         emit(call, func, nullptr, nullptr, 0, yylineno);
         emit(getretval, nullptr, nullptr, new_Tmp, 0, yylineno);
-        if(!hasLibFuncName(*$1)){
-            $$ = NewExpr(programfunc_e);
-            $$->sym = new_Tmp->sym;
-        }else{
-            $$ = NewExpr(libraryfunc_e);
-            $$->sym = new_Tmp->sym;
-        }
+        $$->sym = new_Tmp->sym;
         
     }
     | LEFT_PARENTHES funcdef RIGHT_PARENTHES callsuffix{

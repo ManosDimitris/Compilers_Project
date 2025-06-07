@@ -1,6 +1,11 @@
 someShit = 0;
 good_value = 8;
 
+{
+	local y = 0;
+	::someShit = 9;
+}
+
 if(good_value == someShit){
-	g4("Something");
+	print("Something");
 }

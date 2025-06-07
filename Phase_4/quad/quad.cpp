@@ -74,7 +74,7 @@ string exprtToString(expr* expr){
         case var_e: return expr->sym->name;
         case tableitem_e: return expr->sym->name; 
         case programfunc_e: return expr->sym->name;
-        case libraryfunc_e: return "libraryfunc_e";
+        case libraryfunc_e: return expr->sym->name;
         case arithexpr_e: return expr->sym->name;
         case boolexpr_e: return expr->sym->name; 
         case assignexpr_e: return expr->sym->name;

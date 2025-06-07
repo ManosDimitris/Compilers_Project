@@ -1,5 +1,7 @@
 #include "./instructions.hpp"
+#include "../quad/quad.hpp"
 #include <vector>
+#include <cassert>
 
 using namespace std;
 
@@ -50,4 +52,65 @@ unsigned int userfuncs_newFunc(SymbolEntry* s){
     newFunc.id = s->name;
     userFuncs.push_back(newFunc);
     return userFuncs.size() - 1;
+}
+
+void variableOP(expr *e, vmarg* arg){
+    assert(e->sym);
+    arg->val = e->sym->offset;
+
+    switch(e->sym->scopespace){
+        case programvar:
+            arg->type = global_a;
+            break;
+        case functionlocal:
+            arg->type = local_a;
+        case formalarg:
+            arg->type = formal_a;
+        default:
+            assert(0);
+    }
+}
+
+void make_operant(expr* e, vmarg* arg){
+    switch (e->type){
+        case var_e:
+            variableOP(e, arg);
+            break;
+        case tableitem_e:
+            variableOP(e, arg);
+            break;
+        case arithexpr_e:
+            variableOP(e, arg);
+            break;
+        case boolexpr_e:
+            variableOP(e, arg);
+            break;
+        case newtable_e:
+            variableOP(e, arg);
+            break;
+        case constbool_e:
+            arg->val = e->boolConst;
+            arg->type = bool_a;
+            break;
+        case conststring_e:
+            arg->val = consts_newString(e->strConst);
+            arg->type = string_a;
+            break;
+        case constnum_e:
+            arg->val = consts_newNumber(e->numConst);
+            arg->type = number_a;
+            break;
+        case nil_e:
+            arg->type = nil_a;
+            break;
+        case programfunc_e:
+            arg->type = userfunc_a;
+            arg->val = userfuncs_newFunc(e->sym);
+            break;
+        case libraryfunc_e:
+            arg->type = libfunc_a;
+            arg->val = libfuncs_newUsed(e->sym->name);
+            break;
+        default: assert(0);
+    }
 }
