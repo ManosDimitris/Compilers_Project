@@ -65,4 +65,9 @@ unsigned int userfuncs_newFunc(SymbolEntry* s);
 
 void make_operant(expr* e, vmarg* arg);
 
+/* Helper funcs */
+void make_numberoperant(vmarg* arg, double val);
+void make_booloperant(vmarg* arg, bool val);
+void make_retval(vmarg* arg);
+
 #endif
