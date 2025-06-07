@@ -2,6 +2,7 @@
 #define __INSTR_HPP__
 #include <string>
 #include <vector>
+#include "../SymTable/SymTable.hpp"
 
 using namespace std;
 
@@ -49,14 +50,17 @@ struct userfunc{
     string id;
 };
 
-vector<double> numConsts;
-vector<string> stringConsts;
-vector<string> namedLibfuncs;
-vector<userfunc> userFuncs;
+extern vector<double> numConsts;
+extern vector<string> stringConsts;
+extern vector<string> namedLibfuncs;
+extern vector<userfunc> userFuncs;
 
-unsigned consts_newNumber(double n);
-unsigned consts_newString(string s);
-unsigned libfuncs_newUsed(string s);
-unsigned userfuncs_newFunc(string s);
+extern vector<instruction> instructions;
+
+unsigned int consts_newNumber(double n);
+unsigned int consts_newString(string s);
+unsigned int libfuncs_newUsed(string s);
+unsigned int userfuncs_newFunc(SymbolEntry* s);
+
 
 #endif

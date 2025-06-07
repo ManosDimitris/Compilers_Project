@@ -1,7 +1,6 @@
-{
-	function f1(){}
-	function f1(){}
-}
-{
-	function f1(){}
+someShit = 0;
+good_value = 8;
+
+if(good_value == someShit){
+	g4("Something");
 }
