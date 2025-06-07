@@ -582,8 +582,8 @@ funcdef: FUNCTION{
             curr_func_expr.top()->sym = symTable.returnSymbol(*$2);
             emit(funcstart, nullptr, nullptr, curr_func_expr.top(), 0, yylineno);
         }
-        if(hasLibFuncName(*$2)) yyerror("user function " + *$2 + " cannot have the same id as a library function");
-        else if (isInSmtb) yyerror("redefinition of " + *$2);
+        if(hasLibFuncName(*$2)){ yyerror("user function " + *$2 + " cannot have the same id as a library function"); curr_func_expr.push(nullptr); }
+        else if (isInSmtb){ yyerror("redefinition of " + *$2); curr_func_expr.push(nullptr);}
 
 
     }LEFT_PARENTHES{++scope; ++scopeSpaceCounter;} idlist RIGHT_PARENTHES {scope--;} {found_Func = true; ++scopeSpaceCounter;} block { found_Func = false;
