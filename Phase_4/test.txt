@@ -1,5 +1,6 @@
 ao = 9;
 
 function a(i){
-	y = 9;
+	::ao = 10;
+	local x = 10;
 }
