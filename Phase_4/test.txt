@@ -1,6 +1,11 @@
-ao = 9;
+someShit = 0;
+good_value = 8;
 
-function a(i){
-	::ao = 10;
-	local x = 10;
+{
+	local y = 0;
+	::someShit = 9;
+}
+
+if(good_value == someShit){
+	print("Something");
 }

@@ -487,17 +487,19 @@ call: call callsuffix{
             symTable.insert(*$1, "user function", scope, yylineno);
             sym = symTable.returnSymbol(*$1);
         }
-        expr* func = NewExpr(programfunc_e), *new_Tmp = newtemp();
+        expr* func, *new_Tmp = newtemp();
+        if(!hasLibFuncName(*$1)){
+            func = NewExpr(programfunc_e);
+            $$ = NewExpr(programfunc_e);
+        }
+        else{
+            func = NewExpr(libraryfunc_e);
+            $$ = NewExpr(libraryfunc_e);
+        }
         func->sym = sym;
         emit(call, func, nullptr, nullptr, 0, yylineno);
         emit(getretval, nullptr, nullptr, new_Tmp, 0, yylineno);
-        if(!hasLibFuncName(*$1)){
-            $$ = NewExpr(programfunc_e);
-            $$->sym = new_Tmp->sym;
-        }else{
-            $$ = NewExpr(libraryfunc_e);
-            $$->sym = new_Tmp->sym;
-        }
+        $$->sym = new_Tmp->sym;
         
     }
     | LEFT_PARENTHES funcdef RIGHT_PARENTHES callsuffix{
@@ -599,8 +601,8 @@ funcdef: FUNCTION{
             curr_func_expr.top()->sym = symTable.returnSymbol(*$2);
             emit(funcstart, nullptr, nullptr, curr_func_expr.top(), 0, yylineno);
         }
-        if(hasLibFuncName(*$2)) yyerror("user function " + *$2 + " cannot have the same id as a library function");
-        else if (isInSmtb) yyerror("redefinition of " + *$2);
+        if(hasLibFuncName(*$2)){ yyerror("user function " + *$2 + " cannot have the same id as a library function"); curr_func_expr.push(nullptr); }
+        else if (isInSmtb){ yyerror("redefinition of " + *$2); curr_func_expr.push(nullptr);}
 
 
     }LEFT_PARENTHES{++scope; ++scopeSpaceCounter;} idlist RIGHT_PARENTHES {scope--;} {found_Func = true; ++scopeSpaceCounter;} block { found_Func = false;

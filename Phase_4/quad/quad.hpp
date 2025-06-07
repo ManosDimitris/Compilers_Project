@@ -60,7 +60,7 @@ struct quad {
     expr* result;
     unsigned int label;
     unsigned int line;
-
+    unsigned int taddress; 
     quad();
     quad(iopcode op, expr* arg1, expr* arg2, expr* result, unsigned int label, unsigned int line) : 
     op(op), arg1(arg1), arg2(arg2), result(result), label(label), line(line){}
