@@ -130,4 +130,10 @@ void make_retval(vmarg* arg){
     arg->type = retval_a;
 }
 
+unsigned int nextinstructionlabel(){
+    return instructions.size();
+}
 
+void emit(instruction instr){
+    instructions.push_back(instr);
+}
