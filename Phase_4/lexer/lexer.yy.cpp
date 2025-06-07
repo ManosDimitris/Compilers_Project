@@ -1,6 +1,6 @@
-#line 1 "lexer/lexer.yy.cpp"
+#line 2 "lexer/lexer.yy.cpp"
 
-#line 3 "lexer/lexer.yy.cpp"
+#line 4 "lexer/lexer.yy.cpp"
 
 #define  YY_INT_ALIGNED short int
 
@@ -566,8 +566,8 @@ char *yytext;
     CommentNode *rootNode;
 
     void printTree(CommentNode *Node, int depth);
-#line 569 "lexer/lexer.yy.cpp"
 #line 570 "lexer/lexer.yy.cpp"
+#line 571 "lexer/lexer.yy.cpp"
 
 #define INITIAL 0
 
@@ -786,7 +786,7 @@ YY_DECL
 	{
 #line 83 "lexer/lexer.l"
 
-#line 789 "lexer/lexer.yy.cpp"
+#line 790 "lexer/lexer.yy.cpp"
 
 	while ( /*CONSTCOND*/1 )		/* loops until end-of-file is reached */
 		{
@@ -1185,7 +1185,7 @@ YY_RULE_SETUP
 #line 223 "lexer/lexer.l"
 ECHO;
 	YY_BREAK
-#line 1188 "lexer/lexer.yy.cpp"
+#line 1189 "lexer/lexer.yy.cpp"
 case YY_STATE_EOF(INITIAL):
 	yyterminate();
 
