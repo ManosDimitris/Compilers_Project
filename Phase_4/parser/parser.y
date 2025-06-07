@@ -382,20 +382,37 @@ lvalue: ID {
             }
         }
     | LOCAL ID {
-        if(scope != 0){
-            if(!symTable.lookup(*$2, scope) && !(hasLibFuncName(*$2))){
-                symTable.insert(*$2, "local_variable", scope, yylineno);
-            }
-            else{
-                if(hasLibFuncName(*$2)) yyerror("Variable " + *$2 + " cannot have the same name as a library function");
-                else yyerror("redefinition of " + *$2);
+         if(scope != 0){
+        if(!symTable.lookup(*$2, scope) && !(hasLibFuncName(*$2))){
+            symTable.insert(*$2, "local_variable", scope, yylineno);
+            SymbolEntry* entry = symTable.returnSymbol(*$2);
+            if(!entry){
+                yyerror("Failed to insert variable: " + *$2);
+                $$ = nullptr;
+            } else {
+                $$ = NewExpr(var_e);
+                $$->sym = entry;
             }
         }
-        else yyerror("Cannot declare local va riable with scope 0");
+        else{
+            if(hasLibFuncName(*$2)) yyerror("Variable " + *$2 + " cannot have the same name as a library function");
+            else yyerror("redefinition of " + *$2);
+            $$ = nullptr;
+        }
+    }
+    else {
+        yyerror("Cannot declare local variable with scope 0");
+        $$ = nullptr;
+    }
     }
     | DCOLON ID { 
-                if(!symTable.lookup(*$2,0)){
-                    yyerror("Undefined refrence to " + *$2);
+               SymbolEntry* entry = symTable.returnSymbol(*$2);  // Lookup in global scope only
+                if(!entry){
+                    yyerror("Undefined reference to global variable " + *$2);
+                    $$ = nullptr;
+                } else {
+                    $$ = NewExpr(var_e);
+                    $$->sym = entry;
                 }
         }
     | member{ $$ = $1;}
