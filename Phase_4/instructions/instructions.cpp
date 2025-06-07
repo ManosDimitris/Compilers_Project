@@ -114,3 +114,26 @@ void make_operant(expr* e, vmarg* arg){
         default: assert(0);
     }
 }
+
+/* Helper funcs */
+void make_numberoperant(vmarg* arg, double val){
+    arg->val = val;
+    arg->type = number_a;
+}
+
+void make_booloperant(vmarg* arg, bool val){
+    arg->val = val;
+    arg->type = bool_a;
+}
+
+void make_retval(vmarg* arg){
+    arg->type = retval_a;
+}
+
+unsigned int nextinstructionlabel(){
+    return instructions.size();
+}
+
+void emit(instruction instr){
+    instructions.push_back(instr);
+}
