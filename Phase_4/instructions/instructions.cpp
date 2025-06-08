@@ -1,44 +1,19 @@
 #include "./instructions.hpp"
 #include "../quad/quad.hpp"
 #include <vector>
+#include <list>
 #include <cassert>
 
 using namespace std;
 
 vector<instruction> instructions;
 
+list<incomplete_jump> ij_head;
+
 vector<double> numConsts;
 vector<string> stringConsts;
 vector<string> namedLibfuncs;
 vector<userfunc> userFuncs;
-
- void generate_ADD(quad*);
-void generate_SUB(quad*);
- void generate_MUL(quad*);
- void generate_DIV(quad*);
- void generate_MOD(quad*);
- void generate_UMINUS(quad*);
- void generate_AND(quad*);
- void generate_NEWTABLE(quad*);
- void generate_TABLEGETELEM(quad*);
- void generate_TABLESETELEM(quad*);
- void generate_ASSIGN(quad*);
- void generate_NOP(quad*);
- void generate_JUMP(quad*);
- void generate_IF_EQ(quad*);
- void generate_IF_NOTEQ(quad*);
- void generate_IF_GREATER(quad*);
- void generate_IF_GREATEREQ(quad*);
- void generate_IF_LESS(quad*);
- void generate_IF_LESSEQ(quad*);
- void generate_NOT(quad*);
- void generate_OR(quad*);
-void generate_PARAM(quad*);
-void generate_CALL(quad*);
-void generate_GETRETVAL(quad*);
-void generate_FUNCSTART(quad*);
-void generate_RETURN(quad*);
-void generate_FUNCEND(quad*);
 
 generator_func_t generators[] = {
     //OLA BASISMENA ME TO enum iopcode STO QUAD.HPP
@@ -71,6 +46,22 @@ generator_func_t generators[] = {
     generate_TABLESETELEM,
     generate_NOP
 };
+
+void add_incomplete_jump(unsigned int instrNo, unsigned int iaddress){
+    incomplete_jump newIncompleteJump;
+    newIncompleteJump.instrNo = instrNo;
+    newIncompleteJump.iaddress = iaddress;
+    ij_head.push_back(newIncompleteJump);
+};
+
+void patch_incomplete_jumps(){
+    for(incomplete_jump& ij_element : ij_head){
+        if(ij_element.iaddress == quads.size())
+            instructions[ij_element.instrNo].result.val = nextinstructionlabel();
+        else
+            instructions[ij_element.instrNo].result.val = quads[ij_element.iaddress]->taddress;
+    }
+}
 
 unsigned int consts_newNumber(double n){
     for(unsigned int i = 0; i < numConsts.size(); i++){
