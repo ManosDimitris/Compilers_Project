@@ -241,7 +241,41 @@ void generate_MUL(quad* q) {generate(vmopcode(mul_v), q);}
 void generate_DIV(quad* q){generate(vmopcode(div_v), q);}
 void generate_MOD(quad* q){generate(vmopcode(mod_v), q);}
 void generate_UMINUS(quad* q){generate(vmopcode(uminus_v), q);}
-void generate_AND(quad* q){generate(vmopcode(and_v), q);}
+
+void generate_AND(quad* q){
+    q->taddress = nextinstructionlabel();
+    instruction t;
+    t.opcode=jeq_v;
+    make_operant(q->arg1,&t.arg1);
+    make_booloperant(&t.arg2,false);
+    t.result.type=label_a;
+    t.result.val = nextinstructionlabel()+4;
+    emit(t);
+
+    make_operant(q->arg2,&t.arg1);
+    t.result.val=nextinstructionlabel()+3;
+    emit(t);
+
+    t.opcode = assign_v;
+    make_booloperant(&t.arg1,true);
+    reset_operant(&t.arg2);
+    make_operant(q->result,&t.result);
+    emit(t);
+
+    t.opcode = jmp_v;
+    reset_operant(&t.arg2);
+    reset_operant(&t.arg2);
+    t.result.type=label_a;
+    t.result.val = nextinstructionlabel()+2;
+    emit(t);
+
+    t.opcode= assign_v;
+    make_booloperant(&t.arg1,false);
+    reset_operand(&t.arg2);
+    make_operant(q->result,&t.result);
+    emit(t);
+}
+
 void generate_NEWTABLE(quad* q){generate(vmopcode(newtable_v), q);}
 void generate_TABLEGETELEM(quad* q){generate(vmopcode(tablegetelem_v), q);}
 void generate_TABLESETELEM(quad* q){generate(vmopcode(tableselem_v), q);}
