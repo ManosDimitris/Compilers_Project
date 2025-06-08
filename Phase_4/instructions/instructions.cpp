@@ -137,3 +137,11 @@ unsigned int nextinstructionlabel(){
 void emit(instruction instr){
     instructions.push_back(instr);
 }
+
+void generate(){
+    for (int i = 0; i < quads.size(); i++)
+    {   
+       generators[quads[i]->op](quads[i]); 
+    }
+    
+}
