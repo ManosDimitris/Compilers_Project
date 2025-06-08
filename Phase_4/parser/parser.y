@@ -7,6 +7,7 @@
     #include <vector>
     #include "../SymTable/SymTable.hpp"
     #include "../quad/quad.hpp"
+    #include"../instructions/instructions.hpp"
     using namespace std;
 
     int yyerror(string yaccProvidedMessage);
@@ -808,6 +809,9 @@ int main(int argc, char* argv[]){
     yyparse();
     symTable.display();
     printQuads();
+
+    
+    generate_Default();
 
     cout.rdbuf(backup); 
     if (file.is_open()) file.close();
