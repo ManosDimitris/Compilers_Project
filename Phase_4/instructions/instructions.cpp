@@ -249,9 +249,32 @@ void generate_IF_LESSEQ(quad*){}
 
 void generate_NOT(quad*){}
 void generate_OR(quad*){}
-void generate_PARAM(quad*){}
-void generate_CALL(quad*){}
-void generate_GETRETVAL(quad*){}
+
+void generate_PARAM(quad* q){
+    q->taddress = nextinstructionlabel();
+    instruction t;
+    t.opcode = pusharg_v;
+    make_operant(q->arg1,&t.arg1);
+    emit(t);
+}
+
+void generate_CALL(quad* q){
+    q->taddress = nextinstructionlabel();
+    instruction t;
+    t.opcode = call_v;
+    make_operant(q->arg1, &t.arg1);
+    emit(t);
+}
+
+void generate_GETRETVAL(quad* q){
+    q->taddress = nextinstructionlabel();
+    instruction t;
+    t.opcode = assign_v;
+    make_operant(q->result, &t.result);
+    make_retval(&t.arg1);
+
+    emit(t);
+}
 void generate_FUNCSTART(quad*){}
 void generate_RETURN(quad*){}
 void generate_FUNCEND(quad*){}
