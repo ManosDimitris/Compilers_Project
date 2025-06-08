@@ -22,6 +22,7 @@ extern unsigned int scopeSpaceCounter;
 extern unsigned int programVarOffset;
 extern unsigned int funcVarOffset;
 extern unsigned int formalArgOffset;
+extern unsigned int currFuncLocals;
 
 struct SymbolEntry {
     string name;
@@ -31,7 +32,8 @@ struct SymbolEntry {
     bool isActive; //Ebala active
     scopespace_t scopespace;
     unsigned int offset;
-    unsigned int userFuncIndex;  
+    unsigned int taddress;
+    unsigned int totallocal;  
     SymbolEntry *next;
     
     SymbolEntry(string n, string t, int s, int l, bool b) : name(n), type(t), scope(s), line(l), isActive(b) ,next(NULL){}
