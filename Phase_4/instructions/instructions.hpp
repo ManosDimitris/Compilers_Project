@@ -15,7 +15,7 @@ enum vmopcode{
     jle_v, jge_v, jlt_v, jgt_v, 
     call_v, pusharg_v,
     funcenter_v, funcexit_v, newtable_v,
-    tablegetelem_v, tableelem_v, nop_v
+    tablegetelem_v, tableselem_v, nop_v
 };
 
 enum vmarg_t{
@@ -51,40 +51,6 @@ struct userfunc{
     string id;                  
 };
 
-typedef void (*generator_func_t)(quad*);
-
-generator_func_t generators[] = {
-    //OLA BASISMENA ME TO enum iopcode STO QUAD.HPP
-    //!! MHN ALLAXTEI KATI
-    generate_ASSIGN,
-    generate_ADD,
-    generate_SUB,
-    generate_MUL,
-    generate_DIV,
-    generate_MOD,
-    generate_UMINUS,
-    generate_AND,
-    generate_OR,
-    generate_NOT,
-    generate_IF_EQ,
-    generate_IF_NOTEQ,
-    generate_IF_LESSEQ,
-    generate_IF_GREATEREQ,
-    generate_IF_LESS,
-    generate_IF_GREATER,
-    generate_JUMP,
-    generate_CALL,
-    generate_PARAM,
-    generate_RETURN,
-    generate_GETRETVAL,
-    generate_FUNCSTART,
-    generate_FUNCEND,
-    generate_NEWTABLE,
-    generate_TABLEGETELEM,
-    generate_TABLESETELEM,
-    generate_NOP
-};
-
 /*-------------GENERATORS-------------*/
 
 extern void generate_ADD(quad*);
@@ -115,6 +81,11 @@ extern void generate_FUNCSTART(quad*);
 extern void generate_RETURN(quad*);
 extern void generate_FUNCEND(quad*);
 
+typedef void (*generator_func_t)(quad*);
+
+extern generator_func_t generators[];
+
+
 /*------------------------------------*/
 extern vector<double> numConsts;
 extern vector<string> stringConsts;
@@ -138,6 +109,7 @@ void make_retval(vmarg* arg);
 unsigned int nextinstructionlabel();
 void emit(instruction instr);
 
-void generate();
+void generate(vmopcode op,quad* quad);
+void generate_Default();
 
 #endif
