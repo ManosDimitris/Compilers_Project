@@ -175,6 +175,7 @@ void make_operant(expr* e, vmarg* arg){
     }
 }
 
+
 /* Helper funcs */
 void make_numberoperant(vmarg* arg, double val){
     arg->val = val;
@@ -210,6 +211,21 @@ void generate(vmopcode op, quad* quad){
     emit(t);
 }
 
+//Relational
+void generate_relational(vmopcode op,quad* q){
+    instruction t;
+    t.opcode=op;
+    make_operant(q->arg1,&t.arg1);
+    make_operant(q->arg2,&t.arg2);
+    t.result.type=label_a;
+    if(q->label<curr_quad){
+        t.result.val = quads[q->label]->taddress;
+    }
+    else{
+        add_in
+    }
+
+}
 
 //Extra
 void generate_Default(){
