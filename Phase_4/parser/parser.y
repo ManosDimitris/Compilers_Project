@@ -580,11 +580,13 @@ funcdef: FUNCTION{
             found_Func = false; 
             emit(funcend, nullptr, nullptr, curr_func_expr.top(), 0, yylineno);
             $$ = curr_func_expr.top();
+            curr_func_expr.top()->sym->totallocal = currFuncLocals;
+            
             curr_func_expr.pop();
-
             loopStack.pop();
 
             scopeSpaceCounter -= 2;
+            currFuncLocals = 0;
         }
     
     | FUNCTION ID {
@@ -607,15 +609,19 @@ funcdef: FUNCTION{
 
 
     }LEFT_PARENTHES{++scope; ++scopeSpaceCounter;} idlist RIGHT_PARENTHES {scope--;} {found_Func = true; ++scopeSpaceCounter;} block { found_Func = false;
-      if(curr_func_expr.top() != nullptr){
+        if(curr_func_expr.top() != nullptr){
             emit(funcend, nullptr, nullptr, curr_func_expr.top(), 0, yylineno);
             $$ = curr_func_expr.top();
+            curr_func_expr.top()->sym->totallocal = currFuncLocals;
+            
             curr_func_expr.pop(); 
         }
+    
         returnAvailabe.pop();
         loopStack.pop();
 
         scopeSpaceCounter -= 2;
+        currFuncLocals = 0;
      }
 ;
 
@@ -810,7 +816,6 @@ int main(int argc, char* argv[]){
     symTable.display();
     printQuads();
 
-    
     generate_Default();
 
     cout.rdbuf(backup); 

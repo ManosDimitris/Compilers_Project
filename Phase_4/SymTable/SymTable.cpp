@@ -5,6 +5,7 @@
 unsigned int programVarOffset = 0;
 unsigned int funcVarOffset = 0;
 unsigned int formalArgOffset = 0;
+unsigned int currFuncLocals = 0;
 
 scopespace_t SymbolTable::currscopespace(){
     if(scopeSpaceCounter == 1)
@@ -63,13 +64,16 @@ void SymbolTable::insert(string name, string type, int scope, int line) {
                 break;
             case functionlocal:
                 funcVarOffset++;
+                
+                //Amount of locals in function
+                currFuncLocals++;
                 newEntry->offset = funcVarOffset;
                 break;
             default:
                 break;
         }
     }
-
+    
     if (table[index] == nullptr) {
         table[index] = newEntry;
     } 

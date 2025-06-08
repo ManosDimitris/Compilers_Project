@@ -4,6 +4,7 @@
 #include <vector>
 #include "../SymTable/SymTable.hpp"
 #include "../quad/quad.hpp"
+#include <stack>
 
 using namespace std;
 
@@ -51,6 +52,12 @@ struct userfunc{
     string id;                  
 };
 
+struct FuncInfo {
+    SymbolEntry* sym;
+    string id;
+    std::vector<int> returnList; 
+};
+
 /*-------------GENERATORS-------------*/
 
 extern void generate_ADD(quad*);
@@ -93,6 +100,7 @@ extern vector<string> namedLibfuncs;
 extern vector<userfunc> userFuncs;
 
 extern vector<instruction> instructions;
+extern stack<FuncInfo> funcStack;
 
 unsigned int consts_newNumber(double n);
 unsigned int consts_newString(string s);

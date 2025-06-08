@@ -2,6 +2,7 @@
 #include "../quad/quad.hpp"
 #include <vector>
 #include <cassert>
+#include <stack>
 
 using namespace std;
 
@@ -11,6 +12,7 @@ vector<double> numConsts;
 vector<string> stringConsts;
 vector<string> namedLibfuncs;
 vector<userfunc> userFuncs;
+stack<FuncInfo> funcStack;
 
  void generate_ADD(quad*);
 void generate_SUB(quad*);
@@ -132,6 +134,7 @@ void variableOP(expr *e, vmarg* arg){
 }
 
 void make_operant(expr* e, vmarg* arg){
+    
     switch (e->type){
         case var_e:
             variableOP(e, arg);
@@ -171,7 +174,7 @@ void make_operant(expr* e, vmarg* arg){
             arg->type = libfunc_a;
             arg->val = libfuncs_newUsed(e->sym->name);
             break;
-        default: assert(0);
+        default: assert(0); 
     }
 }
 
@@ -203,6 +206,7 @@ void generate(vmopcode op, quad* quad){
     t.opcode = op;
 
     make_operant(quad->arg1,&t.arg1);
+
     make_operant(quad->arg2,&t.arg2);
     make_operant(quad->result,&t.result);
     quad->taddress = nextinstructionlabel();
@@ -213,9 +217,10 @@ void generate(vmopcode op, quad* quad){
 
 //Extra
 void generate_Default(){
-    for (int i = 0; i < quads.size(); i++)
+    
+    for (int i = 0; i < quads.size(); ++i)
     {   
-       generators[quads[i]->op](quads[i]); 
+       (*generators[quads[i]->op])(quads[i]); 
     }
 }
 
@@ -275,6 +280,59 @@ void generate_GETRETVAL(quad* q){
 
     emit(t);
 }
-void generate_FUNCSTART(quad*){}
-void generate_RETURN(quad*){}
-void generate_FUNCEND(quad*){}
+
+void generate_FUNCSTART(quad* q) {
+    FuncInfo f;
+    f.sym = q->result->sym;
+    f.sym->taddress = nextinstructionlabel();
+    q->taddress = nextinstructionlabel();
+    userfunc tmp;
+    tmp.address = f.sym->taddress;
+    tmp.id = f.sym->name;
+    tmp.localSize = f.sym->totallocal;
+
+    userFuncs.push_back(tmp);
+    funcStack.push(f);
+    instruction t;
+    t.opcode = funcenter_v;
+    make_operant(q->result, &t.result);
+    emit(t);
+
+}
+
+void generate_RETURN(quad* q){
+    q->taddress = nextinstructionlabel();
+    instruction t;
+    t.opcode = assign_v;
+    make_retval(&t.result);
+    make_operant(q->arg1,&t.arg1);
+    emit(t);
+
+    FuncInfo f = funcStack.top();
+    f.returnList.push_back(nextinstructionlabel());
+
+    t.opcode = jmp_v;
+    reset_operand(&t.arg1);
+    reset_operand(&t.arg2);
+    t.result.type = label_a;
+    emit(t);
+
+}
+
+void generate_FUNCEND(quad* q){
+    FuncInfo f = funcStack.top();
+    funcStack.pop();
+
+    for (int i = 0; i < f.returnList.size(); i++)
+    {
+        instructions[f.returnList[i]].result.val = nextinstructionlabel();
+    }
+    
+    q->taddress = nextinstructionlabel();
+    instruction t;
+    t.opcode = funcexit_v;
+    make_operant(q->result,&t.result);
+    emit(t);
+
+
+}
