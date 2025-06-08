@@ -166,6 +166,7 @@ void make_operant(expr* e, vmarg* arg){
     }
 }
 
+
 /* Helper funcs */
 void make_numberoperant(vmarg* arg, double val){
     arg->val = val;
@@ -181,6 +182,10 @@ void make_retval(vmarg* arg){
     arg->type = retval_a;
 }
 
+void reset_operand(vmarg* arg){
+    arg=nullptr;
+}
+
 unsigned int nextinstructionlabel(){
     return instructions.size();
 }
@@ -188,6 +193,8 @@ unsigned int nextinstructionlabel(){
 void emit(instruction instr){
     instructions.push_back(instr);
 }
+
+
 
 void generate(vmopcode op, quad* quad){
     instruction t;
@@ -201,6 +208,23 @@ void generate(vmopcode op, quad* quad){
     emit(t);
 }
 
+//Relational
+void generate_relational(vmopcode op,quad* q){
+    instruction t;
+    t.opcode=op;
+    make_operant(q->arg1,&t.arg1);
+    make_operant(q->arg2,&t.arg2);
+    t.result.type=label_a;
+    if(q->label<curr_quad){
+        t.result.val = quads[q->label]->taddress;
+    }
+    else{
+        add_incomplete_jump(nextinstructionlabel(),q->label);
+    }
+    q->taddress=nextinstructionlabel();
+    emit(t);
+
+}
 
 //Extra
 void generate_Default(){
@@ -239,7 +263,40 @@ void generate_IF_LESS(quad*){}
 void generate_IF_LESSEQ(quad*){}
 
 void generate_NOT(quad*){}
-void generate_OR(quad*){}
+
+void generate_OR(quad* q){
+    q->taddress = nextinstructionlabel();
+    instruction t;
+    t.opcode=jeq_v;
+    make_operant(q->arg1,&t.arg1);
+    make_booloperant(&t.arg2,true);
+    t.result.type=label_a;
+    t.result.val = nextinstructionlabel()+4;
+    emit(t);
+
+    make_operant(q->arg2,&t.arg1);
+    t.result.val=nextinstructionlabel()+3;
+    emit(t);
+
+    t.opcode = assign_v;
+    make_booloperant(&t.arg1,false);
+    reset_operant(&t.arg2);
+    make_operant(q->result,&t.result);
+    emit(t);
+
+    t.opcode = jmp_v;
+    reset_operant(&t.arg2);
+    reset_operant(&t.arg2);
+    t.result.type=label_a;
+    t.result.val = nextinstructionlabel()+2;
+    emit(t);
+
+    t.opcode= assign_v;
+    make_booloperant(&t.arg1,true);
+    reset_operand(&t.arg2);
+    make_operant(q->result,&t.result);
+    emit(t);
+}
 
 void generate_PARAM(quad* q){
     q->taddress = nextinstructionlabel();
