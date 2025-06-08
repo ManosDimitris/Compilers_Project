@@ -12,14 +12,14 @@ extern unsigned int curr_quad;
 
 //O opcode ton quads
 enum iopcode {
-    assign, add, sub, mul, div_i, mod, uminus,
-    and_i, or_i, not_i,
-    if_eq, if_noteq, if_lesseq, if_greatereq, if_less, if_greater,
-    jump,
-    call, param, ret, getretval,
-    funcstart, funcend,
-    tablecreate, tablegetelem, tablesetelem, 
-    nop // Phase 4
+    assign = 0, add = 1, sub = 2, mul = 3, div_i= 4, mod = 5, uminus = 6,
+    and_i = 7, or_i = 8, not_i = 9,
+    if_eq = 10, if_noteq = 11, if_lesseq = 12, if_greatereq = 13, if_less = 14, if_greater = 15,
+    jump = 16,
+    call = 17, param = 18, ret = 19, getretval = 20,
+    funcstart = 21, funcend = 22,
+    tablecreate = 23, tablegetelem = 24, tablesetelem = 25, 
+    nop = 26 // Phase 4
 };
 
 //Ta types ton expressions poy einai apodekta

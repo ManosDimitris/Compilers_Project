@@ -123,6 +123,7 @@ void variableOP(expr *e, vmarg* arg){
 }
 
 void make_operant(expr* e, vmarg* arg){
+    if(e == nullptr) {arg->val = 0; return;}
     switch (e->type){
         case var_e:
             variableOP(e, arg);
@@ -230,7 +231,11 @@ void generate_relational(vmopcode op,quad* q){
 void generate_Default(){
     for (int i = 0; i < quads.size(); i++)
     {   
-       generators[quads[i]->op](quads[i]); 
+        // if((*generators[quads[i]->op])(quads[i]) == nullptr){
+        //     cout << "Hitting null at " << i << endl;
+        //     break;
+        // }
+        generators[quads[i]->op](quads[i]); 
     }
 }
 
@@ -258,13 +263,13 @@ void generate_AND(quad* q){
 
     t.opcode = assign_v;
     make_booloperant(&t.arg1,true);
-    reset_operant(&t.arg2);
+    reset_operand(&t.arg2);
     make_operant(q->result,&t.result);
     emit(t);
 
     t.opcode = jmp_v;
-    reset_operant(&t.arg2);
-    reset_operant(&t.arg2);
+    reset_operand(&t.arg2);
+    reset_operand(&t.arg2);
     t.result.type=label_a;
     t.result.val = nextinstructionlabel()+2;
     emit(t);
@@ -357,13 +362,13 @@ void generate_OR(quad* q){
 
     t.opcode = assign_v;
     make_booloperant(&t.arg1,false);
-    reset_operant(&t.arg2);
+    reset_operand(&t.arg2);
     make_operant(q->result,&t.result);
     emit(t);
 
     t.opcode = jmp_v;
-    reset_operant(&t.arg2);
-    reset_operant(&t.arg2);
+    reset_operand(&t.arg2);
+    reset_operand(&t.arg2);
     t.result.type=label_a;
     t.result.val = nextinstructionlabel()+2;
     emit(t);
