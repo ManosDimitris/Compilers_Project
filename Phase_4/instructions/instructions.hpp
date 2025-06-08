@@ -4,6 +4,7 @@
 #include <vector>
 #include "../SymTable/SymTable.hpp"
 #include "../quad/quad.hpp"
+#include <stack>
 
 using namespace std;
 
@@ -51,6 +52,11 @@ struct userfunc{
     string id;                  
 };
 
+struct FuncInfo {
+    SymbolEntry* sym;
+    string id;
+    std::vector<int> returnList; 
+};
 struct incomplete_jump{
     unsigned int instrNo;
     unsigned int iaddress;
@@ -98,6 +104,7 @@ extern vector<string> namedLibfuncs;
 extern vector<userfunc> userFuncs;
 
 extern vector<instruction> instructions;
+extern stack<FuncInfo> funcStack;
 
 void add_incomplete_jump(unsigned int instrNo, unsigned int iaddress);
 void patch_incomplete_jumps();
