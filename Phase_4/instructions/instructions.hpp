@@ -57,36 +57,40 @@ struct FuncInfo {
     string id;
     std::vector<int> returnList; 
 };
+struct incomplete_jump{
+    unsigned int instrNo;
+    unsigned int iaddress;
+};
 
 /*-------------GENERATORS-------------*/
 
-extern void generate_ADD(quad*);
-extern void generate_SUB(quad*);
-extern void generate_MUL(quad*);
-extern void generate_DIV(quad*);
-extern void generate_MOD(quad*);
-extern void generate_UMINUS(quad*);
-extern void generate_AND(quad*);
-extern void generate_NEWTABLE(quad*);
-extern void generate_TABLEGETELEM(quad*);
-extern void generate_TABLESETELEM(quad*);
-extern void generate_ASSIGN(quad*);
-extern void generate_NOP(quad*);
-extern void generate_JUMP(quad*);
-extern void generate_IF_EQ(quad*);
-extern void generate_IF_NOTEQ(quad*);
-extern void generate_IF_GREATER(quad*);
-extern void generate_IF_GREATEREQ(quad*);
-extern void generate_IF_LESS(quad*);
-extern void generate_IF_LESSEQ(quad*);
-extern void generate_NOT(quad*);
-extern void generate_OR(quad*);
-extern void generate_PARAM(quad*);
-extern void generate_CALL(quad*);
-extern void generate_GETRETVAL(quad*);
-extern void generate_FUNCSTART(quad*);
-extern void generate_RETURN(quad*);
-extern void generate_FUNCEND(quad*);
+void generate_ADD(quad* q);
+void generate_SUB(quad* q);
+void generate_MUL(quad* q);
+void generate_DIV(quad* q);
+void generate_MOD(quad* q);
+void generate_UMINUS(quad* q);
+void generate_AND(quad* q);
+void generate_NEWTABLE(quad* q);
+void generate_TABLEGETELEM(quad* q);
+void generate_TABLESETELEM(quad* q);
+void generate_ASSIGN(quad* q);
+void generate_NOP(quad* q);
+void generate_JUMP(quad* q);
+void generate_IF_EQ(quad* q);
+void generate_IF_NOTEQ(quad* q);
+void generate_IF_GREATER(quad* q);
+void generate_IF_GREATEREQ(quad* q);
+void generate_IF_LESS(quad* q);
+void generate_IF_LESSEQ(quad* q);
+void generate_NOT(quad* q);
+void generate_OR(quad* q);
+void generate_PARAM(quad* q);
+void generate_CALL(quad* q);
+void generate_GETRETVAL(quad* q);
+void generate_FUNCSTART(quad* q);
+void generate_RETURN(quad* q);
+void generate_FUNCEND(quad* q);
 
 typedef void (*generator_func_t)(quad*);
 
@@ -102,6 +106,9 @@ extern vector<userfunc> userFuncs;
 extern vector<instruction> instructions;
 extern stack<FuncInfo> funcStack;
 
+void add_incomplete_jump(unsigned int instrNo, unsigned int iaddress);
+void patch_incomplete_jumps();
+
 unsigned int consts_newNumber(double n);
 unsigned int consts_newString(string s);
 unsigned int libfuncs_newUsed(string s);
@@ -113,6 +120,7 @@ void make_operant(expr* e, vmarg* arg);
 void make_numberoperant(vmarg* arg, double val);
 void make_booloperant(vmarg* arg, bool val);
 void make_retval(vmarg* arg);
+void reset_operant(vmarg* arg);
 
 unsigned int nextinstructionlabel();
 void emit(instruction instr);

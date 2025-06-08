@@ -1,6 +1,7 @@
 #include "./instructions.hpp"
 #include "../quad/quad.hpp"
 #include <vector>
+#include <list>
 #include <cassert>
 #include <stack>
 
@@ -8,39 +9,13 @@ using namespace std;
 
 vector<instruction> instructions;
 
+list<incomplete_jump> ij_head;
+
 vector<double> numConsts;
 vector<string> stringConsts;
 vector<string> namedLibfuncs;
 vector<userfunc> userFuncs;
 stack<FuncInfo> funcStack;
-
- void generate_ADD(quad*);
-void generate_SUB(quad*);
- void generate_MUL(quad*);
- void generate_DIV(quad*);
- void generate_MOD(quad*);
- void generate_UMINUS(quad*);
- void generate_AND(quad*);
- void generate_NEWTABLE(quad*);
- void generate_TABLEGETELEM(quad*);
- void generate_TABLESETELEM(quad*);
- void generate_ASSIGN(quad*);
- void generate_NOP(quad*);
- void generate_JUMP(quad*);
- void generate_IF_EQ(quad*);
- void generate_IF_NOTEQ(quad*);
- void generate_IF_GREATER(quad*);
- void generate_IF_GREATEREQ(quad*);
- void generate_IF_LESS(quad*);
- void generate_IF_LESSEQ(quad*);
- void generate_NOT(quad*);
- void generate_OR(quad*);
-void generate_PARAM(quad*);
-void generate_CALL(quad*);
-void generate_GETRETVAL(quad*);
-void generate_FUNCSTART(quad*);
-void generate_RETURN(quad*);
-void generate_FUNCEND(quad*);
 
 generator_func_t generators[] = {
     //OLA BASISMENA ME TO enum iopcode STO QUAD.HPP
@@ -73,6 +48,22 @@ generator_func_t generators[] = {
     generate_TABLESETELEM,
     generate_NOP
 };
+
+void add_incomplete_jump(unsigned int instrNo, unsigned int iaddress){
+    incomplete_jump newIncompleteJump;
+    newIncompleteJump.instrNo = instrNo;
+    newIncompleteJump.iaddress = iaddress;
+    ij_head.push_back(newIncompleteJump);
+};
+
+void patch_incomplete_jumps(){
+    for(incomplete_jump& ij_element : ij_head){
+        if(ij_element.iaddress == quads.size())
+            instructions[ij_element.instrNo].result.val = nextinstructionlabel();
+        else
+            instructions[ij_element.instrNo].result.val = quads[ij_element.iaddress]->taddress;
+    }
+}
 
 unsigned int consts_newNumber(double n){
     for(unsigned int i = 0; i < numConsts.size(); i++){
@@ -178,6 +169,7 @@ void make_operant(expr* e, vmarg* arg){
     }
 }
 
+
 /* Helper funcs */
 void make_numberoperant(vmarg* arg, double val){
     arg->val = val;
@@ -193,6 +185,10 @@ void make_retval(vmarg* arg){
     arg->type = retval_a;
 }
 
+void reset_operand(vmarg* arg){
+    arg=nullptr;
+}
+
 unsigned int nextinstructionlabel(){
     return instructions.size();
 }
@@ -200,6 +196,8 @@ unsigned int nextinstructionlabel(){
 void emit(instruction instr){
     instructions.push_back(instr);
 }
+
+
 
 void generate(vmopcode op, quad* quad){
     instruction t;
@@ -214,6 +212,23 @@ void generate(vmopcode op, quad* quad){
     emit(t);
 }
 
+//Relational
+void generate_relational(vmopcode op,quad* q){
+    instruction t;
+    t.opcode=op;
+    make_operant(q->arg1,&t.arg1);
+    make_operant(q->arg2,&t.arg2);
+    t.result.type=label_a;
+    if(q->label<curr_quad){
+        t.result.val = quads[q->label]->taddress;
+    }
+    else{
+        add_incomplete_jump(nextinstructionlabel(),q->label);
+    }
+    q->taddress=nextinstructionlabel();
+    emit(t);
+
+}
 
 //Extra
 void generate_Default(){
@@ -231,7 +246,41 @@ void generate_MUL(quad* q) {generate(vmopcode(mul_v), q);}
 void generate_DIV(quad* q){generate(vmopcode(div_v), q);}
 void generate_MOD(quad* q){generate(vmopcode(mod_v), q);}
 void generate_UMINUS(quad* q){generate(vmopcode(uminus_v), q);}
-void generate_AND(quad* q){generate(vmopcode(and_v), q);}
+
+void generate_AND(quad* q){
+    q->taddress = nextinstructionlabel();
+    instruction t;
+    t.opcode=jeq_v;
+    make_operant(q->arg1,&t.arg1);
+    make_booloperant(&t.arg2,false);
+    t.result.type=label_a;
+    t.result.val = nextinstructionlabel()+4;
+    emit(t);
+
+    make_operant(q->arg2,&t.arg1);
+    t.result.val=nextinstructionlabel()+3;
+    emit(t);
+
+    t.opcode = assign_v;
+    make_booloperant(&t.arg1,true);
+    reset_operant(&t.arg2);
+    make_operant(q->result,&t.result);
+    emit(t);
+
+    t.opcode = jmp_v;
+    reset_operant(&t.arg2);
+    reset_operant(&t.arg2);
+    t.result.type=label_a;
+    t.result.val = nextinstructionlabel()+2;
+    emit(t);
+
+    t.opcode= assign_v;
+    make_booloperant(&t.arg1,false);
+    reset_operand(&t.arg2);
+    make_operant(q->result,&t.result);
+    emit(t);
+}
+
 void generate_NEWTABLE(quad* q){generate(vmopcode(newtable_v), q);}
 void generate_TABLEGETELEM(quad* q){generate(vmopcode(tablegetelem_v), q);}
 void generate_TABLESETELEM(quad* q){generate(vmopcode(tableselem_v), q);}
@@ -244,16 +293,92 @@ void generate_NOP(quad* q){
 }
 
 /*Generate relation*/
-void generate_JUMP(quad*){}
-void generate_IF_EQ(quad*){}
-void generate_IF_NOTEQ(quad*){}
-void generate_IF_GREATER(quad*){}
-void generate_IF_GREATEREQ(quad*){}
-void generate_IF_LESS(quad*){}
-void generate_IF_LESSEQ(quad*){}
+void generate_JUMP(quad* q){
+    generate_relational(jmp_v, q);
+}
+void generate_IF_EQ(quad* q){
+    generate_relational(jeq_v, q);
+}
+void generate_IF_NOTEQ(quad* q){
+    generate_relational(jne_v, q);
+}
+void generate_IF_GREATER(quad* q){
+    generate_relational(jgt_v, q);
+}
+void generate_IF_GREATEREQ(quad* q){
+    generate_relational(jge_v, q);
+}
+void generate_IF_LESS(quad* q){
+    generate_relational(jlt_v, q);
+}
+void generate_IF_LESSEQ(quad* q){
+    generate_relational(jle_v, q);
+}
 
-void generate_NOT(quad*){}
-void generate_OR(quad*){}
+void generate_NOT(quad* q){
+    q->taddress = nextinstructionlabel();
+    instruction t;
+
+    t.opcode = jeq_v;
+    make_operant(q->arg1, &t.arg1);
+    make_booloperant(&t.arg2, false);
+    t.result.type = label_a;
+    t.result.val = nextinstructionlabel() + 3;
+    emit(t);
+
+    t.opcode = assign_v;
+    make_booloperant(&t.arg1, false);
+    reset_operand(&t.arg2);
+    make_operant(q->result, &t.result);
+    emit(t);
+
+    t.opcode = jmp_v;
+    reset_operand(&t.arg1);
+    reset_operand(&t.arg2);
+    t.result.type = label_a;
+    t.result.val = nextinstructionlabel() + 2;
+    emit(t);
+
+    t.opcode = assign_v;
+    make_booloperant(&t.arg1, true);
+    reset_operand(&t.arg2);
+    make_operant(q->result, &t.result);
+    emit(t);
+}
+
+void generate_OR(quad* q){
+    q->taddress = nextinstructionlabel();
+    instruction t;
+    t.opcode=jeq_v;
+    make_operant(q->arg1,&t.arg1);
+    make_booloperant(&t.arg2,true);
+    t.result.type=label_a;
+    t.result.val = nextinstructionlabel()+4;
+    emit(t);
+
+    make_operant(q->arg2,&t.arg1);
+    t.result.val=nextinstructionlabel()+3;
+    emit(t);
+
+    t.opcode = assign_v;
+    make_booloperant(&t.arg1,false);
+    reset_operant(&t.arg2);
+    make_operant(q->result,&t.result);
+    emit(t);
+
+    t.opcode = jmp_v;
+    reset_operant(&t.arg2);
+    reset_operant(&t.arg2);
+    t.result.type=label_a;
+    t.result.val = nextinstructionlabel()+2;
+    emit(t);
+
+    t.opcode= assign_v;
+    make_booloperant(&t.arg1,true);
+    reset_operand(&t.arg2);
+    make_operant(q->result,&t.result);
+    emit(t);
+}
 
 void generate_PARAM(quad* q){
     q->taddress = nextinstructionlabel();
