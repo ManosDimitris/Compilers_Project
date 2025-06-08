@@ -51,35 +51,40 @@ struct userfunc{
     string id;                  
 };
 
+struct incomplete_jump{
+    unsigned int instrNo;
+    unsigned int iaddress;
+};
+
 /*-------------GENERATORS-------------*/
 
-extern void generate_ADD(quad*);
-extern void generate_SUB(quad*);
-extern void generate_MUL(quad*);
-extern void generate_DIV(quad*);
-extern void generate_MOD(quad*);
-extern void generate_UMINUS(quad*);
-extern void generate_AND(quad*);
-extern void generate_NEWTABLE(quad*);
-extern void generate_TABLEGETELEM(quad*);
-extern void generate_TABLESETELEM(quad*);
-extern void generate_ASSIGN(quad*);
-extern void generate_NOP(quad*);
-extern void generate_JUMP(quad*);
-extern void generate_IF_EQ(quad*);
-extern void generate_IF_NOTEQ(quad*);
-extern void generate_IF_GREATER(quad*);
-extern void generate_IF_GREATEREQ(quad*);
-extern void generate_IF_LESS(quad*);
-extern void generate_IF_LESSEQ(quad*);
-extern void generate_NOT(quad*);
-extern void generate_OR(quad*);
-extern void generate_PARAM(quad*);
-extern void generate_CALL(quad*);
-extern void generate_GETRETVAL(quad*);
-extern void generate_FUNCSTART(quad*);
-extern void generate_RETURN(quad*);
-extern void generate_FUNCEND(quad*);
+void generate_ADD(quad*);
+void generate_SUB(quad*);
+void generate_MUL(quad*);
+void generate_DIV(quad*);
+void generate_MOD(quad*);
+void generate_UMINUS(quad*);
+void generate_AND(quad*);
+void generate_NEWTABLE(quad*);
+void generate_TABLEGETELEM(quad*);
+void generate_TABLESETELEM(quad*);
+void generate_ASSIGN(quad*);
+void generate_NOP(quad*);
+void generate_JUMP(quad*);
+void generate_IF_EQ(quad*);
+void generate_IF_NOTEQ(quad*);
+void generate_IF_GREATER(quad*);
+void generate_IF_GREATEREQ(quad*);
+void generate_IF_LESS(quad*);
+void generate_IF_LESSEQ(quad*);
+void generate_NOT(quad*);
+void generate_OR(quad*);
+void generate_PARAM(quad*);
+void generate_CALL(quad*);
+void generate_GETRETVAL(quad*);
+void generate_FUNCSTART(quad*);
+void generate_RETURN(quad*);
+void generate_FUNCEND(quad*);
 
 typedef void (*generator_func_t)(quad*);
 
@@ -93,6 +98,9 @@ extern vector<string> namedLibfuncs;
 extern vector<userfunc> userFuncs;
 
 extern vector<instruction> instructions;
+
+void add_incomplete_jump(unsigned int instrNo, unsigned int iaddress);
+void patch_incomplete_jumps();
 
 unsigned int consts_newNumber(double n);
 unsigned int consts_newString(string s);
