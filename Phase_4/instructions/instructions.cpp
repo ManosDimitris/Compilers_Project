@@ -288,15 +288,58 @@ void generate_NOP(quad* q){
 }
 
 /*Generate relation*/
-void generate_JUMP(quad*){}
-void generate_IF_EQ(quad*){}
-void generate_IF_NOTEQ(quad*){}
-void generate_IF_GREATER(quad*){}
-void generate_IF_GREATEREQ(quad*){}
-void generate_IF_LESS(quad*){}
-void generate_IF_LESSEQ(quad*){}
+void generate_JUMP(quad* q){
+    generate_relational(jmp_v, q);
+}
+void generate_IF_EQ(quad* q){
+    generate_relational(jeq_v, q);
+}
+void generate_IF_NOTEQ(quad* q){
+    generate_relational(jne_v, q);
+}
+void generate_IF_GREATER(quad* q){
+    generate_relational(jgt_v, q);
+}
+void generate_IF_GREATEREQ(quad* q){
+    generate_relational(jge_v, q);
+}
+void generate_IF_LESS(quad* q){
+    generate_relational(jlt_v, q);
+}
+void generate_IF_LESSEQ(quad* q){
+    generate_relational(jle_v, q);
+}
 
-void generate_NOT(quad*){}
+void generate_NOT(quad* q){
+    q->taddress = nextinstructionlabel();
+    instruction t;
+
+    t.opcode = jeq_v;
+    make_operant(q->arg1, &t.arg1);
+    make_booloperant(&t.arg2, false);
+    t.result.type = label_a;
+    t.result.val = nextinstructionlabel() + 3;
+    emit(t);
+
+    t.opcode = assign_v;
+    make_booloperant(&t.arg1, false);
+    reset_operand(&t.arg2);
+    make_operant(q->result, &t.result);
+    emit(t);
+
+    t.opcode = jmp_v;
+    reset_operand(&t.arg1);
+    reset_operand(&t.arg2);
+    t.result.type = label_a;
+    t.result.val = nextinstructionlabel() + 2;
+    emit(t);
+
+    t.opcode = assign_v;
+    make_booloperant(&t.arg1, true);
+    reset_operand(&t.arg2);
+    make_operant(q->result, &t.result);
+    emit(t);
+}
 
 void generate_OR(quad* q){
     q->taddress = nextinstructionlabel();
@@ -357,6 +400,6 @@ void generate_GETRETVAL(quad* q){
 
     emit(t);
 }
-void generate_FUNCSTART(quad*){}
-void generate_RETURN(quad*){}
-void generate_FUNCEND(quad*){}
+void generate_FUNCSTART(quad* q){}
+void generate_RETURN(quad* q){}
+void generate_FUNCEND(quad* q){}
