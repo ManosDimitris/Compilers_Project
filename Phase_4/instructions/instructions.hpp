@@ -105,6 +105,7 @@ void make_operant(expr* e, vmarg* arg);
 void make_numberoperant(vmarg* arg, double val);
 void make_booloperant(vmarg* arg, bool val);
 void make_retval(vmarg* arg);
+void reset_operant(vmarg* arg);
 
 unsigned int nextinstructionlabel();
 void emit(instruction instr);
