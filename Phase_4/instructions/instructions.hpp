@@ -48,9 +48,74 @@ struct instruction{
 struct userfunc{
     unsigned int address;
     unsigned int localSize;
-    string id;
+    string id;                  
 };
 
+typedef void (*generator_func_t)(quad*);
+
+generator_func_t generators[] = {
+    //OLA BASISMENA ME TO enum iopcode STO QUAD.HPP
+    //!! MHN ALLAXTEI KATI
+    generate_ASSIGN,
+    generate_ADD,
+    generate_SUB,
+    generate_MUL,
+    generate_DIV,
+    generate_MOD,
+    generate_UMINUS,
+    generate_AND,
+    generate_OR,
+    generate_NOT,
+    generate_IF_EQ,
+    generate_IF_NOTEQ,
+    generate_IF_LESSEQ,
+    generate_IF_GREATEREQ,
+    generate_IF_LESS,
+    generate_IF_GREATER,
+    generate_JUMP,
+    generate_CALL,
+    generate_PARAM,
+    generate_RETURN,
+    generate_GETRETVAL,
+    generate_FUNCSTART,
+    generate_FUNCEND,
+    generate_NEWTABLE,
+    generate_TABLEGETELEM,
+    generate_TABLESETELEM,
+    generate_NOP
+};
+
+/*-------------GENERATORS-------------*/
+
+extern void generate_ADD(quad*);
+extern void generate_SUB(quad*);
+extern void generate_MUL(quad*);
+extern void generate_DIV(quad*);
+extern void generate_MOD(quad*);
+extern void generate_UMINUS(quad*);
+extern void generate_AND(quad*);
+extern void generate_NEWTABLE(quad*);
+extern void generate_TABLEGETELEM(quad*);
+extern void generate_TABLESETELEM(quad*);
+extern void generate_ASSIGN(quad*);
+extern void generate_NOP(quad*);
+extern void generate_JUMP(quad*);
+extern void generate_IF_EQ(quad*);
+extern void generate_IF_NOTEQ(quad*);
+extern void generate_IF_GREATER(quad*);
+extern void generate_IF_GREATEREQ(quad*);
+extern void generate_IF_LESS(quad*);
+extern void generate_IF_LESSEQ(quad*);
+extern void generate_NOT(quad*);
+extern void generate_OR(quad*);
+extern void generate_PARAM(quad*);
+extern void generate_CALL(quad*);
+extern void generate_GETRETVAL(quad*);
+extern void generate_FUNCSTART(quad*);
+extern void generate_RETURN(quad*);
+extern void generate_FUNCEND(quad*);
+
+/*------------------------------------*/
 extern vector<double> numConsts;
 extern vector<string> stringConsts;
 extern vector<string> namedLibfuncs;
@@ -71,6 +136,8 @@ void make_booloperant(vmarg* arg, bool val);
 void make_retval(vmarg* arg);
 
 unsigned int nextinstructionlabel();
-void emit(instruction* instr);
+void emit(instruction instr);
+
+void generate();
 
 #endif

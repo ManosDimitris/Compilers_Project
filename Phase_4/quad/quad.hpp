@@ -18,7 +18,8 @@ enum iopcode {
     jump,
     call, param, ret, getretval,
     funcstart, funcend,
-    tablecreate, tablegetelem, tablesetelem
+    tablecreate, tablegetelem, tablesetelem, 
+    nop // Phase 4
 };
 
 //Ta types ton expressions poy einai apodekta
