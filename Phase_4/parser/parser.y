@@ -817,7 +817,7 @@ int main(int argc, char* argv[]){
     printQuads();
 
     generate_Default();
-
+    print_instructions();
     cout.rdbuf(backup); 
     if (file.is_open()) file.close();
     fclose(yyin);

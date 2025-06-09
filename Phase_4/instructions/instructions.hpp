@@ -5,6 +5,7 @@
 #include "../SymTable/SymTable.hpp"
 #include "../quad/quad.hpp"
 #include <stack>
+#include <iomanip> 
 
 using namespace std;
 
@@ -34,8 +35,9 @@ enum vmarg_t{
 };
 
 struct vmarg{
-    vmarg_t type;
-    unsigned int val;
+    vmarg_t type = nil_a;
+    unsigned int val = 0;
+    string name;
 };
 
 struct instruction{
@@ -127,5 +129,6 @@ void emit(instruction instr);
 
 void generate(vmopcode op,quad* quad);
 void generate_Default();
-
+void print_instructions();
+void print_Args(vmarg*); 
 #endif
