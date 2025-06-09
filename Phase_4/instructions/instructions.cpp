@@ -110,6 +110,7 @@ unsigned int userfuncs_newFunc(SymbolEntry* s){
 void variableOP(expr *e, vmarg* arg){
     assert(e->sym);
     arg->val = e->sym->offset;
+    arg->name = e->sym->name;
 
     switch(e->sym->scopespace){
         case programvar:
@@ -117,8 +118,10 @@ void variableOP(expr *e, vmarg* arg){
             break;
         case functionlocal:
             arg->type = local_a;
+            break;
         case formalarg:
             arg->type = formal_a;
+            break;
         default:
             assert(0);
     }
@@ -460,4 +463,104 @@ void generate_FUNCEND(quad* q){
     emit(t);
 
 
+}
+
+
+
+void print_instructions() {
+    cout << "\n===== AVM INSTRUCTIONS =====\n\n";
+
+    for (unsigned int i = 0; i < instructions.size(); ++i) {
+        cout << i << ":";
+        cout << setw(5);
+
+        switch (instructions[i].opcode) {
+            case assign_v:       cout << "assign\t"; break;
+            case add_v:          cout << "add\t"; break;
+            case sub_v:          cout << "sub\t"; break;
+            case mul_v:          cout << "mul\t"; break;
+            case div_v:          cout << "div\t"; break;
+            case mod_v:          cout << "mod\t"; break;
+            case uminus_v:       cout << "uminus\t"; break;
+            case and_v:          cout << "and\t"; break;
+            case or_v:           cout << "or\t"; break;
+            case not_v:          cout << "not\t"; break;
+            case jmp_v:          cout << "jump\t"; break;
+            case jeq_v:          cout << "jeq\t"; break;
+            case jne_v:          cout << "jne\t"; break;
+            case jle_v:          cout << "jle\t"; break;
+            case jge_v:          cout << "jge\t"; break;
+            case jlt_v:          cout << "jlt\t"; break;
+            case jgt_v:          cout << "jgt\t"; break;
+            case call_v:         cout << "call\t"; break;
+            case pusharg_v:      cout << "pusharg\t"; break;
+            case funcenter_v:    cout << "enterfunc\t"; break;
+            case funcexit_v:     cout << "exitfunc\t"; break;
+            case newtable_v:     cout << "newtable\t"; break;
+            case tablegetelem_v: cout << "tablegetelem\t"; break;
+            case tableselem_v:   cout << "tablesetelem\t"; break;
+            case nop_v:          cout << "nop\t"; break;
+            default:              break;
+        }
+       
+        // Operands
+        print_Args(&instructions[i].result);
+        print_Args(&instructions[i].arg1);
+        print_Args(&instructions[i].arg2);
+
+        cout << "\n";
+    }
+
+    cout << "\n=============================\n";
+}
+
+
+void print_Args(vmarg* arg) {
+    if (!arg || arg->type == nil_a || arg->type > retval_a) {
+        cout << "\t";
+        return;
+    }
+
+
+    cout  << arg->type << "(";
+    switch (arg->type) {
+        case label_a:
+            cout << "label), " << arg->val;
+            break;
+        case global_a:
+            cout << "global), " << arg->val << ":" << arg->name;
+            break;
+        case formal_a:
+            cout << "formal), " << arg->val << ":" << arg->name;
+            break;
+        case local_a:
+            cout << "local), " << arg->val << ":" << arg->name;
+            break;
+        case number_a:
+            cout << "num), " << arg->val << ":" << numConsts[arg->val];
+            break;
+        case string_a:
+            cout << "string), " << arg->val << ":\"" << stringConsts[arg->val] << "\"";
+            break;
+        case bool_a:
+            cout << "boolean), " << arg->val << ":" << (arg->val ? "true" : "false");
+            break;
+        case nil_a:
+            cout << "nil), " << arg->val << ":nil";
+            break;
+        case userfunc_a:
+            cout << "userfunc), " << arg->val << ":" << userFuncs[arg->val].id;
+            break;
+        case libfunc_a:
+            cout << "libfunc), " << arg->val << ":" << namedLibfuncs[arg->val];
+            break;
+        case retval_a:
+            cout << "retval), " << arg->val;
+            break;
+        default:
+            cout << "nop" << arg->val;
+            break;
+    }
+    cout << setw(5);
+    cout << "\t";
 }
