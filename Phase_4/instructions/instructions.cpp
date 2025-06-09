@@ -410,6 +410,12 @@ void generate_GETRETVAL(quad* q){
 }
 
 void generate_FUNCSTART(quad* q) {
+    instruction t;
+    t.opcode = jmp_v;
+    t.result.val = nextinstructionlabel();
+    t.result.type = label_a;
+    emit(t);
+
     FuncInfo f;
     f.sym = q->result->sym;
     f.sym->taddress = nextinstructionlabel();
@@ -421,7 +427,6 @@ void generate_FUNCSTART(quad* q) {
 
     userFuncs.push_back(tmp);
     funcStack.push(f);
-    instruction t;
     t.opcode = funcenter_v;
     make_operant(q->result, &t.result);
     emit(t);
@@ -432,12 +437,14 @@ void generate_RETURN(quad* q){
     q->taddress = nextinstructionlabel();
     instruction t;
     t.opcode = assign_v;
+    t.arg1.type = nil_a;
     make_retval(&t.result);
     make_operant(q->arg1,&t.arg1);
     emit(t);
-
-    FuncInfo f = funcStack.top();
-    f.returnList.push_back(nextinstructionlabel());
+    
+    
+    FuncInfo *f = &funcStack.top();
+    f->returnList.push_back(nextinstructionlabel());
 
     t.opcode = jmp_v;
     reset_operand(&t.arg1);
@@ -448,12 +455,10 @@ void generate_RETURN(quad* q){
 }
 
 void generate_FUNCEND(quad* q){
-    FuncInfo f = funcStack.top();
-    funcStack.pop();
-
-    for (int i = 0; i < f.returnList.size(); i++)
+    FuncInfo *f = &funcStack.top();
+    for (int i = 0; i < f->returnList.size(); i++)
     {
-        instructions[f.returnList[i]].result.val = nextinstructionlabel();
+        instructions[f->returnList[i]].result.val = nextinstructionlabel();
     }
     
     q->taddress = nextinstructionlabel();
@@ -461,10 +466,11 @@ void generate_FUNCEND(quad* q){
     t.opcode = funcexit_v;
     make_operant(q->result,&t.result);
     emit(t);
-
+    
+    instructions[f->sym->taddress - 1].result.val = nextinstructionlabel();
+    funcStack.pop();
 
 }
-
 
 
 void print_instructions() {

@@ -37,7 +37,7 @@ enum vmarg_t{
 struct vmarg{
     vmarg_t type = nil_a;
     unsigned int val = 0;
-    string name;
+    string name;// Gia prints.
 };
 
 struct instruction{

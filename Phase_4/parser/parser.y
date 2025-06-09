@@ -23,11 +23,13 @@
     int curr_func = 1, loopCount = 0;
     bool returnSTMT = false;
     unsigned int scopeSpaceCounter = 1;
+    bool comesFromCall = false;
 
     stack<bool> returnAvailabe; 
     ostream *outStream;
     //Helper expr* var to print the curr function name
     bool hasLibFuncName(string name);
+
     
     struct LoopContext {
         bool isLoop;
@@ -367,8 +369,8 @@ lvalue: ID {
             }else{
                 
                 if(!symTable.lookup(*$1,0) &&!symTable.lookup(*$1, scope) && found_Func) yyerror("Undefined refrence to " + *$1);
-                else if(hasLibFuncName(*$1)) yyerror("Variable " + *$1 + " cannot have the same name as a library function");
-                else if(symTable.isFunction(*$1,scope) && !returnSTMT){
+                else if(hasLibFuncName(*$1) && !comesFromCall) yyerror("Variable " + *$1 + " cannot have the same name as a library function");
+                else if(symTable.isFunction(*$1,scope) && !returnSTMT && !comesFromCall){
                         yyerror(*$1 + " Defined as function");
                 }
             }
@@ -378,7 +380,14 @@ lvalue: ID {
                 yyerror("Undefined Variable: " + *$1);
                 $$ = nullptr;
             } else {
-                $$ = NewExpr(var_e);  
+                if(entry->type == "user function"){
+                    $$ = NewExpr(programfunc_e);  
+                }else if(entry->type == "library function"){
+                    $$ = NewExpr(libraryfunc_e);  
+                }
+                else{
+                    $$ = NewExpr(var_e);  
+                }
                 $$->sym = entry;
             }
         }
@@ -513,7 +522,7 @@ call: call callsuffix{
     }
     | DOTS ID callsuffix{}
 ;
-callsuffix: normcall { $$ = $1;}
+callsuffix: {comesFromCall = true ;}normcall { $$ = $2; comesFromCall = false;} 
    // | methodcall{ $$ = $1; }
 ;
 
@@ -817,7 +826,9 @@ int main(int argc, char* argv[]){
     printQuads();
 
     generate_Default();
+    patch_incomplete_jumps();
     print_instructions();
+
     cout.rdbuf(backup); 
     if (file.is_open()) file.close();
     fclose(yyin);

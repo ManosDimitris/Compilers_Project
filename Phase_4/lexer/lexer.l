@@ -180,7 +180,8 @@ INVALID_STRING  \"([^\"\\\n]|\\.)*
                     curr_Node = root;
                     curr_Node->comment_content += "/*";
 
-                    while((c = cin.get()) != EOF){
+                    while ((c = yyinput()) != 0){
+                        
                         curr_Node = root;
                         for(int i = 0; i < nested; i++){
                             curr_Node->comment_content += (char)c;
@@ -188,26 +189,26 @@ INVALID_STRING  \"([^\"\\\n]|\\.)*
                         }
                         if(nested != 0){
                             if(c == '/'){
-                                if((c = cin.get()) == '*'){
+                                if((c = yyinput()) == '*'){
                                     nested++;
                                     temp_node = new CommentNode;
                                     temp_node->comment_content += "/*";
                                     curr_Node->children.push_back(temp_node);
                                 }
-                                else cin.putback(c);
+                                else unput(c);
                             }
                             else if(c == '*'){
-                                if((c = cin.get()) == '/'){
+                                if((c = yyinput()) == '/'){
                                     nested--;
                                     curr_Node->comment_content += "/";
                                 }
-                                else cin.putback(c);
+                                else unput(c);
                             }
-                            else if(c == '\n') ++yylineno;
+                            
                         }
                         else break;
                     }
-                    if(c == EOF){
+                    if(c == 0){
                         cout << "Error at line " << yylineno << ": Unterminated comment" << endl;
                         exit(1);
                     }
