@@ -24,6 +24,8 @@
     bool returnSTMT = false;
     unsigned int scopeSpaceCounter = 1;
     bool comesFromCall = false;
+    //For tables
+    expr* curr_table;
 
     stack<bool> returnAvailabe; 
     ostream *outStream;
@@ -51,7 +53,7 @@
     struct expr* exprVal;
 }
 
-%type <exprVal> expr assignexpr term lvalue const primary call objectdef funcdef member callsuffix normcall elist
+%type <exprVal> expr assignexpr term lvalue const primary call objectdef funcdef member callsuffix normcall elist indexed indexedelemlist indexedelem
 %type <intVal> ifprefix ifstmt;
 
 %token <strVal> IF ELSE WHILE FOR FUNCTION RETURN BREAK CONTINUE AND OR LOCAL TRUE FALSE NIL
@@ -552,18 +554,30 @@ elist : { $$ = nullptr; }
     }
 ;
 
-objectdef: LEFT_BRACKET elist RIGHT_BRACKET
-    | LEFT_BRACKET indexed RIGHT_BRACKET
+objectdef: LEFT_BRACKET elist RIGHT_BRACKET{
+        $$ =  insert_tableelist($2,curr_quad); 
+    }
+    | LEFT_BRACKET indexed RIGHT_BRACKET{
+        curr_table = nullptr;
+        $$ = $2;
+    }
+
 ;
 
-indexed: indexedelemlist
+indexed: indexedelemlist{
+    curr_table = newtemp();
+    emit(tablecreate, nullptr, nullptr, curr_table, 0, yylineno);
+    $$ = curr_table;
+}
 ;
 
 indexedelemlist: indexedelem
     | indexedelem COMMA indexedelemlist
 ;
 
-indexedelem: LEFT_CBRACKET expr COLON expr RIGHT_CBRACKET
+indexedelem: LEFT_CBRACKET expr COLON expr RIGHT_CBRACKET{
+    emit(tablesetelem, $2, $4, curr_table, 0, yylineno);    
+}
 ;
 
 block: LEFT_CBRACKET{++scope;} stmntlist RIGHT_CBRACKET{
@@ -578,6 +592,8 @@ funcdef: FUNCTION{
         ctx.isLoop = false;
         loopStack.push(ctx);
 
+        returnAvailabe.push(1);
+        
         string name = "$" + to_string(curr_func);
         symTable.insert(name, "user function", scope, yylineno);
         curr_func_expr.push(NewExpr(programfunc_e));
