@@ -113,5 +113,6 @@ expr* member_item (expr* lv, string name);
 
 
 void patchLabel(unsigned int quadNo, unsigned int label);
+expr* insert_tableelist(expr* elist, int line) ;
 
 #endif

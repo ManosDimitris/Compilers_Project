@@ -13,6 +13,7 @@ expr* NewExpr(expr_t t){
     expr *new_expr = new expr;
     new_expr->type = t;
     new_expr->next = NULL;
+
     new_expr->index = NULL;
     new_expr->sym = NULL;
     new_expr->numConst = 0.0;
@@ -78,7 +79,7 @@ string exprtToString(expr* expr){
         case arithexpr_e: return expr->sym->name;
         case boolexpr_e: return expr->sym->name; 
         case assignexpr_e: return expr->sym->name;
-        case newtable_e: return "newtable_e";
+        case newtable_e: return expr->sym->name;
         case constnum_e: oss << fixed << setprecision(1) << expr->numConst; return oss.str(); 
         case constbool_e: return (expr->boolConst) ? "True" : "false"; 
         case conststring_e: return expr->strConst;
@@ -193,4 +194,22 @@ void patchLabel(unsigned int quadNo, unsigned int label){
         exit(1);
     }
     quads[quadNo - 2]->label = label;
+}
+
+
+expr* insert_tableelist(expr* elist, int line){
+    expr* t = newtemp();
+    t->sym->name = elist->sym->name;
+    emit(tablecreate, t, nullptr, nullptr, 0, line);
+
+    expr* tmp = elist;
+    int j = 0;
+    while (tmp != nullptr) {
+        expr* newexpr = NewExpr(constnum_e);
+	    newexpr->numConst = j;
+        emit(tablesetelem, t, newexpr, tmp, -1, line);
+        tmp = tmp->next;
+        ++j;
+    }
+    return t;
 }
