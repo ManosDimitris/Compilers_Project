@@ -130,5 +130,8 @@ void emit(instruction instr);
 void generate(vmopcode op,quad* quad);
 void generate_Default();
 void print_instructions();
-void print_Args(vmarg*); 
+void print_Args(vmarg*);
+
+void serialize(string outName);
+
 #endif

@@ -570,3 +570,62 @@ void print_Args(vmarg* arg) {
     cout << setw(5);
     cout << "\t";
 }
+
+void serialize(string outName){
+    ofstream out(outName + ".abc", ios::binary);
+
+    /* Writing numConsts */
+    unsigned int n = numConsts.size();
+    out.write(reinterpret_cast<char *>(&n), sizeof(n));
+    for(double num : numConsts){
+        out.write(reinterpret_cast<char *>(&num), sizeof(num));
+    }
+
+    /* Writing string consts */
+    n = stringConsts.size();
+    out.write(reinterpret_cast<char *>(&n), sizeof(n));
+    for(const string& str : stringConsts){
+        unsigned int str_len = str.size();
+        out.write(reinterpret_cast<char *>(&str_len), sizeof(str_len));
+        out.write(str.c_str(), str_len);
+    }
+
+    /* Writing namedLibFuncs */
+    n = namedLibfuncs.size();
+    out.write(reinterpret_cast<char *>(&n), sizeof(n));
+    for(const string& libFunc : namedLibfuncs){
+        unsigned int str_len = libFunc.size();
+        out.write(reinterpret_cast<char *>(&str_len), sizeof(str_len));
+        out.write(libFunc.c_str(), str_len);
+    }
+
+    /* Writing userFuncs */
+    n = userFuncs.size();
+    out.write(reinterpret_cast<char*>(&n), sizeof(n));
+    for(const userfunc& func : userFuncs){
+        out.write(reinterpret_cast<const char*>(&func.address), sizeof(func.address));
+        out.write(reinterpret_cast<const char*>(&func.localSize), sizeof(func.localSize));
+
+        unsigned int id_len = func.id.size();
+        out.write(reinterpret_cast<const char *>(&id_len), sizeof(id_len));
+        out.write(func.id.c_str(), id_len);
+    }
+
+    /* Writing instructions */
+    n = instructions.size();
+    out.write(reinterpret_cast<char *>(&n), sizeof(n));
+    for(const instruction& inst : instructions){
+        out.write(reinterpret_cast<const char*>(&inst.opcode), sizeof(inst.opcode));
+        
+        out.write(reinterpret_cast<const char*>(&inst.result.type), sizeof(inst.result.type));
+        out.write(reinterpret_cast<const char*>(&inst.result.val), sizeof(inst.result.val));
+
+        out.write(reinterpret_cast<const char*>(&inst.arg1.type), sizeof(inst.arg1.type));
+        out.write(reinterpret_cast<const char*>(&inst.arg1.val), sizeof(inst.arg1.val));
+
+        out.write(reinterpret_cast<const char*>(&inst.arg2.type), sizeof(inst.arg2.type));
+        out.write(reinterpret_cast<const char*>(&inst.arg2.val), sizeof(inst.arg2.val));
+
+        out.write(reinterpret_cast<const char*>(&inst.srcLine), sizeof(inst.srcLine));
+    }
+}
