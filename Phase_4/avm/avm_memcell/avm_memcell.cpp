@@ -1,4 +1,6 @@
 #include "avm_memcell.hpp"
+#include <cstring>
+using namespace std;
 
 void avm_initstack (){
     for (int i = 0; i < AVM_STACKSIZE; ++i)

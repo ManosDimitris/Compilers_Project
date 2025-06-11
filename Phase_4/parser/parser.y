@@ -838,14 +838,23 @@ int main(int argc, char* argv[]){
     }
 
     yyparse();
-    symTable.display();
-    printQuads();
+    //symTable.display();
+    //printQuads();
 
     generate_Default();
     patch_incomplete_jumps();
-    print_instructions();
+    //print_instructions();
 
-    cout.rdbuf(backup); 
+    string file_name = argv[1];
+    size_t dot_pos = file_name.find(".asc");
+    string name;
+
+    if (dot_pos != string::npos) {
+        name = file_name.substr(0, dot_pos);
+    }
+
+    serialize(name);
+    
     if (file.is_open()) file.close();
     fclose(yyin);
 

@@ -1,17 +1,20 @@
 #ifndef AVM_MEMCELL_HPP
 #define AVM_MEMCELL_HPP
+#include <string>
 #include <cstring>
 #include <iostream>
 
+using namespace std;
+
 enum avm_memcell_t {
-    number_m,
-    string_m,
-    bool_m,
-    table_m,
-    userfunc_m,
-    libfunc_m,
-    nil_m,
-    undef_m
+    number_m =0,
+    string_m =1,
+    bool_m =2,
+    table_m =3,
+    userfunc_m =4,
+    libfunc_m =5,
+    nil_m =6,
+    undef_m =7
 };
 
 struct avm_table; 
@@ -21,11 +24,11 @@ struct avm_memcell {
 
     union {
         double          numVal;
-        std::string*    strVal;
+        string*         strVal;
         bool            boolVal;
-        avm_table*          tableVal;
+        avm_table*      tableVal;
         unsigned        funcVal;       
-        std::string*    libfuncVal;
+        string*         libfuncVal;
     } data;
 };
 
