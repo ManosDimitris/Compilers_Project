@@ -1,10 +1,10 @@
-# 🛠️ Alpha Language Compiler — HY340
+# Alpha Language Compiler — HY340
 
 > A full compiler and virtual machine for the **Alpha** programming language, built as part of the **HY340 — Compilers & Programming Languages** course at the **Computer Science Department, University of Crete**.
 
 ---
 
-## 📌 Overview
+## Overview
 
 This project implements a complete compiler pipeline for the **Alpha language** — from raw source code all the way down to executable bytecode running on a custom virtual machine. It is structured in **4 phases**, each building on top of the previous one.
 
@@ -12,7 +12,7 @@ This project implements a complete compiler pipeline for the **Alpha language** 
 
 ---
 
-## 📁 Project Structure
+## Project Structure
 
 ```
 Compilers_Project/
@@ -24,7 +24,7 @@ Compilers_Project/
 
 ---
 
-## 🔍 Phases
+## Phases
 
 ### Phase 1 — Lexical Analysis
 Implements a **scanner** using **Flex** that tokenizes Alpha source code.
@@ -74,7 +74,7 @@ Translates the intermediate quadruples into **binary target code** and executes 
 
 ---
 
-## 🚀 Build & Run
+##  Build & Run
 
 Each phase has its own `Makefile`. Navigate to the desired phase and build:
 
@@ -92,7 +92,7 @@ make
 
 ---
 
-## 🧪 Testing
+## Testing
 
 To run the compiler on test files:
 
@@ -104,7 +104,7 @@ This will compile and execute the specified Alpha source file using the virtual 
 
 ---
 
-## 🌐 Course Information
+## Course Information
 
 | Field       | Details                                          |
 |-------------|--------------------------------------------------|
@@ -115,15 +115,19 @@ This will compile and execute the specified Alpha source file using the virtual 
 
 ---
 
-## 👤 Author
+## Authors
 
 **Manos Dimitris**
-- 📍 Heraklion, Crete, Greece
-- 🔗 [LinkedIn](https://www.linkedin.com/in/manos-dimitris-442330273/)
-- 🐙 [GitHub](https://github.com/ManosDimitris)
+- Heraklion, Crete, Greece
+- [GitHub](https://github.com/ManosDimitris)
 
+**Tsekouras Kwstantinos**
+- [GitHub](https://github.com/KostasTsek)
+
+**Efstratios Kaitatzis**
+- [GitHub](https://github.com/stratos-kaita)
 ---
 
-## 📄 License
+## License
 
 This project was developed for academic purposes as part of the HY340 course at the University of Crete.
